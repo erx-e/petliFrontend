@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   // API_URL: 'https://localhost:44387',
   API_URL: 'https://petslighthouseapi.online',
   AWS_REGION: 'us-east-1',
