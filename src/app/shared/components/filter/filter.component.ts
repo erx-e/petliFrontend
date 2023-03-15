@@ -62,10 +62,7 @@ export class FilterComponent implements OnInit {
   postspetLoading = [null, null, null, null, null, null, null, null];
 
   async ngOnInit(): Promise<void> {
-
-
     await this.getPostsByParams();
-
 
     this.getBreedsBySpecie();
     this.getProvincias();
@@ -84,9 +81,9 @@ export class FilterComponent implements OnInit {
     }
   }
 
-  async getPostsByParams(){
-    await this.getParams()
-    await this.getPosts()
+  async getPostsByParams() {
+    await this.getParams();
+    await this.getPosts();
   }
 
   async getParams() {
@@ -133,35 +130,35 @@ export class FilterComponent implements OnInit {
     });
   }
 
-  async getPosts(){
+  async getPosts() {
     this.postpetService
-    .GetByFilter(
-      this.stateId,
-      this.petSpecieId,
-      this.petBreedId,
-      this.provinciaId,
-      this.cantonId,
-      this.sectorId,
-      this.userId,
-      this.date,
-      this.order,
-      this.limit,
-      this.offset
-    )
-    .subscribe((data) => {
-      this.postspet = []
-      if (data) {
-        this.postspet = data;
-        if (data.length < 12 || data.length > 12) {
-          this.morePostspet = false;
-        } else {
-          this.morePostspet = true;
+      .GetByFilter(
+        this.stateId,
+        this.petSpecieId,
+        this.petBreedId,
+        this.provinciaId,
+        this.cantonId,
+        this.sectorId,
+        this.userId,
+        this.date,
+        this.order,
+        this.limit,
+        this.offset
+      )
+      .subscribe((data) => {
+        this.postspet = [];
+        if (data) {
+          this.postspet = data;
+          if (data.length < 12 || data.length > 12) {
+            this.morePostspet = false;
+          } else {
+            this.morePostspet = true;
+          }
+          this.filter = false;
+          this.overflowHidden();
+          this.offset += this.limit;
         }
-        this.filter = false;
-        this.overflowHidden();
-        this.offset += this.limit;
-      }
-    });
+      });
   }
 
   onLoadMore() {
