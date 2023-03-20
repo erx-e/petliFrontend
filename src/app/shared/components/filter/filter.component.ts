@@ -60,6 +60,7 @@ export class FilterComponent implements OnInit {
   isLoadingMore: boolean = false;
 
   postspetLoading = [null, null, null, null, null, null, null, null];
+  onInit = true;
 
   async ngOnInit(): Promise<void> {
     await this.getPostsByParams();
@@ -83,7 +84,6 @@ export class FilterComponent implements OnInit {
 
   async getPostsByParams() {
     await this.getParams();
-    await this.getPosts();
   }
 
   async getParams() {
@@ -102,6 +102,7 @@ export class FilterComponent implements OnInit {
       }
       if (parseInt(params.get('raza'))) {
         this.petBreedField.setValue(params.get('raza'));
+        console.log(this.petBreedField.value)
         this.petBreedId = parseInt(params.get('raza'));
       }
       if (parseInt(params.get('provincia'))) {
@@ -127,6 +128,8 @@ export class FilterComponent implements OnInit {
       this.limit = 12;
       this.offset = 0;
       this.form.markAllAsTouched();
+
+      this.getPosts();
     });
   }
 
@@ -195,7 +198,7 @@ export class FilterComponent implements OnInit {
   private buildForm() {
     this.form = this.formBuilder.group({
       idPetSpecie: [''],
-      idPetBreed: [{ value: '', disabled: 'true' }],
+      idPetBreed: [{ value: ''}],
       idProvincia: [''],
       idCanton: [{ value: '', disabled: 'true' }],
       idSector: [{ value: '', disabled: 'true' }],
@@ -330,6 +333,12 @@ export class FilterComponent implements OnInit {
   }
 
   private getBreedsBySpecie() {
+    if(this.onInit) {
+      if(this.petSpecieField.value) {
+        this.onInit = false
+        this.categoryService.getBreedsBySpecie(this.petSpecieField.value).subscribe((breeds: breed[] | null) => (this.breeds = breeds));
+      }
+    }
     this.petSpecieField.valueChanges
       .pipe(
         switchMap((id) => {
