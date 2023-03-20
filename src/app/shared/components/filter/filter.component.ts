@@ -198,7 +198,7 @@ export class FilterComponent implements OnInit {
   private buildForm() {
     this.form = this.formBuilder.group({
       idPetSpecie: [''],
-      idPetBreed: [{ value: ''}],
+      idPetBreed: [{ value: '', disabled: 'true'}],
       idProvincia: [''],
       idCanton: [{ value: '', disabled: 'true' }],
       idSector: [{ value: '', disabled: 'true' }],
@@ -336,6 +336,7 @@ export class FilterComponent implements OnInit {
     if(this.onInit) {
       if(this.petSpecieField.value) {
         this.onInit = false
+        this.petBreedField.enable()
         this.categoryService.getBreedsBySpecie(this.petSpecieField.value).subscribe((breeds: breed[] | null) => (this.breeds = breeds));
       }
     }
