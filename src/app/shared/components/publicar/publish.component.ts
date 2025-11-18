@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
   Validators,
 } from '@angular/forms';
 import { createImgDTO, CreatePostpetDTO } from 'src/app/models/postpet.model';
@@ -31,7 +31,7 @@ import { Observable, of } from 'rxjs';
 })
 export class PublishComponent implements OnInit {
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private categoryService: CategoryService,
     private postpetService: PostpetService,
     private location: Location,
@@ -46,7 +46,7 @@ export class PublishComponent implements OnInit {
   isLoading: boolean = false;
 
   urlBucket = `${environment.BUCKET_URL}`;
-  form: FormGroup;
+  form: UntypedFormGroup;
   createdPost: CreatePostpetDTO = {
     contact: null,
     petAge: null,
@@ -118,7 +118,7 @@ export class PublishComponent implements OnInit {
       petAge: [null],
       petSpecialCondition: [null],
       contact: this.formBuilder.array([
-        new FormControl('', [
+        new UntypedFormControl('', [
           Validators.required,
           Validators.minLength(10),
           Validators.maxLength(10),
@@ -145,7 +145,7 @@ export class PublishComponent implements OnInit {
   }
 
   private CreateContactField() {
-    return new FormControl('', [
+    return new UntypedFormControl('', [
       Validators.minLength(10),
       Validators.maxLength(10),
       Validators.pattern(/^[0-9]*$/),
@@ -411,7 +411,7 @@ export class PublishComponent implements OnInit {
   }
 
   get contactField() {
-    return this.form.get('contact') as FormArray;
+    return this.form.get('contact') as UntypedFormArray;
   }
 
   // get contactFieldValid() {

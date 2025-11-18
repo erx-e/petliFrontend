@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -32,7 +32,7 @@ import { Location } from '@angular/common';
 })
 export class EditarComponent implements OnInit {
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private categoryService: CategoryService,
     private postpetService: PostpetService,
     private router: ActivatedRoute,
@@ -119,7 +119,7 @@ export class EditarComponent implements OnInit {
     }
   }
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   @Input() stateId: string = '';
 
   published: boolean = false;
@@ -184,7 +184,7 @@ export class EditarComponent implements OnInit {
       petAge: [null],
       petSpecialCondition: [null],
       contact: this.formBuilder.array([
-        new FormControl('', [
+        new UntypedFormControl('', [
           Validators.required,
           Validators.minLength(10),
           Validators.maxLength(10),
@@ -215,7 +215,7 @@ export class EditarComponent implements OnInit {
   }
 
   private CreateContactField() {
-    return new FormControl('', [
+    return new UntypedFormControl('', [
       Validators.minLength(10),
       Validators.maxLength(10),
       Validators.pattern(/^[0-9]*$/),
@@ -521,6 +521,6 @@ export class EditarComponent implements OnInit {
   }
 
   get contactField() {
-    return this.form.get('contact') as FormArray;
+    return this.form.get('contact') as UntypedFormArray;
   }
 }

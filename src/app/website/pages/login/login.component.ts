@@ -4,8 +4,8 @@ import { AuthService } from "src/app/services/auth.service";
 import { Router } from "@angular/router";
 import {
   Validators,
-  FormGroup,
-  FormBuilder,
+  UntypedFormGroup,
+  UntypedFormBuilder,
 } from "@angular/forms";
 
 @Component({
@@ -14,11 +14,11 @@ import {
   styleUrls: ["./login.component.scss"],
 })
 export class LoginComponent implements OnInit {
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   constructor(
     private authService: AuthService,
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private router: Router
   ) {
     this.buildForm();

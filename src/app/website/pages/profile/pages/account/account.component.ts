@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { UpdateUserDTO } from "src/app/models/user.model";
 import { AuthService } from "src/app/services/auth.service";
 import { UserService } from "src/app/services/user.service";
@@ -12,7 +12,7 @@ import { MyValidators } from "src/app/validators/validators";
 })
 export class AccountComponent implements OnInit {
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private userService: UserService,
     private authService: AuthService
   ) {
@@ -25,7 +25,7 @@ export class AccountComponent implements OnInit {
     );
   }
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   userUpdate: UpdateUserDTO = {
     idUser: null,
     password: null,

@@ -1,9 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
   Validators,
 } from "@angular/forms";
 import { UserView, UpdateUserDTO } from "src/app/models/user.model";
@@ -19,7 +19,7 @@ export class PublicProfileComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    private formBuilder: FormBuilder
+    private formBuilder: UntypedFormBuilder
   ) {
     this.buildForm();
   }
@@ -31,7 +31,7 @@ export class PublicProfileComponent implements OnInit {
     cellNumber: null,
   };
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   disableForm: boolean = true;
   emailAlreadyRegistered: boolean = false;
 
@@ -76,7 +76,7 @@ export class PublicProfileComponent implements OnInit {
           this.cellNumberField.removeAt(0);
         }
         this.cellNumberField.setValue([
-          new FormControl({ value: "", disabled: true }, [
+          new UntypedFormControl({ value: "", disabled: true }, [
             Validators.required,
             Validators.minLength(10),
             Validators.maxLength(10),
@@ -118,7 +118,7 @@ export class PublicProfileComponent implements OnInit {
         [Validators.required, Validators.email],
       ],
       cellNumber: this.formBuilder.array([
-        new FormControl({ value: "", disabled: true }, [
+        new UntypedFormControl({ value: "", disabled: true }, [
           Validators.required,
           Validators.minLength(10),
           Validators.maxLength(10),
@@ -138,7 +138,7 @@ export class PublicProfileComponent implements OnInit {
   }
 
   private CreateContactField() {
-    return new FormControl(
+    return new UntypedFormControl(
       { value: "", disabled: this.disableForm ? true : false },
       [
         Validators.minLength(10),
@@ -173,6 +173,6 @@ export class PublicProfileComponent implements OnInit {
   }
 
   get cellNumberField() {
-    return this.form.get("cellNumber") as FormArray;
+    return this.form.get("cellNumber") as UntypedFormArray;
   }
 }

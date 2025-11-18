@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { postpetView } from 'src/app/models/postpet.model';
 import {
   breed,
@@ -24,7 +24,7 @@ import { LoadingService } from 'src/app/services/loading.service';
 export class FilterComponent implements OnInit {
   constructor(
     private postpetService: PostpetService,
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private categoryService: CategoryService,
     private noScrollService: NoScrollService,
     private route: ActivatedRoute,
@@ -50,7 +50,7 @@ export class FilterComponent implements OnInit {
   cantones: canton[] = [];
   sectores: sector[] = [];
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   postspet: postpetView[] = null;
   limit: number = 12;
   offset: number = 0;

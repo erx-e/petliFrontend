@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { CreateUserDTO } from "src/app/models/user.model";
 import { UserService } from "src/app/services/user.service";
-import { Validators, FormGroup, FormBuilder } from "@angular/forms";
+import { Validators, UntypedFormGroup, UntypedFormBuilder } from "@angular/forms";
 import { MyValidators } from "src/app/validators/validators";
 import { ActivatedRoute, Router } from "@angular/router";
 import { userErrors } from "src/app/models/errorsModelBinding";
@@ -15,7 +15,7 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private router: Router,
     private route: ActivatedRoute,
   ) {
@@ -29,7 +29,7 @@ export class RegisterComponent implements OnInit {
       }
     })
   }
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
