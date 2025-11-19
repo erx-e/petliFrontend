@@ -1,13 +1,5 @@
 import { Injectable } from "@angular/core";
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-  HttpContextToken,
-  HttpContext,
-  HttpResponse,
-} from "@angular/common/http";
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpContextToken, HttpContext, HttpResponse } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { LoadingService } from "../services/loading.service";
 import { finalize, tap } from "rxjs/operators";

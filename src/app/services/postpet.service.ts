@@ -1,9 +1,4 @@
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpParams,
-  HttpStatusCode,
-} from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, HttpParams, HttpStatusCode } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { Response } from "../models/response.model";
