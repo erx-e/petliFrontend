@@ -1,9 +1,11 @@
 <div class="profilePublicPage">
   <div class="title__container">
     <h1 class="profilePublicPage__title">Información pública</h1>
-    <button class="editButton" *ngIf="disableForm" (click)="toggleForm()">
-      Editar
-    </button>
+    @if (disableForm) {
+      <button class="editButton" (click)="toggleForm()">
+        Editar
+      </button>
+    }
   </div>
   <div class="profilePublicPage__info">
     <form [formGroup]="form" (ngSubmit)="editInfo()">
@@ -17,114 +19,138 @@
           type="text"
           id="formName"
           formControlName="name"
-        />
-        <div class="validationMessage" [class.active]="nameFieldInvalid">
-          <p *ngIf="nameField.hasError('required')" class="invalid-feedback">
-            El nombre es requerido
-          </p>
-          <p *ngIf="nameField.hasError('pattern')" class="invalid-feedback">
-            Nombre incorrecto
-          </p>
+          />
+          <div class="validationMessage" [class.active]="nameFieldInvalid">
+            @if (nameField.hasError('required')) {
+              <p class="invalid-feedback">
+                El nombre es requerido
+              </p>
+            }
+            @if (nameField.hasError('pattern')) {
+              <p class="invalid-feedback">
+                Nombre incorrecto
+              </p>
+            }
+          </div>
         </div>
-      </div>
-      <div class="form-field">
-        <label class="form-label" for="formEmail"> Email </label>
-        <input
-          class="form-control"
-          [class.is-valid]="emailFieldValid"
-          [class.is-invalid]="emailFieldInvalid || emailAlreadyRegistered"
-          name="email"
-          type="email"
-          id="formEmail"
-          formControlName="email"
-        />
-        <div
-          class="validationMessage"
-          [class.active]="emailFieldInvalid || emailAlreadyRegistered"
-        >
-          <p *ngIf="emailAlreadyRegistered" class="invalid-feedback">
-            El email ya esta registrado
-          </p>
-          <p *ngIf="emailField.hasError('required')" class="invalid-feedback">
-            El email es requerido
-          </p>
-          <p *ngIf="emailField.hasError('email')" class="invalid-feedback">
-            No es un email valido
-          </p>
-        </div>
-      </div>
-      <div class="form-field formContact">
-        <div
-          formArrayName="cellNumber"
-          *ngFor="let contact of cellNumberField.controls; let i = index"
-        >
-          <div class="formArrayElement">
-            <label *ngIf="this.i == 0" class="form-label" for="contact"
-              >Número de contacto:
-            </label>
-            <div>
-              <input
-                type="tel"
-                class="form-control contactInput"
-                [formControlName]="i"
-                placeholder="Número de contacto"
-                [name]="i"
-                [id]="i == 0 ? 'contact' : null"
-                [class.is-valid]="this.contact.touched && this.contact.valid"
-                [class.is-invalid]="this.contact.touched && this.contact.invalid"
-              />
-              <button
-                class="addContactField"
-                *ngIf="this.i == 0 && !disableForm"
-                type="button"
-                (click)="addContactField()"
-              >
-                +
-              </button>
-            </div>
+        <div class="form-field">
+          <label class="form-label" for="formEmail"> Email </label>
+          <input
+            class="form-control"
+            [class.is-valid]="emailFieldValid"
+            [class.is-invalid]="emailFieldInvalid || emailAlreadyRegistered"
+            name="email"
+            type="email"
+            id="formEmail"
+            formControlName="email"
+            />
             <div
               class="validationMessage"
+              [class.active]="emailFieldInvalid || emailAlreadyRegistered"
+              >
+              @if (emailAlreadyRegistered) {
+                <p class="invalid-feedback">
+                  El email ya esta registrado
+                </p>
+              }
+              @if (emailField.hasError('required')) {
+                <p class="invalid-feedback">
+                  El email es requerido
+                </p>
+              }
+              @if (emailField.hasError('email')) {
+                <p class="invalid-feedback">
+                  No es un email valido
+                </p>
+              }
+            </div>
+          </div>
+          <div class="form-field formContact">
+            @for (contact of cellNumberField.controls; track contact; let i = $index) {
+              <div
+                formArrayName="cellNumber"
+                >
+                <div class="formArrayElement">
+                  @if (this.i == 0) {
+                    <label class="form-label" for="contact"
+                      >Número de contacto:
+                    </label>
+                  }
+                  <div>
+                    <input
+                      type="tel"
+                      class="form-control contactInput"
+                      [formControlName]="i"
+                      placeholder="Número de contacto"
+                      [name]="i"
+                      [id]="i == 0 ? 'contact' : null"
+                      [class.is-valid]="this.contact.touched && this.contact.valid"
+                      [class.is-invalid]="this.contact.touched && this.contact.invalid"
+                      />
+                      @if (this.i == 0 && !disableForm) {
+                        <button
+                          class="addContactField"
+                          type="button"
+                          (click)="addContactField()"
+                          >
+                          +
+                        </button>
+                      }
+                    </div>
+                    <div
+                      class="validationMessage"
               [class.active]="
                 this.contact.touched && this.contact.invalid
               "
-            >
-              <p
-                *ngIf="this.contact.hasError('required')"
-                class="invalid-feedback"
-              >
-                Ingrese un número de contacto
-              </p>
-              <p
-                *ngIf="this.contact.hasError('pattern')"
-                class="invalid-feedback"
-              >
-                Ingrese solamente números
-              </p>
-              <p
-                *ngIf="this.contact.hasError('minlength')"
-                class="invalid-feedback"
-              >
-                El número de teléfono es incorrecto
-              </p>
-              <p
-                *ngIf="this.contact.hasError('maxlength')"
-                class="invalid-feedback"
-              >
-                El número de télefono es incorrecto
-              </p>
+                      >
+                      @if (this.contact.hasError('required')) {
+                        <p
+                          class="invalid-feedback"
+                          >
+                          Ingrese un número de contacto
+                        </p>
+                      }
+                      @if (this.contact.hasError('pattern')) {
+                        <p
+                          class="invalid-feedback"
+                          >
+                          Ingrese solamente números
+                        </p>
+                      }
+                      @if (this.contact.hasError('minlength')) {
+                        <p
+                          class="invalid-feedback"
+                          >
+                          El número de teléfono es incorrecto
+                        </p>
+                      }
+                      @if (this.contact.hasError('maxlength')) {
+                        <p
+                          class="invalid-feedback"
+                          >
+                          El número de télefono es incorrecto
+                        </p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+              @if (maxFourCellNumbers) {
+                <p class="invalid-feedback">
+                  Máximo cuatro números de contacto
+                </p>
+              }
             </div>
-          </div>
+            <div class="form-buttons">
+              @if (!disableForm) {
+                <button class="editButton" type="submit">
+                  Editar
+                </button>
+              }
+              @if (!disableForm) {
+                <button class="cancelButton" (click)="toggleForm()" type="button">Cancelar</button>
+              }
+            </div>
+          </form>
         </div>
-        <p class="invalid-feedback" *ngIf="maxFourCellNumbers">
-          Máximo cuatro números de contacto
-        </p>
       </div>
-      <div class="form-buttons">
-        <button class="editButton" *ngIf="!disableForm" type="submit">
-          Editar
-        </button>
-        <button class="cancelButton" (click)="toggleForm()" *ngIf="!disableForm" type="button">Cancelar</button>
-      </div>
-    </form>
-  </div>
-</div>

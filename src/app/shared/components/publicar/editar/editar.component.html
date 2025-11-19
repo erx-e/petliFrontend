@@ -3,12 +3,13 @@
     <button class="backButton" (click)="goBack()">Back</button>
     <p class="title">Publicar mascota</p>
   </div>  <div class="formBox">
-    <form [formGroup]="form" (ngSubmit)="editPost()">
-      <div class="form-container">
-        <div class="form-element-section">
-          <p>Indique las caracteristicas de la mascota</p>
-          <div class="flex">
-            <div *ngIf="stateId != 'E' && stateId != 'A'" class="form-elements">
+  <form [formGroup]="form" (ngSubmit)="editPost()">
+    <div class="form-container">
+      <div class="form-element-section">
+        <p>Indique las caracteristicas de la mascota</p>
+        <div class="flex">
+          @if (stateId != 'E' && stateId != 'A') {
+            <div class="form-elements">
               <label class="form-label" for="petName">Nombre:</label>
               <input
                 formControlName="petName"
@@ -18,44 +19,49 @@
                 [class.is-valid]="petNameFieldValid"
                 [class.is-invalid]="petNameFieldInvalid"
                 type="text"
-              />
-              <div
-                class="validationMessage"
-                [class.active]="petNameFieldInvalid"
-              >
-                <p
-                  *ngIf="petNameField.hasError('required')"
-                  class="invalid-feedback"
-                >
-                  Debe escribir el nombre de la mascota
-                </p>
-                <p
-                  *ngIf="petNameField.hasError('minlength')"
-                  class="invalid-feedback"
-                >
-                  Debe escribir un nombre de mas de dos caracteres
-                </p>
-                <p
-                  *ngIf="petNameField.hasError('maxlength')"
-                  class="invalid-feedback"
-                >
-                  Debe escribir un nombre de menos de 12 caracteres
-                </p>
-                <p
-                  *ngIf="petNameField.hasError('pattern')"
-                  class="invalid-feedback"
-                >
-                  Debe escribir un nombre sin numeros o signos especiales
-                </p>
+                />
+                <div
+                  class="validationMessage"
+                  [class.active]="petNameFieldInvalid"
+                  >
+                  @if (petNameField.hasError('required')) {
+                    <p
+                      class="invalid-feedback"
+                      >
+                      Debe escribir el nombre de la mascota
+                    </p>
+                  }
+                  @if (petNameField.hasError('minlength')) {
+                    <p
+                      class="invalid-feedback"
+                      >
+                      Debe escribir un nombre de mas de dos caracteres
+                    </p>
+                  }
+                  @if (petNameField.hasError('maxlength')) {
+                    <p
+                      class="invalid-feedback"
+                      >
+                      Debe escribir un nombre de menos de 12 caracteres
+                    </p>
+                  }
+                  @if (petNameField.hasError('pattern')) {
+                    <p
+                      class="invalid-feedback"
+                      >
+                      Debe escribir un nombre sin numeros o signos especiales
+                    </p>
+                  }
+                </div>
               </div>
-            </div>
+            }
             <div class="form-elements">
               <p class="form-label">Tipo de mascota:</p>
               <div
                 class="btn-group full-width"
                 role="group"
                 aria-label="selector de especie"
-              >
+                >
                 <input
                   formControlName="idPetSpecie"
                   type="radio"
@@ -64,334 +70,375 @@
                   id="especie1"
                   class="btn-check"
                   autocomplete="off"
-                />
-                <label class="btn btn-outline-primary" for="especie1"
-                  >Perro</label
-                >
-                <input
-                  formControlName="idPetSpecie"
-                  type="radio"
-                  name="idPetSpecie"
-                  value="2"
-                  id="especie2"
-                  class="btn-check"
-                  autocomplete="off"
-                />
-                <label class="btn btn-outline-primary" for="especie2"
-                  >Gato</label
-                >
-              </div>
-              <div
-                class="validationMessage"
-                [class.active]="petSpecieFieldInvalid"
-              >
-                <p
-                  *ngIf="petSpecieField.hasError('required')"
-                  class="invalid-feedback"
-                >
-                  Debe seleccionar el tipo de mascota
-                </p>
-              </div>
-            </div>
-            <div class="form-elements">
-              <label class="form-label" for="formRaza">Raza: </label>
-              <select
-                class="form-select"
-                formControlName="idPetBreed"
-                name="raza"
-                id="formRaza"
-                [class.is-valid]="petBreedFieldValid"
-                [class.is-invalid]="petBreedFieldInvalid"
-              >
-                <option value="">Escoja la raza de la mascota</option>
-                <option
-                  *ngFor="let breed of breeds; let i = index"
-                  [value]="breeds[i].id"
-                >
-                  {{ breeds[i].name }}
-                </option>
-              </select>
-              <div
-                class="validationMessage"
-                [class.active]="petBreedFieldInvalid"
-              >
-                <p
-                  *ngIf="petBreedField.hasError('required')"
-                  class="invalid-feedback"
-                >
-                  Debe seleccionar la raza
-                </p>
-              </div>
-            </div>
-            <div *ngIf="stateId != 'E'" class="form-elements">
-              <label class="form-label" for="petAge">Edad: </label>
-              <input
-                type="text"
-                class="form-control"
-                formControlName="petAge"
-                placeholder="Edad de tu mascota"
-                name="petAge"
-                id="petAge"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="form-element-section">
-          <p *ngIf="stateId == 'E'">
-            Indique en donde y cuando vio a la mascota
-          </p>
-          <p *ngIf="stateId == 'B'">
-            Indique por donde y cuando se perdio la mascota
-          </p>
-          <p *ngIf="stateId == 'A' || stateId == 'H'">
-            Indique en donde se encuentra la mascota
-          </p>
-          <div class="flex">
-            <div class="form-elements">
-              <label class="form-label" for="formProvincia">Provincia: </label>
-              <select
-                class="form-select"
-                formControlName="idProvincia"
-                name="idProvincia"
-                id="formProvincia"
-                [class.is-valid]="provinciaFieldValid"
-                [class.is-invalid]="provinciaFieldInvalid"
-              >
-                <option value="">Escoja la provincia</option>
-                <option
-                  *ngFor="let provincia of provincias"
-                  [value]="provincia.id"
-                >
-                  {{ provincia.name }}
-                </option>
-              </select>
-              <div
-                class="validationMessage"
-                [class.active]="provinciaFieldInvalid"
-              >
-                <p
-                  *ngIf="provinciaField.hasError('required')"
-                  class="invalid-feedback"
-                >
-                  Debe seleccionar la provincia
-                </p>
-              </div>
-            </div>
-            <div class="form-elements">
-              <label class="form-label" for="formCanton">Canton: </label>
-              <select
-                class="form-select"
-                formControlName="idCanton"
-                name="idCanton"
-                id="formCanton"
-                [class.is-valid]="cantonFieldValid"
-                [class.is-invalid]="cantonFieldInvalid"
-              >
-                <option value="">Escoja el canton</option>
-                <option *ngFor="let canton of cantones" [value]="canton.id">
-                  {{ canton.name }}
-                </option>
-              </select>
-              <div
-                class="validationMessage"
-                [class.active]="cantonFieldInvalid"
-              >
-                <p
-                  *ngIf="cantonField.hasError('required')"
-                  class="invalid-feedback"
-                >
-                  Debe seleccionar el canton
-                </p>
-              </div>
-            </div>
-            <div
-              *ngIf="this.cantonField.value && sectores.length > 0"
-              class="form-elements"
-            >
-              <label class="form-label" for="formSector">Sector: </label>
-              <select
-                class="form-select"
-                formControlName="idSector"
-                name="sector"
-                id="formSector"
-              >
-                <option value="">Escoja el sector</option>
-                <option *ngFor="let sector of sectores" [value]="sector.id">
-                  {{ sector.name }}
-                </option>
-              </select>
-            </div>
-            <div class="form-elements" *ngIf="stateId == 'E' || stateId == 'B'">
-              <label class="form-label" for="formLastTime">Fecha y hora:</label>
-              <input
-                class="form-control"
-                formControlName="lastTimeSeen"
-                type="datetime-local"
-                name="formLastTime"
-                id="lastTime"
-                [class.is-valid]="lastTimeSeenFieldValid"
-                [class.is-invalid]="lastTimeSeenFieldInvalid"
-              />
-              <div
-                class="validationMessage"
-                [class.active]="lastTimeSeenFieldInvalid"
-              >
-                <p
-                  *ngIf="lastTimeSeenField.hasError('required')"
-                  class="invalid-feedback"
-                >
-                  Debe colocar la fecha y hora
-                </p>
-                <p
-                  *ngIf="lastTimeSeenField.hasError('invalid_date')"
-                  class="invalid-feedback"
-                >
-                  Debe colocar una fecha correcta
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="form-element-section">
-          <p>Indique datos adicionales</p>
-          <div class="">
-            <div class="textarea form-elements">
-              <div class="form-floating">
-                <textarea
-                  class="form-control textDescription"
-                  formControlName="description"
-                  name="description"
-                  id="formDescription"
-                  placeholder="Describe con detalle en que lugar y como estaba la mascota para ayudarle a encontrar dueño"
-                  [class.is-valid]="descriptionFieldValid"
-                  [class.is-invalid]="descriptionFieldInvalid"
-                ></textarea>
-                <label for="formDescription">Descripcion de detalles</label>
-              </div>
-              <div
-                class="validationMessage"
-                [class.active]="descriptionFieldInvalid"
-              >
-                <p
-                  *ngIf="descriptionField.hasError('required')"
-                  class="invalid-feedback"
-                >
-                  Debe escribir una description
-                </p>
-              </div>
-            </div>
-            <div class="form-elements formContact">
-              <div
-                formArrayName="contact"
-                *ngFor="let contact of contactField.controls; let i = index"
-              >
-                <div class="formArrayElement">
-                  <label *ngIf="this.i == 0" class="form-label" for="contact"
-                    >Número de contacto:
-                  </label>
-                  <div>
+                  />
+                  <label class="btn btn-outline-primary" for="especie1"
+                    >Perro</label
+                    >
                     <input
-                      type="tel"
-                      class="form-control contactInput"
-                      [formControlName]="i"
-                      placeholder="Número de contacto"
-                      [name]="i"
-                      [style.width.%]="i == 0 ? '87.65' : '100'"
-                      [id]="i == 0 ? 'contact' : null"
+                      formControlName="idPetSpecie"
+                      type="radio"
+                      name="idPetSpecie"
+                      value="2"
+                      id="especie2"
+                      class="btn-check"
+                      autocomplete="off"
+                      />
+                      <label class="btn btn-outline-primary" for="especie2"
+                        >Gato</label
+                        >
+                      </div>
+                      <div
+                        class="validationMessage"
+                        [class.active]="petSpecieFieldInvalid"
+                        >
+                        @if (petSpecieField.hasError('required')) {
+                          <p
+                            class="invalid-feedback"
+                            >
+                            Debe seleccionar el tipo de mascota
+                          </p>
+                        }
+                      </div>
+                    </div>
+                    <div class="form-elements">
+                      <label class="form-label" for="formRaza">Raza: </label>
+                      <select
+                        class="form-select"
+                        formControlName="idPetBreed"
+                        name="raza"
+                        id="formRaza"
+                        [class.is-valid]="petBreedFieldValid"
+                        [class.is-invalid]="petBreedFieldInvalid"
+                        >
+                        <option value="">Escoja la raza de la mascota</option>
+                        @for (breed of breeds; track breed; let i = $index) {
+                          <option
+                            [value]="breeds[i].id"
+                            >
+                            {{ breeds[i].name }}
+                          </option>
+                        }
+                      </select>
+                      <div
+                        class="validationMessage"
+                        [class.active]="petBreedFieldInvalid"
+                        >
+                        @if (petBreedField.hasError('required')) {
+                          <p
+                            class="invalid-feedback"
+                            >
+                            Debe seleccionar la raza
+                          </p>
+                        }
+                      </div>
+                    </div>
+                    @if (stateId != 'E') {
+                      <div class="form-elements">
+                        <label class="form-label" for="petAge">Edad: </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          formControlName="petAge"
+                          placeholder="Edad de tu mascota"
+                          name="petAge"
+                          id="petAge"
+                          />
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div class="form-element-section">
+                    @if (stateId == 'E') {
+                      <p>
+                        Indique en donde y cuando vio a la mascota
+                      </p>
+                    }
+                    @if (stateId == 'B') {
+                      <p>
+                        Indique por donde y cuando se perdio la mascota
+                      </p>
+                    }
+                    @if (stateId == 'A' || stateId == 'H') {
+                      <p>
+                        Indique en donde se encuentra la mascota
+                      </p>
+                    }
+                    <div class="flex">
+                      <div class="form-elements">
+                        <label class="form-label" for="formProvincia">Provincia: </label>
+                        <select
+                          class="form-select"
+                          formControlName="idProvincia"
+                          name="idProvincia"
+                          id="formProvincia"
+                          [class.is-valid]="provinciaFieldValid"
+                          [class.is-invalid]="provinciaFieldInvalid"
+                          >
+                          <option value="">Escoja la provincia</option>
+                          @for (provincia of provincias; track provincia) {
+                            <option
+                              [value]="provincia.id"
+                              >
+                              {{ provincia.name }}
+                            </option>
+                          }
+                        </select>
+                        <div
+                          class="validationMessage"
+                          [class.active]="provinciaFieldInvalid"
+                          >
+                          @if (provinciaField.hasError('required')) {
+                            <p
+                              class="invalid-feedback"
+                              >
+                              Debe seleccionar la provincia
+                            </p>
+                          }
+                        </div>
+                      </div>
+                      <div class="form-elements">
+                        <label class="form-label" for="formCanton">Canton: </label>
+                        <select
+                          class="form-select"
+                          formControlName="idCanton"
+                          name="idCanton"
+                          id="formCanton"
+                          [class.is-valid]="cantonFieldValid"
+                          [class.is-invalid]="cantonFieldInvalid"
+                          >
+                          <option value="">Escoja el canton</option>
+                          @for (canton of cantones; track canton) {
+                            <option [value]="canton.id">
+                              {{ canton.name }}
+                            </option>
+                          }
+                        </select>
+                        <div
+                          class="validationMessage"
+                          [class.active]="cantonFieldInvalid"
+                          >
+                          @if (cantonField.hasError('required')) {
+                            <p
+                              class="invalid-feedback"
+                              >
+                              Debe seleccionar el canton
+                            </p>
+                          }
+                        </div>
+                      </div>
+                      @if (this.cantonField.value && sectores.length > 0) {
+                        <div
+                          class="form-elements"
+                          >
+                          <label class="form-label" for="formSector">Sector: </label>
+                          <select
+                            class="form-select"
+                            formControlName="idSector"
+                            name="sector"
+                            id="formSector"
+                            >
+                            <option value="">Escoja el sector</option>
+                            @for (sector of sectores; track sector) {
+                              <option [value]="sector.id">
+                                {{ sector.name }}
+                              </option>
+                            }
+                          </select>
+                        </div>
+                      }
+                      @if (stateId == 'E' || stateId == 'B') {
+                        <div class="form-elements">
+                          <label class="form-label" for="formLastTime">Fecha y hora:</label>
+                          <input
+                            class="form-control"
+                            formControlName="lastTimeSeen"
+                            type="datetime-local"
+                            name="formLastTime"
+                            id="lastTime"
+                            [class.is-valid]="lastTimeSeenFieldValid"
+                            [class.is-invalid]="lastTimeSeenFieldInvalid"
+                            />
+                            <div
+                              class="validationMessage"
+                              [class.active]="lastTimeSeenFieldInvalid"
+                              >
+                              @if (lastTimeSeenField.hasError('required')) {
+                                <p
+                                  class="invalid-feedback"
+                                  >
+                                  Debe colocar la fecha y hora
+                                </p>
+                              }
+                              @if (lastTimeSeenField.hasError('invalid_date')) {
+                                <p
+                                  class="invalid-feedback"
+                                  >
+                                  Debe colocar una fecha correcta
+                                </p>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="form-element-section">
+                      <p>Indique datos adicionales</p>
+                      <div class="">
+                        <div class="textarea form-elements">
+                          <div class="form-floating">
+                            <textarea
+                              class="form-control textDescription"
+                              formControlName="description"
+                              name="description"
+                              id="formDescription"
+                              placeholder="Describe con detalle en que lugar y como estaba la mascota para ayudarle a encontrar dueño"
+                              [class.is-valid]="descriptionFieldValid"
+                              [class.is-invalid]="descriptionFieldInvalid"
+                            ></textarea>
+                            <label for="formDescription">Descripcion de detalles</label>
+                          </div>
+                          <div
+                            class="validationMessage"
+                            [class.active]="descriptionFieldInvalid"
+                            >
+                            @if (descriptionField.hasError('required')) {
+                              <p
+                                class="invalid-feedback"
+                                >
+                                Debe escribir una description
+                              </p>
+                            }
+                          </div>
+                        </div>
+                        <div class="form-elements formContact">
+                          @for (contact of contactField.controls; track contact; let i = $index) {
+                            <div
+                              formArrayName="contact"
+                              >
+                              <div class="formArrayElement">
+                                @if (this.i == 0) {
+                                  <label class="form-label" for="contact"
+                                    >Número de contacto:
+                                  </label>
+                                }
+                                <div>
+                                  <input
+                                    type="tel"
+                                    class="form-control contactInput"
+                                    [formControlName]="i"
+                                    placeholder="Número de contacto"
+                                    [name]="i"
+                                    [style.width.%]="i == 0 ? '87.65' : '100'"
+                                    [id]="i == 0 ? 'contact' : null"
                       [class.is-valid]="
                         this.contact.touched && this.contact.valid
                       "
                       [class.is-invalid]="
                         this.contact.touched && this.contact.invalid
                       "
-                    />
-                    <button
-                      class="addContactField"
-                      *ngIf="this.i == 0"
-                      type="button"
-                      (click)="addContactField()"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div
-                    class="validationMessage"
+                                    />
+                                    @if (this.i == 0) {
+                                      <button
+                                        class="addContactField"
+                                        type="button"
+                                        (click)="addContactField()"
+                                        >
+                                        +
+                                      </button>
+                                    }
+                                  </div>
+                                  <div
+                                    class="validationMessage"
                     [class.active]="
                       this.contact.touched && this.contact.invalid
                     "
-                  >
-                    <p
-                      *ngIf="this.contact.hasError('required')"
-                      class="invalid-feedback"
-                    >
-                      Ingrese un número de contacto
-                    </p>
-                    <p
-                      *ngIf="this.contact.hasError('pattern')"
-                      class="invalid-feedback"
-                    >
-                      Ingrese solamente números
-                    </p>
-                    <p
-                      *ngIf="this.contact.hasError('minlength')"
-                      class="invalid-feedback"
-                    >
-                      El número de teléfono es incorrecto
-                    </p>
-                    <p
-                      *ngIf="this.contact.hasError('maxlength')"
-                      class="invalid-feedback"
-                    >
-                      El número de télefono es incorrecto
-                    </p>
+                                    >
+                                    @if (this.contact.hasError('required')) {
+                                      <p
+                                        class="invalid-feedback"
+                                        >
+                                        Ingrese un número de contacto
+                                      </p>
+                                    }
+                                    @if (this.contact.hasError('pattern')) {
+                                      <p
+                                        class="invalid-feedback"
+                                        >
+                                        Ingrese solamente números
+                                      </p>
+                                    }
+                                    @if (this.contact.hasError('minlength')) {
+                                      <p
+                                        class="invalid-feedback"
+                                        >
+                                        El número de teléfono es incorrecto
+                                      </p>
+                                    }
+                                    @if (this.contact.hasError('maxlength')) {
+                                      <p
+                                        class="invalid-feedback"
+                                        >
+                                        El número de télefono es incorrecto
+                                      </p>
+                                    }
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                            @if (maxFourContactNumbers) {
+                              <p class="invalid-feedback">
+                                Máximo cuatro números de contacto
+                              </p>
+                            }
+                          </div>
+                          @if (stateId == 'B') {
+                            <div class="form-elements">
+                              <label class="form-label" for="reward">Recompensa:</label>
+                              <input
+                                formControlName="reward"
+                                id="reward"
+                                class="form-control"
+                                type="number"
+                                [class.is-valid]="rewardFieldValid"
+                                [class.is-invalid]="rewardFieldInvalid"
+                                placeholder="Cantidad de la recompensa"
+                                />
+                                <div
+                                  class="validationMessage"
+                                  [class.active]="rewardFieldInvalid"
+                                  >
+                                  @if (rewardField.hasError('min')) {
+                                    <p class="invalid-feedback">
+                                      Debe ingresar una cantidad mayor a cero
+                                    </p>
+                                  }
+                                  @if (rewardField.hasError('max')) {
+                                    <p class="invalid-feedback">
+                                      Debe ingresar una cantidad menor a 100.000
+                                    </p>
+                                  }
+                                </div>
+                              </div>
+                            }
+                            <div>
+                              <app-uploader [published]="published" [imgsUrlUpdating]="imgUrls" [imgsUrlUpdatingToShow]="imgUrlsOrigin" [updating]="true"  (changeUpdate)="onUrlsChange($event)"></app-uploader>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          class="submit-btn"
+                          type="submit"
+                          [disabled]="disableSubmit"
+                          >
+                          @if (!isLoading) {
+                            <span>
+                              Editar publicación
+                            </span>
+                          } @else {
+                            <app-spinner></app-spinner>
+                          }
+                        </button>
+                      </div>
+                    </form>
                   </div>
-                </div>
-              </div>
-              <p class="invalid-feedback" *ngIf="maxFourContactNumbers">
-                Máximo cuatro números de contacto
-              </p>
-            </div>
-            <div *ngIf="stateId == 'B'" class="form-elements">
-              <label class="form-label" for="reward">Recompensa:</label>
-              <input
-                formControlName="reward"
-                id="reward"
-                class="form-control"
-                type="number"
-                [class.is-valid]="rewardFieldValid"
-                [class.is-invalid]="rewardFieldInvalid"
-                placeholder="Cantidad de la recompensa"
-              />
-              <div
-                class="validationMessage"
-                [class.active]="rewardFieldInvalid"
-              >
-                <p *ngIf="rewardField.hasError('min')" class="invalid-feedback">
-                  Debe ingresar una cantidad mayor a cero
-                </p>
-                <p *ngIf="rewardField.hasError('max')" class="invalid-feedback">
-                  Debe ingresar una cantidad menor a 100.000
-                </p>
-              </div>
-            </div>
-            <div>
-              <app-uploader [published]="published" [imgsUrlUpdating]="imgUrls" [imgsUrlUpdatingToShow]="imgUrlsOrigin" [updating]="true"  (changeUpdate)="onUrlsChange($event)"></app-uploader>
-            </div>
-          </div>
-        </div>
-        <button
-          class="submit-btn"
-          type="submit"
-          [disabled]="disableSubmit"
-        >
-        <span *ngIf="!isLoading; else loading">
-          Editar publicación
-        </span>
-        <ng-template #loading>
-          <app-spinner></app-spinner>
-        </ng-template>
-        </button>
-      </div>
-    </form>
-  </div>
-</main>
+                </main>

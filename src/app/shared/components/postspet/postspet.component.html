@@ -1,24 +1,28 @@
-<div class="postpets--grid" *ngIf="postspet[0]; else loading" [class.profileGrid]="profilePosts">
-  <app-postpet
-    [postpet]="postpet"
-    *ngFor="let postpet of postspet"
-  ></app-postpet>
-</div>
-<ng-template #loading>
+@if (postspet[0]) {
   <div class="postpets--grid" [class.profileGrid]="profilePosts">
-    <app-postpet
-      [postpet]="postpet"
-      *ngFor="let postpet of postspet"
-    ></app-postpet>
+    @for (postpet of postspet; track postpet) {
+      <app-postpet
+        [postpet]="postpet"
+      ></app-postpet>
+    }
   </div>
-</ng-template>
+} @else {
+  <div class="postpets--grid" [class.profileGrid]="profilePosts">
+    @for (postpet of postspet; track postpet) {
+      <app-postpet
+        [postpet]="postpet"
+      ></app-postpet>
+    }
+  </div>
+}
 <div>
   <div class="load-container">
     <button id="load-button" class="load-button" (click)="onLoadMore()">
-      <span *ngIf="!isLoadingMore; else loadingMore">Cargar más</span>
-      <ng-template #loadingMore>
+      @if (!isLoadingMore) {
+        <span>Cargar más</span>
+      } @else {
         <app-spinner> </app-spinner>
-      </ng-template>
+      }
     </button>
   </div>
 </div>

@@ -1,150 +1,164 @@
-<div
-  class="filter-container-mobile show-mobile-flex"
-  *ngIf="!userId"
-  [class.toggle-filter]="filter"
->
-  <div class="filter-main">
-    <div class="filtro-title">
-      <div class="icon-container-filter">
-        <i class="icon-closeFilter" (click)="toggleFilter()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-            <path
-              d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"
-            />
-          </svg>
-        </i>
-      </div>
-      <p>Filtro</p>
-    </div>
-    <form [formGroup]="form" class="form-container">
-      <div class="form-filter-element">
-        <p class="form-label">Tipo de mascota</p>
-        <div
-          class="btn-group full-width"
-          role="group"
-          aria-label="selector de especie"
-        >
-          <input
-            formControlName="idPetSpecie"
-            type="radio"
-            name="idPetSpecie"
-            value="1"
-            id="especie1"
-            class="btn-check"
-            autocomplete="off"
-          />
-          <label class="btn btn-outline-primary" for="especie1">Perro</label>
-          <input
-            formControlName="idPetSpecie"
-            type="radio"
-            name="idPetSpecie"
-            value="2"
-            id="especie2"
-            class="btn-check"
-            autocomplete="off"
-          />
-          <label class="btn btn-outline-primary" for="especie2">Gato</label>
+@if (!userId) {
+  <div
+    class="filter-container-mobile show-mobile-flex"
+    [class.toggle-filter]="filter"
+    >
+    <div class="filter-main">
+      <div class="filtro-title">
+        <div class="icon-container-filter">
+          <i class="icon-closeFilter" (click)="toggleFilter()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+              <path
+                d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"
+                />
+              </svg>
+            </i>
+          </div>
+          <p>Filtro</p>
         </div>
-      </div>
-      <div class="form-filter-element">
-        <label class="form-label" for="formRaza">Raza: </label>
-        <select
-          class="form-select"
-          formControlName="idPetBreed"
-          name="raza"
-          id="formRaza"
-        >
-          <option value="">Escoja la raza</option>
-          <option
-            *ngFor="let breed of breeds; let i = index"
-            [value]="breeds[i].id"
-          >
-            {{ breeds[i].name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-filter-element">
-        <label class="form-label" for="formProvincia">Provincia: </label>
-        <select
-          class="form-select"
-          formControlName="idProvincia"
-          name="idProvincia"
-          id="formProvincia"
-        >
-          <option value="">Escoja la provincia</option>
-          <option *ngFor="let provincia of provincias" [value]="provincia.id">
-            {{ provincia.name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-filter-element">
-        <label class="form-label" for="formCanton">Canton: </label>
-        <select
-          class="form-select"
-          formControlName="idCanton"
-          name="idCanton"
-          id="formCanton"
-        >
-          <option value="">Escoja el canton</option>
-          <option *ngFor="let canton of cantones" [value]="canton.id">
-            {{ canton.name }}
-          </option>
-        </select>
-      </div>
-      <div *ngIf="sectores.length > 0" class="form-filter-element">
-        <label class="form-label" for="formSector">Sector: </label>
-        <select
-          class="form-select"
-          formControlName="idSector"
-          name="sector"
-          id="formSector"
-        >
-          <option value="">Escoja el sector</option>
-          <option *ngFor="let sector of sectores" [value]="sector.id">
-            {{ sector.name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-filter-element" *ngIf="stateId == 'B' || stateId == 'E'">
-        <label class="form-label" for="formLastTime"
-          >Cuando fue visto por ultima vez:</label
-        >
-        <input
-          class="form-control"
-          formControlName="lastTimeSeen"
-          type="datetime-local"
-          name="formLastTime"
-          id="lastTime"
-        />
-        <div
-          class="validationMessage"
-          [class.active]="lastTimeSeenFieldInvalid"
-        >
-          <p
-            *ngIf="lastTimeSeenField.hasError('invalid_date')"
-            class="invalid-feedback"
-          >
-            Debe colocar una fecha correcta
-          </p>
-        </div>
-      </div>
-      <div class="form-filter-element" *ngIf="stateId == 'B' || stateId == 'E'">
-        <label class="form-label" for="order">Ordernar por: </label>
-        <select
-          class="form-select"
-          formControlName="order"
-          name="order"
-          id="order"
-        >
-          <option value="0">Vistos (más recientes)</option>
-          <option value="1">Vistos (más antiguos)</option>
-        </select>
-      </div>
-      <div class="submitButtons">
-        <a
-          class="btnSubmit btn-clear"
-          routerLink="."
-          (click)="cleanForm()"
+        <form [formGroup]="form" class="form-container">
+          <div class="form-filter-element">
+            <p class="form-label">Tipo de mascota</p>
+            <div
+              class="btn-group full-width"
+              role="group"
+              aria-label="selector de especie"
+              >
+              <input
+                formControlName="idPetSpecie"
+                type="radio"
+                name="idPetSpecie"
+                value="1"
+                id="especie1"
+                class="btn-check"
+                autocomplete="off"
+                />
+                <label class="btn btn-outline-primary" for="especie1">Perro</label>
+                <input
+                  formControlName="idPetSpecie"
+                  type="radio"
+                  name="idPetSpecie"
+                  value="2"
+                  id="especie2"
+                  class="btn-check"
+                  autocomplete="off"
+                  />
+                  <label class="btn btn-outline-primary" for="especie2">Gato</label>
+                </div>
+              </div>
+              <div class="form-filter-element">
+                <label class="form-label" for="formRaza">Raza: </label>
+                <select
+                  class="form-select"
+                  formControlName="idPetBreed"
+                  name="raza"
+                  id="formRaza"
+                  >
+                  <option value="">Escoja la raza</option>
+                  @for (breed of breeds; track breed; let i = $index) {
+                    <option
+                      [value]="breeds[i].id"
+                      >
+                      {{ breeds[i].name }}
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="form-filter-element">
+                <label class="form-label" for="formProvincia">Provincia: </label>
+                <select
+                  class="form-select"
+                  formControlName="idProvincia"
+                  name="idProvincia"
+                  id="formProvincia"
+                  >
+                  <option value="">Escoja la provincia</option>
+                  @for (provincia of provincias; track provincia) {
+                    <option [value]="provincia.id">
+                      {{ provincia.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="form-filter-element">
+                <label class="form-label" for="formCanton">Canton: </label>
+                <select
+                  class="form-select"
+                  formControlName="idCanton"
+                  name="idCanton"
+                  id="formCanton"
+                  >
+                  <option value="">Escoja el canton</option>
+                  @for (canton of cantones; track canton) {
+                    <option [value]="canton.id">
+                      {{ canton.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+              @if (sectores.length > 0) {
+                <div class="form-filter-element">
+                  <label class="form-label" for="formSector">Sector: </label>
+                  <select
+                    class="form-select"
+                    formControlName="idSector"
+                    name="sector"
+                    id="formSector"
+                    >
+                    <option value="">Escoja el sector</option>
+                    @for (sector of sectores; track sector) {
+                      <option [value]="sector.id">
+                        {{ sector.name }}
+                      </option>
+                    }
+                  </select>
+                </div>
+              }
+              @if (stateId == 'B' || stateId == 'E') {
+                <div class="form-filter-element">
+                  <label class="form-label" for="formLastTime"
+                    >Cuando fue visto por ultima vez:</label
+                    >
+                    <input
+                      class="form-control"
+                      formControlName="lastTimeSeen"
+                      type="datetime-local"
+                      name="formLastTime"
+                      id="lastTime"
+                      />
+                      <div
+                        class="validationMessage"
+                        [class.active]="lastTimeSeenFieldInvalid"
+                        >
+                        @if (lastTimeSeenField.hasError('invalid_date')) {
+                          <p
+                            class="invalid-feedback"
+                            >
+                            Debe colocar una fecha correcta
+                          </p>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (stateId == 'B' || stateId == 'E') {
+                    <div class="form-filter-element">
+                      <label class="form-label" for="order">Ordernar por: </label>
+                      <select
+                        class="form-select"
+                        formControlName="order"
+                        name="order"
+                        id="order"
+                        >
+                        <option value="0">Vistos (más recientes)</option>
+                        <option value="1">Vistos (más antiguos)</option>
+                      </select>
+                    </div>
+                  }
+                  <div class="submitButtons">
+                    <a
+                      class="btnSubmit btn-clear"
+                      routerLink="."
+                      (click)="cleanForm()"
           [queryParams]="{
             especie: null,
             raza: null,
@@ -154,11 +168,11 @@
             fecha: null,
             orden: null
           }"
-          >Limpiar</a
-        >
-        <a
-          class="btnSubmit btn-apply"
-          routerLink="."
+                      >Limpiar</a
+                      >
+                      <a
+                        class="btnSubmit btn-apply"
+                        routerLink="."
           [queryParams]="{
             especie: petSpecieField.value ? petSpecieField.value : null,
             raza: petBreedField.value ? petBreedField.value : null,
@@ -171,171 +185,196 @@
                 ? orderField.value
                 : null
           }"
-          >Aplicar</a
-        >
-      </div>
-    </form>
-  </div>
-  <div (click)="toggleFilter()" class="side-background"></div>
-</div>
+                        >Aplicar</a
+                        >
+                      </div>
+                    </form>
+                  </div>
+                  <div (click)="toggleFilter()" class="side-background"></div>
+                </div>
+              }
 
-<div class="allContainer">
-  <div *ngIf="!userId" class="buttons-container show-mobile-flex">
-    <i (click)="toggleFilter()" class="icon-filter">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-        <path
-          d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"
-        />
-      </svg>
-    </i>
-    <a routerLink="publicar" class="publicPet show-mobile"
-      ><span *ngIf="stateId == 'E'">Publica a la mascota que encontraste</span
-      ><span *ngIf="stateId == 'B'">Publica a tu mascota perdida</span>
-      <span *ngIf="stateId == 'A'">Publica la mascota en adopción</span>
-      <span *ngIf="stateId == 'H'"
-        >Publica la mascota necesitada de ayuda</span
-      ></a
-    >
-  </div>
+              <div class="allContainer">
+                @if (!userId) {
+                  <div class="buttons-container show-mobile-flex">
+                    <i (click)="toggleFilter()" class="icon-filter">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <path
+                          d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"
+                          />
+                        </svg>
+                      </i>
+                      <a routerLink="publicar" class="publicPet show-mobile"
+                        >@if (stateId == 'E') {
+                        <span>Publica a la mascota que encontraste</span
+                          >
+                        }@if (stateId == 'B') {
+                        <span>Publica a tu mascota perdida</span>
+                      }
+                      @if (stateId == 'A') {
+                        <span>Publica la mascota en adopción</span>
+                      }
+                      @if (stateId == 'H') {
+                        <span
+                          >Publica la mascota necesitada de ayuda</span
+                          >
+                          }</a
+                          >
+                        </div>
+                      }
 
-  <main class="mainContainer">
-    <div *ngIf="!userId" class="filter-container hide-mobile">
-      <aside>
-        <p class="filter-title">Filtro</p>
-        <form [formGroup]="form" class="form-container">
-          <div class="form-filter-element">
-            <p class="form-label">Tipo de mascota</p>
-            <div
-              class="btn-group full-width"
-              role="group"
-              aria-label="selector de especie"
-            >
-              <input
-                formControlName="idPetSpecie"
-                type="radio"
-                name="idPetSpecie"
-                value="1"
-                id="especie3"
-                class="btn-check"
-                autocomplete="off"
-              />
-              <label class="btn btn-outline-primary" for="especie3"
-                >Perro</label
-              >
-              <input
-                formControlName="idPetSpecie"
-                type="radio"
-                name="idPetSpecie"
-                value="2"
-                id="especie4"
-                class="btn-check"
-                autocomplete="off"
-              />
-              <label class="btn btn-outline-primary" for="especie4">Gato</label>
-            </div>
-          </div>
-          <div class="form-filter-element">
-            <label class="form-label" for="formRaza">Raza: </label>
-            <select
-              class="form-select"
-              formControlName="idPetBreed"
-              name="raza"
-              id="formRaza"
-            >
-              <option value="">Escoja la raza</option>
-              <option
-                *ngFor="let breed of breeds; let i = index"
-                [value]="breeds[i].id"
-              >
-                {{ breeds[i].name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-filter-element">
-            <label class="form-label" for="formProvincia">Provincia: </label>
-            <select
-              class="form-select"
-              formControlName="idProvincia"
-              name="idProvincia"
-              id="formProvincia"
-            >
-              <option value="">Escoja la provincia</option>
-              <option
-                *ngFor="let provincia of provincias"
-                [value]="provincia.id"
-              >
-                {{ provincia.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-filter-element">
-            <label class="form-label" for="formCanton">Canton: </label>
-            <select
-              class="form-select"
-              formControlName="idCanton"
-              name="idCanton"
-              id="formCanton"
-            >
-              <option value="">Escoja el canton</option>
-              <option *ngFor="let canton of cantones" [value]="canton.id">
-                {{ canton.name }}
-              </option>
-            </select>
-          </div>
-          <div *ngIf="sectores.length > 0" class="form-filter-element">
-            <label class="form-label" for="formSector">Sector: </label>
-            <select
-              class="form-select"
-              formControlName="idSector"
-              name="sector"
-              id="formSector"
-            >
-              <option value="">Escoja el sector</option>
-              <option *ngFor="let sector of sectores" [value]="sector.id">
-                {{ sector.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-filter-element" *ngIf="stateId == 'B' || stateId == 'E'">
-            <label class="form-label" for="formLastTime"
-              >Cuando fue visto por ultima vez:</label
-            >
-            <input
-              class="form-control"
-              formControlName="lastTimeSeen"
-              type="datetime-local"
-              name="formLastTime"
-              id="lastTime"
-            />
-            <div
-              class="validationMessage"
-              [class.active]="lastTimeSeenFieldInvalid"
-            >
-              <p
-                *ngIf="lastTimeSeenField.hasError('invalid_date')"
-                class="invalid-feedback"
-              >
-                Debe colocar una fecha correcta
-              </p>
-            </div>
-          </div>
-          <div class="form-filter-element" *ngIf="stateId == 'B' || stateId == 'E'">
-            <label class="form-label" for="order">Ordernar por: </label>
-            <select
-              class="form-select"
-              formControlName="order"
-              name="order"
-              id="order"
-            >
-              <option value="0">Vistos (más recientes)</option>
-              <option value="1">Vistos (más antiguos)</option>
-            </select>
-          </div>
-          <div class="submitButtons">
-            <a
-              class="btnSubmit btn-clear"
-              routerLink="."
-              (click)="cleanForm()"
+                      <main class="mainContainer">
+                        @if (!userId) {
+                          <div class="filter-container hide-mobile">
+                            <aside>
+                              <p class="filter-title">Filtro</p>
+                              <form [formGroup]="form" class="form-container">
+                                <div class="form-filter-element">
+                                  <p class="form-label">Tipo de mascota</p>
+                                  <div
+                                    class="btn-group full-width"
+                                    role="group"
+                                    aria-label="selector de especie"
+                                    >
+                                    <input
+                                      formControlName="idPetSpecie"
+                                      type="radio"
+                                      name="idPetSpecie"
+                                      value="1"
+                                      id="especie3"
+                                      class="btn-check"
+                                      autocomplete="off"
+                                      />
+                                      <label class="btn btn-outline-primary" for="especie3"
+                                        >Perro</label
+                                        >
+                                        <input
+                                          formControlName="idPetSpecie"
+                                          type="radio"
+                                          name="idPetSpecie"
+                                          value="2"
+                                          id="especie4"
+                                          class="btn-check"
+                                          autocomplete="off"
+                                          />
+                                          <label class="btn btn-outline-primary" for="especie4">Gato</label>
+                                        </div>
+                                      </div>
+                                      <div class="form-filter-element">
+                                        <label class="form-label" for="formRaza">Raza: </label>
+                                        <select
+                                          class="form-select"
+                                          formControlName="idPetBreed"
+                                          name="raza"
+                                          id="formRaza"
+                                          >
+                                          <option value="">Escoja la raza</option>
+                                          @for (breed of breeds; track breed; let i = $index) {
+                                            <option
+                                              [value]="breeds[i].id"
+                                              >
+                                              {{ breeds[i].name }}
+                                            </option>
+                                          }
+                                        </select>
+                                      </div>
+                                      <div class="form-filter-element">
+                                        <label class="form-label" for="formProvincia">Provincia: </label>
+                                        <select
+                                          class="form-select"
+                                          formControlName="idProvincia"
+                                          name="idProvincia"
+                                          id="formProvincia"
+                                          >
+                                          <option value="">Escoja la provincia</option>
+                                          @for (provincia of provincias; track provincia) {
+                                            <option
+                                              [value]="provincia.id"
+                                              >
+                                              {{ provincia.name }}
+                                            </option>
+                                          }
+                                        </select>
+                                      </div>
+                                      <div class="form-filter-element">
+                                        <label class="form-label" for="formCanton">Canton: </label>
+                                        <select
+                                          class="form-select"
+                                          formControlName="idCanton"
+                                          name="idCanton"
+                                          id="formCanton"
+                                          >
+                                          <option value="">Escoja el canton</option>
+                                          @for (canton of cantones; track canton) {
+                                            <option [value]="canton.id">
+                                              {{ canton.name }}
+                                            </option>
+                                          }
+                                        </select>
+                                      </div>
+                                      @if (sectores.length > 0) {
+                                        <div class="form-filter-element">
+                                          <label class="form-label" for="formSector">Sector: </label>
+                                          <select
+                                            class="form-select"
+                                            formControlName="idSector"
+                                            name="sector"
+                                            id="formSector"
+                                            >
+                                            <option value="">Escoja el sector</option>
+                                            @for (sector of sectores; track sector) {
+                                              <option [value]="sector.id">
+                                                {{ sector.name }}
+                                              </option>
+                                            }
+                                          </select>
+                                        </div>
+                                      }
+                                      @if (stateId == 'B' || stateId == 'E') {
+                                        <div class="form-filter-element">
+                                          <label class="form-label" for="formLastTime"
+                                            >Cuando fue visto por ultima vez:</label
+                                            >
+                                            <input
+                                              class="form-control"
+                                              formControlName="lastTimeSeen"
+                                              type="datetime-local"
+                                              name="formLastTime"
+                                              id="lastTime"
+                                              />
+                                              <div
+                                                class="validationMessage"
+                                                [class.active]="lastTimeSeenFieldInvalid"
+                                                >
+                                                @if (lastTimeSeenField.hasError('invalid_date')) {
+                                                  <p
+                                                    class="invalid-feedback"
+                                                    >
+                                                    Debe colocar una fecha correcta
+                                                  </p>
+                                                }
+                                              </div>
+                                            </div>
+                                          }
+                                          @if (stateId == 'B' || stateId == 'E') {
+                                            <div class="form-filter-element">
+                                              <label class="form-label" for="order">Ordernar por: </label>
+                                              <select
+                                                class="form-select"
+                                                formControlName="order"
+                                                name="order"
+                                                id="order"
+                                                >
+                                                <option value="0">Vistos (más recientes)</option>
+                                                <option value="1">Vistos (más antiguos)</option>
+                                              </select>
+                                            </div>
+                                          }
+                                          <div class="submitButtons">
+                                            <a
+                                              class="btnSubmit btn-clear"
+                                              routerLink="."
+                                              (click)="cleanForm()"
               [queryParams]="{
                 especie: null,
                 raza: null,
@@ -344,11 +383,11 @@
                 sector: null,
                 fecha: null
               }"
-              >Limpiar</a
-            >
-            <a
-              class="btnSubmit btn-apply"
-              routerLink="."
+                                              >Limpiar</a
+                                              >
+                                              <a
+                                                class="btnSubmit btn-apply"
+                                                routerLink="."
               [queryParams]="{
                 especie: petSpecieField.value ? petSpecieField.value : null,
                 raza: petBreedField.value ? petBreedField.value : null,
@@ -361,54 +400,67 @@
                     ? orderField.value
                     : null
               }"
-              >Aplicar</a
-            >
-          </div>
-        </form>
-      </aside>
-    </div>
-    <div class="post-container" [class.profilePostsContainer] = "userId">
-      <a *ngIf="!userId" routerLink="publicar" class="publicPet hide-mobile"
-        ><span *ngIf="stateId == 'E'">Publica la mascota que encontraste</span
-        ><span *ngIf="stateId == 'B'">Publica a tu mascota perdida</span>
-        <span *ngIf="stateId == 'A'">Publica la mascota en adopción</span>
-        <span *ngIf="stateId == 'H'"
-          >Publica la mascota necesitada de ayuda</span
-        >
-      </a>
-      <div class="posts" [class.profilePosts] = "userId" *ngIf="postspet; else loading">
-        <div *ngIf="postspet.length > 0; else petsNotFound">
-          <app-postspet
-            [isLoadingMore]="isLoadingMore"
-            [profilePosts]="userId != null"
-            [morePostspet]="morePostspet"
-            [postspet]="postspet"
-            (loadMore)="onLoadMore()"
-          ></app-postspet>
-        </div>
-        <ng-template #petsNotFound>
-          <div>
-            <div class="notFound">
-              <img
-                class="notFound__img"
-                src="../../assets/imgs/notFound.png"
-                alt="404 not found"
-              />
-              <p class="notFound__text">Mascotas no encontradas</p>
-            </div>
-          </div>
-        </ng-template>
-      </div>
-      <ng-template #loading>
-        <div class="postsLoading" [class.profilePosts] = "userId">
-          <app-postspet
-            [morePostspet]="false"
-            [profilePosts]="userId != null"
-            [postspet]="postspetLoading"
-            (loadMore)="onLoadMore()"
-          ></app-postspet>
-        </div>
-      </ng-template>
-    </div>
-  </main>
-</div>
+                                                >Aplicar</a
+                                                >
+                                              </div>
+                                            </form>
+                                          </aside>
+                                        </div>
+                                      }
+                                      <div class="post-container" [class.profilePostsContainer] = "userId">
+                                        @if (!userId) {
+                                          <a routerLink="publicar" class="publicPet hide-mobile"
+                                            >@if (stateId == 'E') {
+                                            <span>Publica la mascota que encontraste</span
+                                              >
+                                            }@if (stateId == 'B') {
+                                            <span>Publica a tu mascota perdida</span>
+                                          }
+                                          @if (stateId == 'A') {
+                                            <span>Publica la mascota en adopción</span>
+                                          }
+                                          @if (stateId == 'H') {
+                                            <span
+                                              >Publica la mascota necesitada de ayuda</span
+                                              >
+                                            }
+                                          </a>
+                                        }
+                                        @if (postspet) {
+                                          <div class="posts" [class.profilePosts] = "userId">
+                                            @if (postspet.length > 0) {
+                                              <div>
+                                                <app-postspet
+                                                  [isLoadingMore]="isLoadingMore"
+                                                  [profilePosts]="userId != null"
+                                                  [morePostspet]="morePostspet"
+                                                  [postspet]="postspet"
+                                                  (loadMore)="onLoadMore()"
+                                                ></app-postspet>
+                                              </div>
+                                            } @else {
+                                              <div>
+                                                <div class="notFound">
+                                                  <img
+                                                    class="notFound__img"
+                                                    src="../../assets/imgs/notFound.png"
+                                                    alt="404 not found"
+                                                    />
+                                                    <p class="notFound__text">Mascotas no encontradas</p>
+                                                  </div>
+                                                </div>
+                                              }
+                                            </div>
+                                          } @else {
+                                            <div class="postsLoading" [class.profilePosts] = "userId">
+                                              <app-postspet
+                                                [morePostspet]="false"
+                                                [profilePosts]="userId != null"
+                                                [postspet]="postspetLoading"
+                                                (loadMore)="onLoadMore()"
+                                              ></app-postspet>
+                                            </div>
+                                          }
+                                        </div>
+                                      </main>
+                                    </div>

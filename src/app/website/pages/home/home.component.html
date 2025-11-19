@@ -18,18 +18,19 @@
         <a routerLink="/encuentra">
           <i
             ><img
-              class="link_icon"
-              src="./assets/imgs/link_icon.png"
-              alt="link"
+            class="link_icon"
+            src="./assets/imgs/link_icon.png"
+            alt="link"
           /></i>
         </a>
       </div>
       <div class="seccion__postspet">
-        <app-postpet
-          *ngFor="let postpet of postspetEncuentra"
-          [home]="true"
-          [postpet]="postpet"
-        ></app-postpet>
+        @for (postpet of postspetEncuentra; track postpet) {
+          <app-postpet
+            [home]="true"
+            [postpet]="postpet"
+          ></app-postpet>
+        }
       </div>
     </section>
     <section class="seccion">
@@ -38,18 +39,19 @@
         <a routerLink="/encuentra">
           <i
             ><img
-              class="link_icon"
-              src="./assets/imgs/link_icon.png"
-              alt="link"
+            class="link_icon"
+            src="./assets/imgs/link_icon.png"
+            alt="link"
           /></i>
         </a>
       </div>
       <div class="seccion__postspet">
-        <app-postpet
-          *ngFor="let postpet of postspetDifunde"
-          [home]="true"
-          [postpet]="postpet"
-        ></app-postpet>
+        @for (postpet of postspetDifunde; track postpet) {
+          <app-postpet
+            [home]="true"
+            [postpet]="postpet"
+          ></app-postpet>
+        }
       </div>
     </section>
     <section class="seccion">
@@ -58,18 +60,19 @@
         <a routerLink="/encuentra">
           <i
             ><img
-              class="link_icon"
-              src="./assets/imgs/link_icon.png"
-              alt="link"
+            class="link_icon"
+            src="./assets/imgs/link_icon.png"
+            alt="link"
           /></i>
         </a>
       </div>
       <div class="seccion__postspet">
-        <app-postpet
-          *ngFor="let postpet of postspetAdopta"
-          [home]="true"
-          [postpet]="postpet"
-        ></app-postpet>
+        @for (postpet of postspetAdopta; track postpet) {
+          <app-postpet
+            [home]="true"
+            [postpet]="postpet"
+          ></app-postpet>
+        }
       </div>
     </section>
     <section class="seccion">
@@ -78,18 +81,19 @@
         <a routerLink="/encuentra">
           <i
             ><img
-              class="link_icon"
-              src="./assets/imgs/link_icon.png"
-              alt="link"
+            class="link_icon"
+            src="./assets/imgs/link_icon.png"
+            alt="link"
           /></i>
         </a>
       </div>
       <div class="seccion__postspet">
-        <app-postpet
-          *ngFor="let postpet of postspetAyuda"
-          [home]="true"
-          [postpet]="postpet"
-        ></app-postpet>
+        @for (postpet of postspetAyuda; track postpet) {
+          <app-postpet
+            [home]="true"
+            [postpet]="postpet"
+          ></app-postpet>
+        }
       </div>
     </section>
   </div>

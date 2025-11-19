@@ -10,7 +10,7 @@
         (click)="toggle == false || toggle == null ? toggle : toggleMenu()"
         [routerLink]="user ? '/home' : '/'"
         class="logo"
-      >
+        >
         <img src="../../../../assets/imgs/logo.png" alt="logo" />
       </a>
       <a [routerLink]="user ? '/home' : '/'" class="texto">
@@ -18,56 +18,58 @@
       </a>
     </div>
     <div class="hide-mobile nav__showLinks">
-      <a *ngIf="user" routerLinkActive="active" routerLink="/home">Home</a
-      ><a routerLinkActive="active" routerLink="/encuentra">Encuentra</a
-      ><a routerLinkActive="active" routerLink="difunde">Difunde</a
-      ><a routerLinkActive="active" routerLink="adopta">Adopta</a
-      ><a routerLinkActive="active" routerLink="ayuda">Ayuda</a>
-    </div>
-    <div class="nav__links" [class.flex-end]="user">
-      <a
-        *ngIf="!user; else profileButton"
-        routerLink="login"
-        class="nav__button button__login"
-        >Iniciar sesión</a
-      >
-      <ng-template #profileButton>
-        <div class="hide-mobile">
-          <a routerLink="/profile" class="nav__button button__login">Perfil</a>
-          <a class="nav__button" (click)="logout()">Cerrar sesión</a>
+      @if (user) {
+        <a routerLinkActive="active" routerLink="/home">Home</a
+          >
+          }<a routerLinkActive="active" routerLink="/encuentra">Encuentra</a
+          ><a routerLinkActive="active" routerLink="difunde">Difunde</a
+          ><a routerLinkActive="active" routerLink="adopta">Adopta</a
+          ><a routerLinkActive="active" routerLink="ayuda">Ayuda</a>
         </div>
-      </ng-template>
-      <div class="nav__toggle show-mobile" (click)="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div>
-  </nav>
-  <div
-    class="nav__menu show-mobile"
-    *ngIf="!user; else navMenuAuth"
-    [class.fade-in]="toggle"
-    [class.fade-out-visibility]="toggle == false"
-  >
-    <a (click)="toggleMenu()" routerLink="encuentra">Encuentra</a
-    ><a (click)="toggleMenu()" routerLink="difunde">Difunde</a
-    ><a (click)="toggleMenu()" routerLink="adopta">Adopta</a
-    ><a (click)="toggleMenu()" routerLink="ayuda">Ayuda</a>
-  </div>
-  <ng-template #navMenuAuth>
-    <div
-      class="nav__menu show-mobile"
-      [class.fade-in]="toggle"
-      [class.fade-out-visibility]="toggle == false"
-    >
-      <a (click)="toggleMenu()" routerLink="/home">Home</a
-      ><a (click)="toggleMenu()" routerLink="encuentra">Encuentra</a
-      ><a (click)="toggleMenu()" routerLink="difunde">Difunde</a
-      ><a (click)="toggleMenu()" routerLink="adopta">Adopta</a
-      ><a (click)="toggleMenu()" routerLink="ayuda">Ayuda</a
-      ><a (click)="toggleMenu()" routerLink="/profile">Perfil</a
-      ><a (click)="toggleMenu()" (click)="logout()">Cerrar sesión</a>
-    </div>
-  </ng-template>
-</header>
+        <div class="nav__links" [class.flex-end]="user">
+          @if (!user) {
+            <a
+              routerLink="login"
+              class="nav__button button__login"
+              >Iniciar sesión</a
+              >
+            } @else {
+              <div class="hide-mobile">
+                <a routerLink="/profile" class="nav__button button__login">Perfil</a>
+                <a class="nav__button" (click)="logout()">Cerrar sesión</a>
+              </div>
+            }
+            <div class="nav__toggle show-mobile" (click)="toggleMenu()">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </nav>
+        @if (!user) {
+          <div
+            class="nav__menu show-mobile"
+            [class.fade-in]="toggle"
+            [class.fade-out-visibility]="toggle == false"
+            >
+            <a (click)="toggleMenu()" routerLink="encuentra">Encuentra</a
+              ><a (click)="toggleMenu()" routerLink="difunde">Difunde</a
+              ><a (click)="toggleMenu()" routerLink="adopta">Adopta</a
+              ><a (click)="toggleMenu()" routerLink="ayuda">Ayuda</a>
+            </div>
+          } @else {
+            <div
+              class="nav__menu show-mobile"
+              [class.fade-in]="toggle"
+              [class.fade-out-visibility]="toggle == false"
+              >
+              <a (click)="toggleMenu()" routerLink="/home">Home</a
+                ><a (click)="toggleMenu()" routerLink="encuentra">Encuentra</a
+                ><a (click)="toggleMenu()" routerLink="difunde">Difunde</a
+                ><a (click)="toggleMenu()" routerLink="adopta">Adopta</a
+                ><a (click)="toggleMenu()" routerLink="ayuda">Ayuda</a
+                ><a (click)="toggleMenu()" routerLink="/profile">Perfil</a
+                ><a (click)="toggleMenu()" (click)="logout()">Cerrar sesión</a>
+              </div>
+            }
+          </header>

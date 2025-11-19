@@ -1,17 +1,22 @@
-<div *ngIf="percentage != null && !isImgLoaded" class="progress-container">
-  <h3 class="uploading-title">Subiendo imagen</h3>
-  <progress class="progress-bar" [value]="percentage"></progress>
-</div>
-<div class="img-container" *ngIf="downloadUrl as url" [id]="downloadUrl ? downloadUrl : null" >
-  <a [href]="url" target="_blank" rel="noopener">
-    <img class="img" [src]="url" alt="animal" (load)="onLoaded()"/>
-  </a>
-  <button class="delete__button" type="button" (click)="deleteImg()">
-    <span *ngIf="!isLoading; else loading">
-      Eliminar
-    </span>
-    <ng-template #loading>
-      <app-spinner></app-spinner>
-    </ng-template>
-  </button>
-</div>
+@if (percentage != null && !isImgLoaded) {
+  <div class="progress-container">
+    <h3 class="uploading-title">Subiendo imagen</h3>
+    <progress class="progress-bar" [value]="percentage"></progress>
+  </div>
+}
+@if (downloadUrl; as url) {
+  <div class="img-container" [id]="downloadUrl ? downloadUrl : null" >
+    <a [href]="url" target="_blank" rel="noopener">
+      <img class="img" [src]="url" alt="animal" (load)="onLoaded()"/>
+    </a>
+    <button class="delete__button" type="button" (click)="deleteImg()">
+      @if (!isLoading) {
+        <span>
+          Eliminar
+        </span>
+      } @else {
+        <app-spinner></app-spinner>
+      }
+    </button>
+  </div>
+}

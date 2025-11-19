@@ -1,42 +1,58 @@
-<div [class]="home ? 'postpetHome' : 'postpet'" *ngIf="postpet; else loading">
-  <div class="container__postpet-img">
-    <div class="postpet-img" *ngIf="postpet.urlImgs">
-      <a [routerLink]="['/pet', postpet.id]">
-        <!-- <app-image
-          [img]="postpet.urlImgs[0].url"
-          [alt]="postpet.petSpecie"
-        ></app-image> -->
-        <img class="postpetImg" [src]="postpet.urlImgs[0].url" alt="" />
-      </a>
-    </div>
+@if (postpet) {
+  <div [class]="home ? 'postpetHome' : 'postpet'">
+    <div class="container__postpet-img">
+      @if (postpet.urlImgs) {
+        <div class="postpet-img">
+          <a [routerLink]="['/pet', postpet.id]">
+            <!-- <app-image
+            [img]="postpet.urlImgs[0].url"
+            [alt]="postpet.petSpecie"
+          ></app-image> -->
+          <img class="postpetImg" [src]="postpet.urlImgs[0].url" alt="" />
+        </a>
+      </div>
+    }
   </div>
   <div class="postpet-info">
-    <p *ngIf="postpet.petName">
-      Nombre: {{postpet.petName}}
+    @if (postpet.petName) {
+      <p>
+        Nombre: {{postpet.petName}}
+      </p>
+    }
+    @if (postpet.petStateId == 'B' || postpet.petStateId == 'E') {
+      <p>
+        Visto por ultima vez en {{ postpet.cantonName | titlecase }},
+        {{ postpet.provinciaName | titlecase }}@if (postpet.lastTimeSeen) {
+        <span>, {{ lastTimeSeen }}</span>
+      }
     </p>
-    <p *ngIf="postpet.petStateId == 'B' || postpet.petStateId == 'E'">
-      Visto por ultima vez en {{ postpet.cantonName | titlecase }},
-      {{ postpet.provinciaName | titlecase }}<span *ngIf="postpet.lastTimeSeen">, {{ lastTimeSeen }}</span>
-    </p>
-    <p *ngIf="postpet.petStateId == 'A' || postpet.petStateId == 'H'">
+  }
+  @if (postpet.petStateId == 'A' || postpet.petStateId == 'H') {
+    <p>
       Se encuentra en {{ postpet.cantonName | titlecase }}, {{ postpet.provinciaName | titlecase }}
     </p>
-    <p *ngIf="postpet.petBreed">Raza: {{ postpet.petBreed }}</p>
-    <div *ngIf="postpet.petStateId == 'B'">
-      <p *ngIf="postpet.reward; else noReward">
-        Recompensa: {{ postpet.reward | currency }}
-      </p>
-      <ng-template #noReward>
+  }
+  @if (postpet.petBreed) {
+    <p>Raza: {{ postpet.petBreed }}</p>
+  }
+  @if (postpet.petStateId == 'B') {
+    <div>
+      @if (postpet.reward) {
+        <p>
+          Recompensa: {{ postpet.reward | currency }}
+        </p>
+      } @else {
         <p>Recompensa: -</p>
-      </ng-template>
+      }
     </div>
-  </div>
+  }
 </div>
-<ng-template #loading>
+</div>
+} @else {
   <div [class]="home ? 'postpetHome' : 'postpet'">
     <div class="container__postpet-img">
       <div class="postpet-imgLoading"></div>
     </div>
     <div class="postpet-info"></div>
   </div>
-</ng-template>
+}

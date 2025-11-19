@@ -4,7 +4,7 @@
   (hovered)="toggleHover($event)"
   (dropped)="onDrop($event)"
   [class.hovering]="isHovering"
->
+  >
   <h3 class="text title">Arrastra y suelta una o más imagenes</h3>
   <p class="text">o...</p>
   <div class="file">
@@ -16,43 +16,51 @@
         multiple="multiple"
         accept="image/*"
         (change)="onDrop($any($event.target).files)"
-      />
-      <span>Elige una o más imagenes</span>
-    </label>
+        />
+        <span>Elige una o más imagenes</span>
+      </label>
+    </div>
   </div>
-</div>
 
-<div class="uploaded-files" *ngIf="!updating; else updatingg">
-  <div class="imgUploaded" *ngFor="let file of files">
-    <app-upload-task
-      [published]="published"
-      [updating]="false"
-      (uploaded)="onUpload($event)"
-      (deleted)="onDelete($event)"
-      [file]="file"
-    ></app-upload-task>
-  </div>
-</div>
-<ng-template #updatingg>
-  <div class="uploaded-files">
-    <div class="imgUploaded" *ngFor="let file of files">
-      <app-upload-task
-        [published]="published"
-        [updating]="true"
-        (uploadedUpdate)="onUpload($event)"
-        (deleted)="onDelete($event)"
-        [file]="file"
-      ></app-upload-task>
+  @if (!updating) {
+    <div class="uploaded-files">
+      @for (file of files; track file) {
+        <div class="imgUploaded">
+          <app-upload-task
+            [published]="published"
+            [updating]="false"
+            (uploaded)="onUpload($event)"
+            (deleted)="onDelete($event)"
+            [file]="file"
+          ></app-upload-task>
+        </div>
+      }
     </div>
-    <div class="imgUploaded" *ngFor="let img of imgsUrlUpdatingToShow">
-      <app-upload-task
-        [published]="published"
-        *ngIf="img.url"
-        [updating]="true"
-        (uploadedUpdate)="onUpload($event)"
-        (deletedUpdate)="onDelete($event)"
-        [imgUpdating]="img"
-      ></app-upload-task>
+  } @else {
+    <div class="uploaded-files">
+      @for (file of files; track file) {
+        <div class="imgUploaded">
+          <app-upload-task
+            [published]="published"
+            [updating]="true"
+            (uploadedUpdate)="onUpload($event)"
+            (deleted)="onDelete($event)"
+            [file]="file"
+          ></app-upload-task>
+        </div>
+      }
+      @for (img of imgsUrlUpdatingToShow; track img) {
+        <div class="imgUploaded">
+          @if (img.url) {
+            <app-upload-task
+              [published]="published"
+              [updating]="true"
+              (uploadedUpdate)="onUpload($event)"
+              (deletedUpdate)="onDelete($event)"
+              [imgUpdating]="img"
+            ></app-upload-task>
+          }
+        </div>
+      }
     </div>
-  </div>
-</ng-template>
+  }

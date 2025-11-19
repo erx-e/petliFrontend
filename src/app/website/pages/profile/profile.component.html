@@ -1,23 +1,25 @@
 <main class="profilePage">
-  <div *ngIf="!isLoading; else loading">
-    <div *ngIf="user; else notFound">
-      <h1 class="profile__title">Perfil público</h1>
-      <div class="profile__info">
-        <p><span class="highlight">Nombre:</span> {{ user.name }}</p>
-        <p><span class="highlight">Número:</span> {{ user.cellNumber }}</p>
-        <p>
-          <span class="highlight">Correo electrónico:</span> {{ user.email }}
-        </p>
-      </div>
-      <div>
-        <app-filter [userId]="user.idUser"></app-filter>
-      </div>
+  @if (!isLoading) {
+    <div>
+      @if (user) {
+        <div>
+          <h1 class="profile__title">Perfil público</h1>
+          <div class="profile__info">
+            <p><span class="highlight">Nombre:</span> {{ user.name }}</p>
+            <p><span class="highlight">Número:</span> {{ user.cellNumber }}</p>
+            <p>
+              <span class="highlight">Correo electrónico:</span> {{ user.email }}
+            </p>
+          </div>
+          <div>
+            <app-filter [userId]="user.idUser"></app-filter>
+          </div>
+        </div>
+      } @else {
+        <app-notfound message="Usuario no encontrado"></app-notfound>
+      }
     </div>
-    <ng-template #notFound>
-      <app-notfound message="Usuario no encontrado"></app-notfound>
-    </ng-template>
-  </div>
-  <ng-template #loading>
+  } @else {
     <div></div>
-  </ng-template>
+  }
 </main>

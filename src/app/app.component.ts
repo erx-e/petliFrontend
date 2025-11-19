@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+
+import { Component, Inject, OnInit, DOCUMENT } from '@angular/core';
 import { AuthService } from './services/auth.service';
 import { NoScrollService } from './services/no-scroll.service';
 
