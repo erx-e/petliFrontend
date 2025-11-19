@@ -2,9 +2,10 @@ import { AfterContentInit, AfterViewInit, Component, EventEmitter, Input, Output
 import { updateImg } from "src/app/models/postpet.model";
 
 @Component({
-  selector: "app-uploader",
-  templateUrl: "./uploader.component.html",
-  styleUrls: ["./uploader.component.scss"],
+    selector: "app-uploader",
+    templateUrl: "./uploader.component.html",
+    styleUrls: ["./uploader.component.scss"],
+    standalone: false
 })
 export class UploaderComponent {
   isHovering: boolean;

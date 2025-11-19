@@ -13,9 +13,10 @@ import { environment } from "src/environments/environment";
 import { v4 as uuidv4 } from "uuid";
 
 @Component({
-  selector: "app-upload-task",
-  templateUrl: "./upload-task.component.html",
-  styleUrls: ["./upload-task.component.scss"],
+    selector: "app-upload-task",
+    templateUrl: "./upload-task.component.html",
+    styleUrls: ["./upload-task.component.scss"],
+    standalone: false
 })
 export class UploadTaskComponent implements OnInit, OnDestroy {
   constructor(private s3StorageService: S3StorageService) {}

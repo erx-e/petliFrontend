@@ -17,9 +17,10 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { LoadingService } from 'src/app/services/loading.service';
 
 @Component({
-  selector: 'app-filter',
-  templateUrl: './filter.component.html',
-  styleUrls: ['./filter.component.scss'],
+    selector: 'app-filter',
+    templateUrl: './filter.component.html',
+    styleUrls: ['./filter.component.scss'],
+    standalone: false
 })
 export class FilterComponent implements OnInit {
   constructor(

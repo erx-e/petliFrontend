@@ -8,9 +8,10 @@ import { LoadingService } from "src/app/services/loading.service";
 import { PostpetService } from "src/app/services/postpet.service";
 
 @Component({
-  selector: "app-profile",
-  templateUrl: "./profile.component.html",
-  styleUrls: ["./profile.component.scss"],
+    selector: "app-profile",
+    templateUrl: "./profile.component.html",
+    styleUrls: ["./profile.component.scss"],
+    standalone: false
 })
 export class ProfileComponent implements OnInit {
   constructor(

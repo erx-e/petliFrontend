@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-ayuda',
-  template: `<app-filter [stateId]="stateId"></app-filter>`,
+    selector: 'app-ayuda',
+    template: `<app-filter [stateId]="stateId"></app-filter>`,
+    standalone: false
 })
 export class AyudaComponent implements OnInit {
 

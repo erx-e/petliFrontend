@@ -3,9 +3,10 @@ import { postpetView } from "src/app/models/postpet.model";
 import { PostpetService } from "src/app/services/postpet.service";
 
 @Component({
-  selector: "app-home",
-  templateUrl: "./home.component.html",
-  styleUrls: ["./home.component.scss"],
+    selector: "app-home",
+    templateUrl: "./home.component.html",
+    styleUrls: ["./home.component.scss"],
+    standalone: false
 })
 export class HomeComponent implements OnInit {
   constructor(private postpetService: PostpetService) {}

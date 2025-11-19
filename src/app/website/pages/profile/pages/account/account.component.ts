@@ -6,9 +6,10 @@ import { UserService } from "src/app/services/user.service";
 import { MyValidators } from "src/app/validators/validators";
 
 @Component({
-  selector: "app-account",
-  templateUrl: "./account.component.html",
-  styleUrls: ["./account.component.scss"],
+    selector: "app-account",
+    templateUrl: "./account.component.html",
+    styleUrls: ["./account.component.scss"],
+    standalone: false
 })
 export class AccountComponent implements OnInit {
   constructor(

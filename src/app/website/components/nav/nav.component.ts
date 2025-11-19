@@ -7,9 +7,10 @@ import { NoScrollService } from "../../../services/no-scroll.service"
 
 
 @Component({
-  selector: "app-nav",
-  templateUrl: "./nav.component.html",
-  styleUrls: ["./nav.component.scss"],
+    selector: "app-nav",
+    templateUrl: "./nav.component.html",
+    styleUrls: ["./nav.component.scss"],
+    standalone: false
 })
 export class NavComponent implements OnInit {
   user: UserView | null = null;

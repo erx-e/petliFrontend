@@ -11,9 +11,10 @@ import { AuthService } from "src/app/services/auth.service";
 import { UserService } from "src/app/services/user.service";
 
 @Component({
-  selector: "app-public-profile",
-  templateUrl: "./public-profile.component.html",
-  styleUrls: ["./public-profile.component.scss"],
+    selector: "app-public-profile",
+    templateUrl: "./public-profile.component.html",
+    styleUrls: ["./public-profile.component.scss"],
+    standalone: false
 })
 export class PublicProfileComponent implements OnInit {
   constructor(

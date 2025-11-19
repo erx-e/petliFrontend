@@ -26,9 +26,10 @@ import { MyValidators } from 'src/app/validators/validators';
 import { Location } from '@angular/common';
 
 @Component({
-  selector: 'app-editar',
-  templateUrl: './editar.component.html',
-  styleUrls: ['./editar.component.scss'],
+    selector: 'app-editar',
+    templateUrl: './editar.component.html',
+    styleUrls: ['./editar.component.scss'],
+    standalone: false
 })
 export class EditarComponent implements OnInit {
   constructor(

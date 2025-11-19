@@ -4,9 +4,10 @@ import { formatDistance, subDays } from "date-fns";
 import es from "date-fns/locale/es";
 
 @Component({
-  selector: "app-postpet",
-  templateUrl: "./postpet.component.html",
-  styleUrls: ["./postpet.component.scss"],
+    selector: "app-postpet",
+    templateUrl: "./postpet.component.html",
+    styleUrls: ["./postpet.component.scss"],
+    standalone: false
 })
 export class PostpetComponent implements OnInit {
   constructor() {}

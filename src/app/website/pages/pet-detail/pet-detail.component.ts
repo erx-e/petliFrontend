@@ -13,9 +13,10 @@ import es from "date-fns/locale/es";
 import { LoadingService } from "src/app/services/loading.service";
 
 @Component({
-  selector: "app-pet-detail",
-  templateUrl: "./pet-detail.component.html",
-  styleUrls: ["./pet-detail.component.scss"],
+    selector: "app-pet-detail",
+    templateUrl: "./pet-detail.component.html",
+    styleUrls: ["./pet-detail.component.scss"],
+    standalone: false
 })
 export class PetDetailComponent implements OnInit {
   constructor(

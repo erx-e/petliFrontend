@@ -25,9 +25,10 @@ import { MyValidators } from 'src/app/validators/validators';
 import { Observable, of } from 'rxjs';
 
 @Component({
-  selector: 'app-publish',
-  templateUrl: './publish.component.html',
-  styleUrls: ['./publish.component.scss'],
+    selector: 'app-publish',
+    templateUrl: './publish.component.html',
+    styleUrls: ['./publish.component.scss'],
+    standalone: false
 })
 export class PublishComponent implements OnInit {
   constructor(
