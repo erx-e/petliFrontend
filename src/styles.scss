@@ -1,11 +1,7 @@
-@import "../node_modules/bootstrap/scss/functions";
-@import "../node_modules/bootstrap/scss/variables";
-@import "../node_modules/bootstrap/scss/maps";
-@import "../node_modules/bootstrap/scss/mixins";
-@import "../node_modules/bootstrap/scss/root";
-@import "swiper/scss";
-@import "swiper/scss/pagination";
-@import "swiper/scss/navigation";
+@use "bootstrap/scss/bootstrap" as *;
+@use "swiper/scss";
+@use "swiper/scss/pagination";
+@use "swiper/scss/navigation";
 
 @import url("./app/styles/reset.scss");
 

@@ -15,7 +15,6 @@ import { EncuentraModule } from './pages/encuentra/encuentra.module'
 import { QuicklinkModule } from 'ngx-quicklink'
 import { DifundeModule } from './pages/difunde/difunde.module'
 import { SwiperModule } from 'swiper/angular';
-
 @NgModule({
   declarations: [
     LayoutComponent,
@@ -33,8 +32,9 @@ import { SwiperModule } from 'swiper/angular';
     ReactiveFormsModule,
     EncuentraModule,
     DifundeModule,
-    SwiperModule,
-    QuicklinkModule
+  ],
+  exports: [
+    LayoutComponent
   ]
 })
 export class WebsiteModule { }

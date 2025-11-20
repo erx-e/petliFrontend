@@ -42,13 +42,13 @@
     <div *ngIf="postpet; else notFound">
       <div class="petContainer">
         <div class="petGallery">
-          <swiper [config]="swiperConfig" style="z-index: 0">
+          <!-- <swiper [config]="swiperConfig" style="z-index: 0">
             <ng-template *ngFor="let img of postpet?.urlImgs" swiperSlide>
               <div class="slide-container">
                 <img class="imgPet" [src]="img.url" alt="imagen mascota" />
               </div>
             </ng-template>
-          </swiper>
+          </swiper> -->
         </div>
         <div class="petData">
           <div *ngIf="postpet.petStateId == 'E'">

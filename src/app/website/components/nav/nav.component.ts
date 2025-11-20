@@ -4,13 +4,11 @@ import { UserView } from "src/app/models/user.model";
 import { AuthService } from "src/app/services/auth.service";
 import { NoScrollService } from "../../../services/no-scroll.service"
 
-
-
 @Component({
     selector: "app-nav",
     templateUrl: "./nav.component.html",
     styleUrls: ["./nav.component.scss"],
-    standalone: false
+    standalone: false,
 })
 export class NavComponent implements OnInit {
   user: UserView | null = null;

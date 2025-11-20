@@ -10,12 +10,12 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
 @NgModule({ declarations: [
-        AppComponent
+        AppComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
         FormsModule,
-        QuicklinkModule], providers: [
+        ], providers: [
         { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         provideHttpClient(withInterceptorsFromDi()),

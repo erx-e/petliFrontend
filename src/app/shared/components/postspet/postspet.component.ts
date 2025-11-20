@@ -1,11 +1,14 @@
+import { CommonModule } from "@angular/common";
 import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
 import { postpetView } from "src/app/models/postpet.model";
+import { PostpetComponent } from "../postpet/postpet.component";
+import { SharedModule } from "../../shared.module";
 
 @Component({
     selector: "app-postspet",
     templateUrl: "./postspet.component.html",
     styleUrls: ["./postspet.component.scss"],
-    standalone: false
+    standalone: false,
 })
 export class PostspetComponent implements OnInit {
   constructor() {}

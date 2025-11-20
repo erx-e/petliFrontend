@@ -322,7 +322,7 @@
                                 formArrayName="contact"
                                 >
                                 <div class="formArrayElement">
-                                  @if (this.i == 0) {
+                                  @if (i == 0) {
                                     <label class="form-label" for="contact"
                                       >Número de contacto:
                                     </label>
@@ -337,13 +337,13 @@
                                       [name]="i"
                                       [id]="i == 0 ? 'contact' : null"
                       [class.is-valid]="
-                        this.contact.touched && this.contact.valid
+                        contact.touched && contact.valid
                       "
                       [class.is-invalid]="
-                        this.contact.touched && this.contact.invalid
+                        contact.touched && contact.invalid
                       "
                                       />
-                                      @if (this.i == 0) {
+                                      @if (i == 0) {
                                         <button
                                           class="addContactField"
                                           type="button"
@@ -356,31 +356,31 @@
                                     <div
                                       class="validationMessage"
                     [class.active]="
-                      this.contact.touched && this.contact.invalid
+                      contact.touched && contact.invalid
                     "
                                       >
-                                      @if (this.contact.hasError('required')) {
+                                      @if (contact.hasError('required')) {
                                         <p
                                           class="invalid-feedback"
                                           >
                                           Ingrese un número de contacto
                                         </p>
                                       }
-                                      @if (this.contact.hasError('pattern')) {
+                                      @if (contact.hasError('pattern')) {
                                         <p
                                           class="invalid-feedback"
                                           >
                                           Ingrese solamente números
                                         </p>
                                       }
-                                      @if (this.contact.hasError('minlength')) {
+                                      @if (contact.hasError('minlength')) {
                                         <p
                                           class="invalid-feedback"
                                           >
                                           El número de teléfono es incorrecto
                                         </p>
                                       }
-                                      @if (this.contact.hasError('maxlength')) {
+                                      @if (contact.hasError('maxlength')) {
                                         <p
                                           class="invalid-feedback"
                                           >

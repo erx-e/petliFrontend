@@ -9,6 +9,8 @@ import { PublicProfileComponent } from './pages/public-profile/public-profile.co
 import { AccountComponent } from './pages/account/account.component';
 import { MyPublicationsComponent } from './pages/my-publications/my-publications.component';
 import { LayoutComponent } from './layout/layout.component';
+import { WebsiteModule } from '../../website.module';
+import {  RouterModule } from '@angular/router';
 
 
 @NgModule({
@@ -17,13 +19,15 @@ import { LayoutComponent } from './layout/layout.component';
     PublicProfileComponent,
     AccountComponent,
     MyPublicationsComponent,
-    LayoutComponent,
+    LayoutComponent
   ],
   imports: [
     CommonModule,
     ProfileRoutingModule,
     SharedModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    WebsiteModule,
+    RouterModule
   ]
 })
 export class ProfileModule { }

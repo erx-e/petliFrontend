@@ -28,7 +28,7 @@ export class ProfileComponent implements OnInit {
     this.router.paramMap.subscribe((params) => {
       if (params.get("id")) {
         this.userId = parseInt(params.get("id"));
-        if (this.userId != NaN) {
+        if (!Number.isNaN(this.userId)) {
           this.authService
             .getProfile(this.userId)
             .subscribe((data) => (this.user = data));

@@ -11,7 +11,7 @@ import { NotfoundComponent } from '../not-found/notfound.component';
 import { DropzoneDirective } from './directives/dropzone.directive';
 import { PublishComponent } from './components/publicar/publish.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
-import { UploadTaskComponent } from './components/uploader/upload-task/upload-task.component';
+// import { UploadTaskComponent } from './components/uploader/upload-task/upload-task.component';
 import { EditarComponent } from './components/publicar/editar/editar.component';
 
 
@@ -27,13 +27,13 @@ import { EditarComponent } from './components/publicar/editar/editar.component';
     DropzoneDirective,
     PublishComponent,
     UploaderComponent,
-    UploadTaskComponent,
+    // UploadTaskComponent,
     EditarComponent
   ],
   imports: [
     CommonModule,
     RouterModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   exports: [
     PostpetComponent,
