@@ -60,7 +60,7 @@ export class FilterComponent implements OnInit {
   morePostspet: boolean = true;
   isLoadingMore: boolean = false;
 
-  postspetLoading = [null, null, null, null, null, null, null, null];
+  postspetLoading = [null, null, null, null, null, null, null, null, null];
   onInit = true;
 
   async ngOnInit(): Promise<void> {
