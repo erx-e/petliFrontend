@@ -1,42 +1,66 @@
-// import { Injectable } from '@angular/core';
-// import * as S3 from 'aws-sdk/clients/s3';
-// import { environment } from 'src/environments/environment';
+import {
+  HttpClient,
+  HttpEvent,
+  HttpHeaders,
+  HttpRequest,
+} from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { environment } from "src/environments/environment";
+import { checkToken } from "../interceptors/token.interceptor";
+import { PresignedUploadResponse } from "../models/s3.model";
 
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class S3StorageService {
+/**
+ * Maneja la subida/borrado de imágenes en S3 SIN credenciales de AWS en el
+ * frontend. El backend (que sí guarda las credenciales) firma las operaciones:
+ * aquí solo se le pide una URL temporal y se sube el archivo directo a S3.
+ */
+@Injectable({
+  providedIn: "root",
+})
+export class S3StorageService {
+  constructor(private http: HttpClient) {}
 
-//   constructor() { }
+  private apiUrl = `${environment.API_URL}`;
 
-//   private key_id = environment.AWS_KEY_ID;
-//   private key_secret = environment.AWS_KEY_SECRET;
-//   private region = environment.AWS_REGION;
-//   private bucketName = environment.BUCKET_NAME;
+  /**
+   * Paso 1: pide al backend una URL firmada para subir.
+   * El backend la genera con sus credenciales y responde, además, con la key
+   * y la URL pública final. Lleva el token de la app (checkToken).
+   */
+  getPresignedUploadUrl(fileName: string, contentType: string) {
+    return this.http.post<PresignedUploadResponse>(
+      `${this.apiUrl}/s3/presigned-upload`,
+      { fileName, contentType },
+      { context: checkToken() }
+    );
+  }
 
-//   private storage = new S3({
-//     region: this.region,
-//     accessKeyId: this.key_id,
-//     secretAccessKey: this.key_secret,
-//   });
+  /**
+   * Paso 2: sube el archivo DIRECTO a S3 con la URL firmada.
+   * No lleva el token de la app: S3 valida la firma incluida en la URL, por eso
+   * este request NO usa checkToken(). `reportProgress` permite mostrar el avance.
+   * El Content-Type debe coincidir con el que se firmó en el paso 1.
+   */
+  uploadToPresignedUrl(
+    uploadUrl: string,
+    file: File
+  ): Observable<HttpEvent<unknown>> {
+    const request = new HttpRequest("PUT", uploadUrl, file, {
+      headers: new HttpHeaders({ "Content-Type": file.type }),
+      reportProgress: true,
+    });
+    return this.http.request(request);
+  }
 
-//   uploadImage(file: File, key: string) {
-//     return this.storage.putObject(
-//       { Key: key, Body: file, Bucket: this.bucketName },
-//       function (err, data) {
-//         if (err) {
-//           console.log("There was an error uploading your file: ", err);
-//           return false;
-//         }
-//         console.log("Successfully uploaded file.", data);
-//         return true;
-//       }
-//     );
-//   }
-
-//   deleteImg(key: string) {
-//     return this.storage
-//       .deleteObject({ Key: key, Bucket: this.bucketName })
-//       .promise();
-//   }
-// }
+  /**
+   * Borra un objeto del bucket a través del backend (que tiene las credenciales).
+   * Recibe la key del objeto (no la URL completa). Lleva el token de la app.
+   */
+  deleteImage(key: string) {
+    return this.http.delete(
+      `${this.apiUrl}/s3/object/${encodeURIComponent(key)}`,
+      { context: checkToken() }
+    );
+  }
+}

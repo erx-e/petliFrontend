@@ -10,7 +10,7 @@ import {
 import { checkToken } from "../interceptors/token.interceptor";
 import { checkLoading } from "../interceptors/loading.interceptor";
 import { catchError } from "rxjs/operators";
-import { throwError } from "rxjs/internal/observable/throwError";
+import { throwError } from "rxjs";
 
 @Injectable({
   providedIn: "root",
@@ -19,9 +19,6 @@ export class PostpetService {
   constructor(private http: HttpClient) {}
 
   private apiUrl = `${environment.API_URL}`;
-  private key_id = environment.AWS_KEY_ID;
-  private key_secret = environment.AWS_KEY_SECRET;
-  private region = environment.AWS_REGION;
 
   getAll(limit?: number, offset?: number) {
     let params = new HttpParams();
@@ -41,9 +38,9 @@ export class PostpetService {
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === HttpStatusCode.BadRequest) {
-            return throwError("Post no encontrado");
+            return throwError(() => "Post no encontrado");
           } else {
-            return throwError("Error del servidor");
+            return throwError(() => "Error del servidor");
           }
         })
       );
@@ -55,9 +52,9 @@ export class PostpetService {
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === HttpStatusCode.BadRequest) {
-            return throwError("Post no encontrado");
+            return throwError(() => "Post no encontrado");
           } else {
-            return throwError("Error del servidor");
+            return throwError(() => "Error del servidor");
           }
         })
       );
@@ -75,9 +72,9 @@ export class PostpetService {
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === HttpStatusCode.BadRequest) {
-            return throwError("Id state must be sent");
+            return throwError(() => "Id state must be sent");
           } else {
-            return throwError("Error del servidor");
+            return throwError(() => "Error del servidor");
           }
         })
       );
@@ -149,9 +146,9 @@ export class PostpetService {
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === HttpStatusCode.BadRequest) {
-            return throwError("Post Id incorrecto");
+            return throwError(() => "Post Id incorrecto");
           } else {
-            return throwError("Error del servidor");
+            return throwError(() => "Error del servidor");
           }
         })
       );
@@ -171,9 +168,9 @@ export class PostpetService {
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === HttpStatusCode.BadRequest) {
-            return throwError("Post Id incorrecto");
+            return throwError(() => "Post Id incorrecto");
           } else {
-            return throwError("Error del servidor");
+            return throwError(() => "Error del servidor");
           }
         })
       );

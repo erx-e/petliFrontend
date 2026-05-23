@@ -1,149 +1,166 @@
-// import {
-//   Component,
-//   EventEmitter,
-//   HostListener,
-//   Input,
-//   OnDestroy,
-//   OnInit,
-//   Output,
-// } from "@angular/core";
-// import { updateImg } from "src/app/models/postpet.model";
-// import { S3StorageService } from "src/app/services/s3-storage.service";
-// import { environment } from "src/environments/environment";
-// import { v4 as uuidv4 } from "uuid";
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from "@angular/core";
+import { HttpEventType } from "@angular/common/http";
+import { firstValueFrom } from "rxjs";
+import { switchMap } from "rxjs/operators";
+import { updateImg } from "src/app/models/postpet.model";
+import { S3StorageService } from "src/app/services/s3-storage.service";
 
-// @Component({
-//     selector: "app-upload-task",
-//     templateUrl: "./upload-task.component.html",
-//     styleUrls: ["./upload-task.component.scss"],
-//     standalone: false
-// })
-// export class UploadTaskComponent implements OnInit, OnDestroy {
-//   constructor(private s3StorageService: S3StorageService) {}
+@Component({
+  selector: "app-upload-task",
+  templateUrl: "./upload-task.component.html",
+  styleUrls: ["./upload-task.component.scss"],
+  standalone: false,
+})
+export class UploadTaskComponent implements OnInit, OnDestroy {
+  constructor(private s3StorageService: S3StorageService) {}
 
-//   @HostListener("window:beforeunload")
-//   async ngOnDestroy(): Promise<void> {
-//     if (this.updating) {
-//       if (!this.idImg && !this.published) {
-//         await this.deleteImg();
-//         return;
-//       } else {
-//         return;
-//       }
-//     }
+  @Input() imgUpdating: updateImg = null;
+  @Input() updating: boolean = false;
+  @Output() deletedUpdate = new EventEmitter<updateImg>();
+  @Output() uploadedUpdate = new EventEmitter<updateImg>();
+  idImg: number = null;
 
-//     if (this.downloadUrl && !this.published) {
-//       console.log(this.published);
-//       await this.deleteImg();
-//     }
-//   }
+  @Input() file: File = null;
+  downloadUrl: string = null;
+  @Input() published: boolean = false;
+  @Output() deleted = new EventEmitter<{ file: File; key: string }>();
+  @Output() uploaded = new EventEmitter<{ name: string; url: string }>();
 
-//   ngOnInit(): void {
-//     if (this.updating) {
-//       if (this.file) {
-//         this.startUpload();
-//       }
-//       else{
-//         this.downloadUrl = this.imgUpdating.url;
-//         this.idImg = this.imgUpdating.idImage;
-//       }
-//     }
-//     else{
-//       if (this.file) {
-//         this.startUpload();
-//       }
-//     }
-//   }
+  percentage: number = 0;
+  isImgLoaded: boolean = false;
+  isLoading: boolean = false;
+  imgKey: string = "";
 
+  // URL pública que devuelve el backend; se asigna a downloadUrl solo cuando la
+  // subida termina, para no intentar mostrar la imagen antes de tiempo.
+  private publicUrl: string = null;
 
-//   @Input() imgUpdating: updateImg = null;
-//   @Input() updating: boolean = false;
-//   @Output() deletedUpdate = new EventEmitter<updateImg>();
-//   @Output() uploadedUpdate = new EventEmitter<updateImg>();
-//   idImg: number = null;
+  ngOnInit(): void {
+    if (this.updating) {
+      if (this.file) {
+        this.startUpload();
+      } else {
+        this.downloadUrl = this.imgUpdating.url;
+        this.idImg = this.imgUpdating.idImage;
+      }
+    } else {
+      if (this.file) {
+        this.startUpload();
+      }
+    }
+  }
 
-//   @Input() file: File = null;
-//   downloadUrl: string = null;
-//   @Input() published: boolean = false;
-//   @Output() deleted = new EventEmitter<{ file: File; key: string }>();
-//   @Output() uploaded = new EventEmitter<{ name: string; url: string }>();
+  @HostListener("window:beforeunload")
+  async ngOnDestroy(): Promise<void> {
+    if (this.updating) {
+      if (!this.idImg && !this.published) {
+        await this.deleteImg();
+        return;
+      } else {
+        return;
+      }
+    }
 
-//   percentage: number = 0;
-//   isImgLoaded: boolean = false;
-//   isLoading: boolean = false;
-//   private bucketUrl: string = environment.BUCKET_URL;
-//   imgKey: string = "";
+    if (this.downloadUrl && !this.published) {
+      await this.deleteImg();
+    }
+  }
 
-//   async startUpload() {
-//     this.imgKey = `${uuidv4()}.${this.file.name.split(".").pop()}`;
-//     console.log("start");
-//     await this.s3StorageService
-//       .uploadImage(this.file, this.imgKey)
-//       .on("httpUploadProgress", (progress) => {
-//         this.percentage = Math.round((progress.loaded / progress.total) * 100);
-//       })
-//       .on("success", () => {
-//         this.percentage = null;
-//         this.downloadUrl = `${this.bucketUrl}/${this.imgKey}`;
-//         if (this.updating) {
-//           this.uploadedUpdate.emit({
-//             url: this.downloadUrl,
-//           });
-//         } else {
-//           this.uploaded.emit({ name: this.file.name, url: this.downloadUrl });
-//         }
-//       });
-//   }
+  startUpload() {
+    this.percentage = 0;
+    // 1) Pedimos al backend la URL firmada; 2) subimos el archivo directo a S3.
+    this.s3StorageService
+      .getPresignedUploadUrl(this.file.name, this.file.type)
+      .pipe(
+        switchMap((presigned) => {
+          this.imgKey = presigned.key;
+          this.publicUrl = presigned.publicUrl;
+          return this.s3StorageService.uploadToPresignedUrl(
+            presigned.uploadUrl,
+            this.file
+          );
+        })
+      )
+      .subscribe({
+        next: (event) => {
+          if (event.type === HttpEventType.UploadProgress) {
+            this.percentage = Math.round(
+              (event.loaded / (event.total ?? event.loaded)) * 100
+            );
+          } else if (event.type === HttpEventType.Response) {
+            // Subida completada: ya es seguro mostrar la imagen.
+            this.percentage = null;
+            this.downloadUrl = this.publicUrl;
+            if (this.updating) {
+              this.uploadedUpdate.emit({ url: this.downloadUrl });
+            } else {
+              this.uploaded.emit({
+                name: this.file.name,
+                url: this.downloadUrl,
+              });
+            }
+          }
+        },
+        error: (error) => {
+          console.error("Error al subir la imagen:", error);
+          this.percentage = null;
+        },
+      });
+  }
 
-//   async deleteImg() {
-//     this.imgKey = this.downloadUrl.split("/").pop();
-//     this.isLoading = true;
-//     console.log(this.published)
-//     console.log(this.updating)
-//     if (!this.published) {
-//       if (this.updating) {
-//         if(this.file){
-//           await this.s3StorageService
-//           .deleteImg(this.imgKey)
-//           .then(() => {
-//             this.deleted.emit({ file: this.file, key: this.imgKey });
+  async deleteImg() {
+    // Para imágenes recién subidas ya tenemos la key; para imágenes existentes
+    // (modo edición) la derivamos del último segmento de la URL pública.
+    if (!this.imgKey && this.downloadUrl) {
+      this.imgKey = this.downloadUrl.split("/").pop();
+    }
+    this.isLoading = true;
 
-//             console.log(`Imagen eliminada ${this.imgKey}`);
-//             this.downloadUrl = null;
-//             this.isLoading = false;
-//           })
-//           .catch((error) => {
-//             console.log(error);
-//           });
-//         }
-//         else{
-//           this.deletedUpdate.emit({
-//             idImage: this.idImg,
-//             url: null,
-//             file: this.file ? this.file : null,
-//           });
-//         }
-//       } else {
-//         await this.s3StorageService
-//           .deleteImg(this.imgKey)
-//           .then(() => {
-//             this.deleted.emit({ file: this.file, key: this.imgKey });
+    if (!this.published) {
+      if (this.updating) {
+        if (this.file) {
+          try {
+            await firstValueFrom(this.s3StorageService.deleteImage(this.imgKey));
+            this.deleted.emit({ file: this.file, key: this.imgKey });
+            console.log(`Imagen eliminada ${this.imgKey}`);
+            this.downloadUrl = null;
+          } catch (error) {
+            console.error("Error al eliminar la imagen:", error);
+          }
+        } else {
+          this.deletedUpdate.emit({
+            idImage: this.idImg,
+            url: null,
+            file: this.file ? this.file : null,
+          });
+        }
+      } else {
+        try {
+          await firstValueFrom(this.s3StorageService.deleteImage(this.imgKey));
+          this.deleted.emit({ file: this.file, key: this.imgKey });
+          console.log(`Imagen eliminada ${this.imgKey}`);
+          this.downloadUrl = null;
+        } catch (error) {
+          console.error("Error al eliminar la imagen:", error);
+        }
+      }
+    }
+    this.isLoading = false;
+  }
 
-//             console.log(`Imagen eliminada ${this.imgKey}`);
-//             this.downloadUrl = null;
-//             this.isLoading = false;
-//           })
-//           .catch((error) => {
-//             console.log(error);
-//           });
-//       }
-//     }
-//     this.isLoading = false;
-//   }
-
-//   onLoaded() {
-//     let imgDiv = document.getElementById(this.downloadUrl);
-//     imgDiv.style.display = "flex";
-//     this.isImgLoaded = true;
-//   }
-// }
+  onLoaded() {
+    let imgDiv = document.getElementById(this.downloadUrl);
+    if (imgDiv) {
+      imgDiv.style.display = "flex";
+    }
+    this.isImgLoaded = true;
+  }
+}
