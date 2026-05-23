@@ -4,6 +4,11 @@
     <progress class="progress-bar" [value]="percentage"></progress>
   </div>
 }
+@if (errorMessage) {
+  <div class="upload-error">
+    <p>{{ errorMessage }}</p>
+  </div>
+}
 @if (downloadUrl; as url) {
   <div class="img-container" [id]="downloadUrl ? downloadUrl : null" >
     <a [href]="url" target="_blank" rel="noopener">

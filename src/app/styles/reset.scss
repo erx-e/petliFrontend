@@ -6,6 +6,20 @@
 	box-sizing: border-box;
 }
 
+/* Cursor de mano en botones: otra regla del Reboot de Bootstrap que ya no
+   importamos. El <button> nativo usa cursor por defecto (flecha), no pointer. */
+button,
+[role="button"] {
+	cursor: pointer;
+}
+
+/* Labels como inline-block: regla del Reboot de Bootstrap. El <label> nativo es
+   inline e ignora margin-bottom, que es justo lo que usa .form-label para
+   espaciar. Con inline-block, .form-label vuelve a funcionar en <label>. */
+label {
+	display: inline-block;
+}
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,

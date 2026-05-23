@@ -7,11 +7,12 @@ import {
   OnInit,
   Output,
 } from "@angular/core";
-import { HttpEventType } from "@angular/common/http";
+import { HttpEventType, HttpStatusCode } from "@angular/common/http";
 import { firstValueFrom } from "rxjs";
 import { switchMap } from "rxjs/operators";
 import { updateImg } from "src/app/models/postpet.model";
 import { S3StorageService } from "src/app/services/s3-storage.service";
+import { TokenService } from "src/app/services/token.service";
 
 @Component({
   selector: "app-upload-task",
@@ -20,7 +21,10 @@ import { S3StorageService } from "src/app/services/s3-storage.service";
   standalone: false,
 })
 export class UploadTaskComponent implements OnInit, OnDestroy {
-  constructor(private s3StorageService: S3StorageService) {}
+  constructor(
+    private s3StorageService: S3StorageService,
+    private tokenService: TokenService
+  ) {}
 
   @Input() imgUpdating: updateImg = null;
   @Input() updating: boolean = false;
@@ -38,6 +42,8 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
   isImgLoaded: boolean = false;
   isLoading: boolean = false;
   imgKey: string = "";
+  // Mensaje de error de la subida; se muestra en la tarjeta de la imagen.
+  errorMessage: string = null;
 
   // URL pública que devuelve el backend; se asigna a downloadUrl solo cuando la
   // subida termina, para no intentar mostrar la imagen antes de tiempo.
@@ -75,6 +81,14 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
   }
 
   startUpload() {
+    this.errorMessage = null;
+    // Sin sesión, el backend rechazaría la URL firmada con 401: no intentamos
+    // subir y avisamos directamente que hay que iniciar sesión.
+    if (!this.tokenService.getToken()) {
+      this.percentage = null;
+      this.errorMessage = "Inicia sesión para subir imágenes";
+      return;
+    }
     this.percentage = 0;
     // 1) Pedimos al backend la URL firmada; 2) subimos el archivo directo a S3.
     this.s3StorageService
@@ -112,6 +126,11 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error("Error al subir la imagen:", error);
           this.percentage = null;
+          if (error?.status === HttpStatusCode.Unauthorized) {
+            this.errorMessage = "Inicia sesión para subir imágenes";
+          } else {
+            this.errorMessage = "No se pudo subir la imagen, inténtalo de nuevo";
+          }
         },
       });
   }
