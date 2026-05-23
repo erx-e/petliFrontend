@@ -25,15 +25,12 @@
 .navLinks{
   margin-top: 35px;
   text-align: center;
+  padding: 0;
   li{
     margin-bottom: 10px;
     a{
       text-decoration: none;
       color: var(--lighter-light-blue);
     }
-  }
-  ul{
-    list-style: none;
-    padding: 0;
   }
 }
