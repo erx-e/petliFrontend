@@ -1,8 +1,11 @@
 .notFound {
-  position: absolute;
+  height: 45vh;
+  display: flex;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .notFound__img {
@@ -10,6 +13,6 @@
 }
 
 .notFound__text {
-  margin-top: 5px;
+  margin-top: 10px;
   text-align: center;
 }
