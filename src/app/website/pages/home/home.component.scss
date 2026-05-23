@@ -10,7 +10,7 @@
 
 .homeInfo__title {
   font-weight: 600;
-  font-size: 20px;
+  font-size: var(--text-lg);
   margin-bottom: 6px;
 }
 
@@ -28,7 +28,7 @@
 
 .seccionTitle__text {
   font-weight: 600;
-  font-size: 18px;
+  font-size: var(--text-lg);
 
   margin-right: 5px;
 }

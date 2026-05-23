@@ -42,6 +42,12 @@ export class UploaderComponent {
     } else {
       this.maxSixLimit.emit(true);
     }
+    // Reseteamos el <input file>: sin esto, el evento change no vuelve a
+    // dispararse al elegir el mismo archivo y solo se puede subir una imagen.
+    const input = document.getElementById("inputElement") as HTMLInputElement | null;
+    if (input) {
+      input.value = "";
+    }
   }
 
   onDelete(img: { file?: File; key?: string; idImage?: number; url?: string }) {

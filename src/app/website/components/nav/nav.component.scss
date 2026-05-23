@@ -55,7 +55,7 @@ a {
   align-items: center;
   height: 100%;
   width: min-content;
-  font-size: 15px;
+  font-size: var(--text-sm);
   a {
     font-weight: bold;
     text-decoration: none;
@@ -88,7 +88,7 @@ a {
   text-decoration: none;
   border-radius: 6px;
   background-color: var(--yellow);
-  font-size: 1rem;
+  font-size: var(--text-base);
   line-height: 1.15;
   font-weight: 700;
   color: #03091e;
@@ -214,7 +214,7 @@ a {
     display: block;
   }
   .nav__button {
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
     padding: 9px 16px;
     border: 0;
     text-decoration: none;
@@ -229,7 +229,7 @@ a {
     align-items: center;
     a {
       color: #555a81;
-      font-size: 14px;
+      font-size: var(--text-sm);
       font-weight: 600;
       margin-left: 8px;
       padding: 7px 7px;
@@ -267,7 +267,7 @@ a {
     align-items: center;
     a {
       color: #555a81;
-      font-size: 14px;
+      font-size: var(--text-sm);
       margin-left: 8px;
       font-weight: 600;
       padding: 9px 16px;
@@ -293,7 +293,7 @@ a {
     max-width: none;
   }
   .nav__button {
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
     padding: 9px 16px;
     border: 0;
     text-decoration: none;

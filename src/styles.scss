@@ -17,7 +17,27 @@
 @import "bootstrap/scss/button-group";
 
 * {
-  font-family: Roboto, sans-serif;
+  font-family: var(--font-body);
+}
+
+body {
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--blue);
+}
+
+/* Titulares en Fraunces. Incluye los "títulos" que son <p> con clase. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title,
+.register-texto {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.15;
 }
 
 $yellow: #faff00;
@@ -40,6 +60,19 @@ $red: #ff1d15;
   --lighter-light-blue: #{$lighter-light-blue};
   --green: #{$green};
   --red: #{$red};
+
+  /* Tipografía: Fraunces (serif cálido) para titulares, Mulish para cuerpo/UI */
+  --font-heading: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Mulish", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Escala tipográfica (rem, ratio ~1.25) con nombres semánticos */
+  --text-xs: 0.8rem;     /* ~12.8px */
+  --text-sm: 0.9rem;     /* ~14.4px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.25rem;    /* 20px */
+  --text-xl: 1.563rem;   /* ~25px */
+  --text-2xl: 1.953rem;  /* ~31px */
+  --text-3xl: 2.441rem;  /* ~39px */
 }
 
 .invalid-feedback {

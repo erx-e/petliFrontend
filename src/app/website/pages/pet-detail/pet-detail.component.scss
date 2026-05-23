@@ -82,7 +82,7 @@ a {
 }
 
 .data__question{
-  font-size: 25px;
+  font-size: var(--text-xl);
   font-weight: 600;
   margin-bottom: 8px;
 }

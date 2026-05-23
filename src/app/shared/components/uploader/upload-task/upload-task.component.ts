@@ -110,8 +110,11 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
               (event.loaded / (event.total ?? event.loaded)) * 100
             );
           } else if (event.type === HttpEventType.Response) {
-            // Subida completada: ya es seguro mostrar la imagen.
-            this.percentage = null;
+            // Subida completada. Dejamos la barra al 100% (no la ocultamos aún)
+            // y asignamos la URL: el <img> empieza a cargar oculto. La barra se
+            // ocultará en onLoaded(), cuando la imagen ya esté lista, evitando
+            // el hueco en blanco entre la barra y la foto.
+            this.percentage = 100;
             this.downloadUrl = this.publicUrl;
             if (this.updating) {
               this.uploadedUpdate.emit({ url: this.downloadUrl });

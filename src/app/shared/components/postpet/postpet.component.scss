@@ -41,7 +41,7 @@
 }
 
 .postpet-info {
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.15;
   padding-top: 0px;
   p {
@@ -82,7 +82,7 @@
   .postpet-info {
     display: flex;
     height: 35%;
-    font-size: 14px;
+    font-size: var(--text-sm);
     line-height: 1.15;
     padding-top: 0px;
     flex-direction: column;
@@ -102,7 +102,7 @@
   .postpet-info {
     display: flex;
     height: 35%;
-    font-size: 14px;
+    font-size: var(--text-sm);
     line-height: 1.15;
     padding-top: 0px;
     flex-direction: column;
