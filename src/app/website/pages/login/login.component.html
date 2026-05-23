@@ -5,13 +5,14 @@
     </a>
   </div>
   <div class="register-texto">
-    <p>Bienvenido a Pet's Lighthouse</p>
+    <p>Bienvenido de vuelta</p>
+    <span class="auth-subtitle">Inicia sesión para seguir ayudando a que más mascotas vuelvan a casa.</span>
   </div>
   <div class="form-box">
     <form [formGroup]="form" (ngSubmit)="login()">
       <div class="form-flex">
         <div class="form-items">
-          <label class="form-label" for="formEmail"> Email </label>
+          <label class="form-label" for="formEmail"> Correo electrónico </label>
           <input
             class="form-control"
             type="email"
@@ -23,12 +24,12 @@
             <div class="validationMessage" [class.active]="emailFieldInvalid">
               @if (emailField.hasError('required')) {
                 <p class="invalid-feedback">
-                  El email es requerido
+                  Ingresa tu correo electrónico
                 </p>
               }
               @if (emailField.hasError('email')) {
                 <p class="invalid-feedback">
-                  No es un email valido
+                  Ese correo no parece válido
                 </p>
               }
             </div>
@@ -80,14 +81,14 @@
                   <p
                     class="invalid-feedback"
                     >
-                    Debes colocar una contraseña
+                    Ingresa tu contraseña
                   </p>
                 }
               </div>
             </div>
             <div class="validationMessage" [class.active]="wrongUser">
               <p class="invalid-feedback">
-                El email o contraseña son incorrectos
+                Correo o contraseña incorrectos
               </p>
             </div>
             <div>
@@ -105,7 +106,7 @@
         </form>
       </div>
       <div class="register">
-        <p>¿Aún no tienes cuenta?</p>
-        <button routerLink="/register">Regístrate</button>
+        <p>¿Todavía no tienes cuenta?</p>
+        <button routerLink="/register">Crear cuenta</button>
       </div>
     </div>

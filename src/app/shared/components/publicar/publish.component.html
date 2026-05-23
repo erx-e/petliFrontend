@@ -8,11 +8,11 @@
       <div class="form-container">
         @if (!user) {
           <p class="validateUser">
-            *Necesitas tener una cuenta para hacer una publicación
+            *Necesitas una cuenta para publicar
           </p>
         }
         <div class="form-element-section">
-          <p>Indique las caracteristicas de la mascota</p>
+          <p>Indica las características de la mascota</p>
           <div class="flex">
             @if (stateId != 'E' && stateId != 'A') {
               <div class="form-elements">
@@ -34,28 +34,28 @@
                       <p
                         class="invalid-feedback"
                         >
-                        Debe escribir el nombre de la mascota
+                        Escribe el nombre de la mascota
                       </p>
                     }
                     @if (petNameField.hasError('minlength')) {
                       <p
                         class="invalid-feedback"
                         >
-                        Debe escribir un nombre de mas de dos caracteres
+                        El nombre debe tener más de dos caracteres
                       </p>
                     }
                     @if (petNameField.hasError('maxlength')) {
                       <p
                         class="invalid-feedback"
                         >
-                        Debe escribir un nombre de menos de 12 caracteres
+                        El nombre debe tener menos de 12 caracteres
                       </p>
                     }
                     @if (petNameField.hasError('pattern')) {
                       <p
                         class="invalid-feedback"
                         >
-                        Debe escribir un nombre sin numeros o signos especiales
+                        El nombre no puede tener números ni signos especiales
                       </p>
                     }
                   </div>
@@ -101,7 +101,7 @@
                             <p
                               class="invalid-feedback"
                               >
-                              Debe seleccionar el tipo de mascota
+                              Selecciona el tipo de mascota
                             </p>
                           }
                         </div>
@@ -116,7 +116,7 @@
                           [class.is-valid]="petBreedFieldValid"
                           [class.is-invalid]="petBreedFieldInvalid"
                           >
-                          <option value="">Escoja la raza de la mascota</option>
+                          <option value="">Elige la raza de la mascota</option>
                           @for (breed of breeds; track breed; let i = $index) {
                             <option
                               [value]="breeds[i].id"
@@ -133,7 +133,7 @@
                             <p
                               class="invalid-feedback"
                               >
-                              Debe seleccionar la raza
+                              Selecciona la raza
                             </p>
                           }
                         </div>
@@ -156,17 +156,17 @@
                     <div class="form-element-section">
                       @if (stateId == 'E') {
                         <p>
-                          Indique en donde y cuando vio a la mascota
+                          Indica dónde y cuándo viste a la mascota
                         </p>
                       }
                       @if (stateId == 'B') {
                         <p>
-                          Indique por donde y cuando se perdio la mascota
+                          Indica por dónde y cuándo se perdió la mascota
                         </p>
                       }
                       @if (stateId == 'A' || stateId == 'H') {
                         <p>
-                          Indique en donde se encuentra la mascota
+                          Indica dónde se encuentra la mascota
                         </p>
                       }
                       <div class="flex">
@@ -180,7 +180,7 @@
                             [class.is-valid]="provinciaFieldValid"
                             [class.is-invalid]="provinciaFieldInvalid"
                             >
-                            <option value="">Escoja la provincia</option>
+                            <option value="">Elige la provincia</option>
                             @for (provincia of provincias; track provincia) {
                               <option
                                 [value]="provincia.id"
@@ -197,13 +197,13 @@
                               <p
                                 class="invalid-feedback"
                                 >
-                                Debe seleccionar la provincia
+                                Selecciona la provincia
                               </p>
                             }
                           </div>
                         </div>
                         <div class="form-elements">
-                          <label class="form-label" for="formCanton">Canton: </label>
+                          <label class="form-label" for="formCanton">Cantón: </label>
                           <select
                             class="form-select"
                             formControlName="idCanton"
@@ -212,7 +212,7 @@
                             [class.is-valid]="cantonFieldValid"
                             [class.is-invalid]="cantonFieldInvalid"
                             >
-                            <option value="">Escoja el canton</option>
+                            <option value="">Elige el cantón</option>
                             @for (canton of cantones; track canton) {
                               <option [value]="canton.id">
                                 {{ canton.name }}
@@ -227,7 +227,7 @@
                               <p
                                 class="invalid-feedback"
                                 >
-                                Debe seleccionar el canton
+                                Selecciona el cantón
                               </p>
                             }
                           </div>
@@ -243,7 +243,7 @@
                               name="sector"
                               id="formSector"
                               >
-                              <option value="">Escoja el sector</option>
+                              <option value="">Elige el sector</option>
                               @for (sector of sectores; track sector) {
                                 <option [value]="sector.id">
                                   {{ sector.name }}
@@ -272,14 +272,14 @@
                                   <p
                                     class="invalid-feedback"
                                     >
-                                    Debe colocar la fecha y hora
+                                    Indica la fecha y la hora
                                   </p>
                                 }
                                 @if (lastTimeSeenField.hasError('invalid_date')) {
                                   <p
                                     class="invalid-feedback"
                                     >
-                                    Debe colocar una fecha correcta
+                                    Indica una fecha válida
                                   </p>
                                 }
                               </div>
@@ -288,7 +288,7 @@
                         </div>
                       </div>
                       <div class="form-element-section">
-                        <p>Indique datos adicionales</p>
+                        <p>Indica algunos datos adicionales</p>
                         <div class="">
                           <div class="textarea form-elements">
                             <div class="form-floating">
@@ -297,11 +297,11 @@
                                 formControlName="description"
                                 name="description"
                                 id="formDescription"
-                                placeholder="Describe con detalle en que lugar y como estaba la mascota para ayudarle a encontrar dueño"
+                                placeholder="Agrega cualquier detalle que ayude a identificar a la mascota"
                                 [class.is-valid]="descriptionFieldValid"
                                 [class.is-invalid]="descriptionFieldInvalid"
                               ></textarea>
-                              <label for="formDescription">Descripcion de detalles</label>
+                              <label for="formDescription">Descripción</label>
                             </div>
                             <div
                               class="validationMessage"
@@ -311,7 +311,7 @@
                                 <p
                                   class="invalid-feedback"
                                   >
-                                  Debe escribir una description
+                                  Escribe una descripción
                                 </p>
                               }
                             </div>
@@ -363,28 +363,28 @@
                                         <p
                                           class="invalid-feedback"
                                           >
-                                          Ingrese un número de contacto
+                                          Ingresa un número de contacto
                                         </p>
                                       }
                                       @if (contact.hasError('pattern')) {
                                         <p
                                           class="invalid-feedback"
                                           >
-                                          Ingrese solamente números
+                                          Ingresa solo números
                                         </p>
                                       }
                                       @if (contact.hasError('minlength')) {
                                         <p
                                           class="invalid-feedback"
                                           >
-                                          El número de teléfono es incorrecto
+                                          El número de teléfono no es válido
                                         </p>
                                       }
                                       @if (contact.hasError('maxlength')) {
                                         <p
                                           class="invalid-feedback"
                                           >
-                                          El número de télefono es incorrecto
+                                          El número de teléfono no es válido
                                         </p>
                                       }
                                     </div>
@@ -415,12 +415,12 @@
                                     >
                                     @if (rewardField.hasError('min')) {
                                       <p class="invalid-feedback">
-                                        Debe ingresar una cantidad mayor a cero
+                                        Ingresa una cantidad mayor a cero
                                       </p>
                                     }
                                     @if (rewardField.hasError('max')) {
                                       <p class="invalid-feedback">
-                                        Debe ingresar una cantidad menor a 100.000
+                                        Ingresa una cantidad menor a 100.000
                                       </p>
                                     }
                                   </div>
@@ -436,7 +436,7 @@
                                 ></app-uploader>
                                 @if (maxSixFiles) {
                                   <p class="invalid-feedback">
-                                    Debe subir máximo 6 fotos
+                                    Puedes subir máximo 6 fotos
                                   </p>
                                 }
                               </div>

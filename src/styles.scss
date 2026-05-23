@@ -1,9 +1,20 @@
-@use "bootstrap/scss/bootstrap" as *;
-@use "swiper/scss";
-@use "swiper/scss/pagination";
-@use "swiper/scss/navigation";
+// --- Bootstrap: solo lo que usamos (formularios + botones), sin Reboot ni grid ---
+// 1) Configuración requerida (funciones, variables, mixins).
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/root"; // variables CSS que usan botones y formularios
 
-@import url("./app/styles/reset.scss");
+// 2) Reset propio (incluye box-sizing). Va ANTES de los componentes de Bootstrap
+//    para que el reset no pise el padding/borde de botones e inputs.
+@import "./app/styles/reset";
+
+// 3) Componentes de Bootstrap realmente usados.
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/button-group";
 
 * {
   font-family: Roboto, sans-serif;
@@ -53,22 +64,6 @@ $red: #ff1d15;
 
 .is-valid {
   color: var(--green);
-}
-
-.swiper-wrapper {
-  align-items: center;
-}
-
-.swiper-button-prev {
-  color: $yellow;
-}
-
-.swiper-button-next {
-  color: $yellow;
-}
-
-.swiper-pagination-bullet-active {
-  background: $yellow;
 }
 
 .noScroll {
