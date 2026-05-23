@@ -14,7 +14,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EncuentraModule } from './pages/encuentra/encuentra.module'
 import { QuicklinkModule } from 'ngx-quicklink'
 import { DifundeModule } from './pages/difunde/difunde.module'
-import { SwiperModule } from 'swiper/angular';
 @NgModule({
   declarations: [
     LayoutComponent,

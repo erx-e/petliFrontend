@@ -5,7 +5,6 @@ import { switchMap } from "rxjs/operators";
 import { postpetView } from "src/app/models/postpet.model";
 import { UserView } from "src/app/models/user.model";
 import { PostpetService } from "src/app/services/postpet.service";
-import Swiper, { Navigation, Pagination, SwiperOptions } from "swiper";
 import { AuthService } from "src/app/services/auth.service";
 import { of } from "rxjs";
 import format from "date-fns/format";
@@ -34,13 +33,6 @@ export class PetDetailComponent implements OnInit {
   notFound: boolean = false;
   isLoading: boolean = true;
   contactNum: string[] = [];
-
-  swiperConfig: SwiperOptions = {
-    pagination: true,
-    navigation: true,
-    slidesPerView: 1,
-    spaceBetween: 25,
-  };
 
   ngOnInit(): void {
     this.authService.user$.subscribe((data) => (this.user = data));
@@ -75,8 +67,6 @@ export class PetDetailComponent implements OnInit {
           this.notFound = true;
         }
       );
-
-    Swiper.use([Pagination, Navigation]);
   }
 
   deletePost() {
