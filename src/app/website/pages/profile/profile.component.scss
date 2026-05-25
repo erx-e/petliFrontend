@@ -1,18 +1,18 @@
 .profilePage {
-  padding: 12px;
+  padding: var(--space-3);
   line-height: 1.15;
 }
 
 .profile__title{
   font-weight: 600;
   font-size: var(--text-2xl);
-  margin-bottom: 5px;
+  margin-bottom: var(--space-1);
 }
 
 .profile__info{
-  margin-bottom: 15px;
+  margin-bottom: var(--space-4);
   p{
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
   }
 }
 

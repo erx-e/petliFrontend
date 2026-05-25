@@ -5,8 +5,8 @@
 }
 
 .petpost-page {
-  margin-top: 20px;
-  padding: 0 12px;
+  margin-top: var(--space-5);
+  padding: 0 var(--space-3);
 }
 
 a {
@@ -43,12 +43,12 @@ a {
 }
 
 .petContainer {
-  margin-top: 12px;
+  margin-top: var(--space-3);
   line-height: 1.15;
 }
 
 .petGallery {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
   border-radius: 6px;
   min-width: 296px;
   min-height: 233px;
@@ -56,24 +56,24 @@ a {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  padding: 15px;
+  gap: var(--space-2);
+  padding: var(--space-4);
   background: var(--darker-light-blue);
 }
 
 .petData {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
   border-radius: 6px;
-  padding: 15px;
+  padding: var(--space-4);
   line-height: 1.15;
   background: var(--darker-light-blue);
   min-height: 200px;
   min-width: 296px;
   p {
-    margin-bottom: 5px;
+    margin-bottom: var(--space-1);
   }
   div {
-    margin-bottom: 18px;
+    margin-bottom: var(--space-4);
   }
 }
 
@@ -84,7 +84,7 @@ a {
 .data__question{
   font-size: var(--text-xl);
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .imgPet {
