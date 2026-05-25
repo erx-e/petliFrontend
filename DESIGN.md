@@ -17,17 +17,22 @@ o publicando rápido. La interfaz debe sentirse clara, esperanzadora y de confia
 
 Paleta actual (definida como variables CSS en `:root`, `src/styles.scss`):
 
-| Token | Valor | Rol |
-|---|---|---|
-| `--blue` | `#06003e` | Texto principal / oscuro de marca |
-| `--blue-transparent` | `#06003e5c` | Overlays / estados sutiles |
-| `--yellow` | `#ffb703` | Acento "luz del faro" y CTAs (botones de acción) |
-| `--light-blue` | `#ebebf5` | Fondo de página |
-| `--darker-light-blue` | `#d9d8e6` | Superficies / tarjetas |
-| `--lighter-light-blue` | `#f4f4fa` | Inputs / fondos sutiles |
-| `--grey` | `#5f5e7a` | Texto secundario / mudo |
-| `--green` | `#2ba84a` | Éxito / validación correcta |
-| `--red` | `#ff1d15` | Error / validación incorrecta |
+Definida en **OKLCH** (L C H) con fallback hex. Los neutros comparten el tono de marca
+(H≈272°), croma bajo, variando solo la luminosidad.
+
+| Token | OKLCH | hex fallback | Rol |
+|---|---|---|---|
+| `--blue` | `oklch(0.17 0.11 272)` | `#06003e` | Texto principal / oscuro de marca |
+| `--blue-transparent` | `oklch(0.17 0.11 272 / 0.36)` | `#06003e5c` | Overlays / estados sutiles |
+| `--yellow` | `oklch(0.825 0.171 80)` | `#ffb703` | Acento "luz del faro" y CTAs |
+| `--light-blue` | `oklch(0.945 0.013 272)` | `#ebebf5` | Fondo de página |
+| `--darker-light-blue` | `oklch(0.89 0.018 272)` | `#d9d8e6` | Superficies / tarjetas |
+| `--lighter-light-blue` | `oklch(0.97 0.008 272)` | `#f4f4fa` | Inputs / fondos sutiles |
+| `--grey` | `oklch(0.49 0.04 272)` | `#5f5e7a` | Texto secundario / mudo |
+| `--green` | `oklch(0.64 0.17 147)` | `#2ba84a` | Éxito / validación correcta |
+| `--red` | `oklch(0.64 0.25 29)` | `#ff1d15` | Error / validación incorrecta |
+| `--ink` | `oklch(0.15 0.05 272)` | `#03091e` | Casi-negro: texto sobre CTAs amarillas |
+| `--white` | `oklch(0.99 0.004 272)` | `#fcfcff` | Blanco tintado: superficies / texto en oscuro |
 
 Estrategia de color: **restrained** (neutros azulados + un acento dorado de uso
 limitado para CTAs).
@@ -41,10 +46,11 @@ Los neutros están **tintados hacia el indigo de marca** (antes tiraban a cian),
 croma muy bajo, para que "pertenezcan" a la paleta. El `--grey` se oscureció para
 cumplir contraste AA como texto secundario.
 
-→ futuro: migrar la paleta a **OKLCH** para un control de croma/lightness más preciso.
 El marigold para texto pequeño sobre claro tiene poco contraste: usarlo en fondos con
-texto oscuro encima (como en los CTAs), no como color de texto. Quedan colores ad-hoc
-sueltos en componentes (`white`, `#03091e`, `#555a81`) que convendría tokenizar.
+texto oscuro encima (como en los CTAs), no como color de texto.
+
+**Toda** la app usa tokens: no quedan colores literales (`white`, `black`, `gray`,
+hex ni `rgba`) sueltos en los componentes; cada uno apunta a una variable de la paleta.
 
 ## Typography
 
@@ -90,9 +96,9 @@ Escala de espaciado (base 4px) en `:root`, lista para usar:
 | `--space-7` | 3rem | 48 |
 | `--space-8` | 4rem | 64 |
 
-→ en curso: migrar los paddings/márgenes sueltos en px a estos tokens. Conviene hacerlo
-por pantalla y verificando, porque snappear valores fuera de escala (9, 15, 18, 20px)
-cambia ligeramente el layout.
+Aplicada en **todas** las pantallas: `padding`/`margin`/`gap` usan los tokens (no quedan
+valores px sueltos salvo `0`). El landing además tiene un pase de ritmo (separación
+generosa entre hero / estadísticas / secciones, agrupación más apretada dentro).
 
 ## Components
 
@@ -107,10 +113,27 @@ cambia ligeramente el layout.
   muestra errores en la tarjeta.
 - **Nav, spinner, not-found** completan el sistema.
 
+## Elevación (sombras)
+
+Escala de sombras tintadas con el indigo de marca (no negro puro), en `:root`:
+
+| Token | Uso |
+|---|---|
+| `--shadow-sm` | Tarjetas de mascota, tarjetas de login/registro |
+| `--shadow-md` | Hover de tarjetas (elevación al pasar el cursor) |
+| `--shadow-lg` | Menú desplegable del nav, panel de filtros |
+
 ## Motion
 
-Mínima por ahora. → futuro: añadir microinteracciones con ease-out (sin bounce), sin
-animar propiedades de layout, respetando `prefers-reduced-motion`.
+Tokens en `:root`: `--ease-out` (cubic-bezier exponencial, sin bounce), `--dur` (220ms,
+estados) y `--dur-fast` (140ms, feedback). Microinteracciones aplicadas:
+
+- **Botones:** transición de color/sombra; `brightness(0.96)` al hover y `translateY(1px)`
+  al pulsar (feedback de "press"). `--yellow-hover` disponible para el acento.
+- **Tarjetas de mascota:** se elevan (`translateY(-3px)` + `--shadow-md`) al hover.
+- **Formularios:** anillo de foco on-brand (indigo) en vez del azul de Bootstrap.
+- **Foco visible** accesible (`:focus-visible`) en todos los interactivos.
+- Reglas: no se animan propiedades de layout; todo respeta `prefers-reduced-motion`.
 
 ## Bibliotecas
 

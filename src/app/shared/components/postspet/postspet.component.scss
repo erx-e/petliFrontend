@@ -6,16 +6,16 @@
 .load-container{
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: var(--space-4);
 }
 
 .load-button{
-  padding: 9px 16px;
+  padding: var(--space-2) var(--space-4);
   background-color: var(--yellow);
   font-weight: 700;
   font-size: var(--text-sm);
   border-radius: 6px;
-  color: #03091e;
+  color: var(--ink);
 }
 
 
@@ -23,7 +23,7 @@
   .postpets--grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-gap: 15px;
+    grid-gap: var(--space-4);
   }
   .profileGrid{
     grid-template-columns: repeat(2, 1.5fr);
@@ -35,7 +35,7 @@
   .postpets--grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-gap: 15px;
+    grid-gap: var(--space-4);
   }
   .profileGrid{
     grid-template-columns: repeat(3, 1fr);

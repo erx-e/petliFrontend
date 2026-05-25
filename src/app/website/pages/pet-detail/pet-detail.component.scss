@@ -19,27 +19,27 @@ a {
 }
 
 .backBotton {
-  padding: 9px 9px;
+  padding: var(--space-2) var(--space-2);
   font-weight: 600;
   background-color: var(--yellow);
   border-radius: 6px;
 }
 
 .deleteButton {
-  padding: 9px 9px;
+  padding: var(--space-2) var(--space-2);
   font-weight: 600;
   background-color: var(--blue);
-  color: white;
+  color: var(--white);
   border-radius: 6px;
 }
 
 .editButton {
-  padding: 9px 9px;
+  padding: var(--space-2) var(--space-2);
   font-weight: 600;
-  color: white;
+  color: var(--white);
   background-color: var(--grey);
   border-radius: 6px;
-  margin-right: 5px;
+  margin-right: var(--space-1);
 }
 
 .petContainer {
@@ -102,11 +102,11 @@ a {
 
 @media screen and (min-width: 48rem) {
   .petpost-page {
-    margin-top: 40px;
+    margin-top: var(--space-7);
   }
   .petContainer {
     display: flex;
-    margin-top: 45px;
+    margin-top: var(--space-7);
   }
   .petGallery {
     margin-bottom: 0px;
@@ -114,7 +114,7 @@ a {
   }
   .petData {
     margin-bottom: 0px;
-    margin-left: 5px;
+    margin-left: var(--space-1);
     min-width: 390px;
     min-height: 340px;
   }
@@ -122,7 +122,7 @@ a {
 @media screen and (min-width: 64rem) {
   .petpost-page {
     margin: 0 auto;
-    margin-top: 40px;
+    margin-top: var(--space-7);
     max-width: 1280px;
   }
   .petGallery {
@@ -135,6 +135,6 @@ a {
   .petData {
     min-width: 450px;
     min-height: 520px;
-    margin-left: 20px;
+    margin-left: var(--space-4);
   }
 }

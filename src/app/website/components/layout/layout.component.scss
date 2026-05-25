@@ -2,7 +2,7 @@
   background-color: var(--blue);
   width: 100%;
   height: 350px;
-  margin-top: 50px;
+  margin-top: var(--space-7);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,7 +14,7 @@
   text-align: center;
   color: var(--light-blue);
   p{
-    margin-top: 5px;
+    margin-top: var(--space-1);
   }
 }
 
@@ -23,11 +23,11 @@
 }
 
 .navLinks{
-  margin-top: 35px;
+  margin-top: var(--space-6);
   text-align: center;
   padding: 0;
   li{
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2);
     a{
       text-decoration: none;
       color: var(--lighter-light-blue);

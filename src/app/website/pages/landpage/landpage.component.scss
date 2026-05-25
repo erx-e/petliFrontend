@@ -86,7 +86,7 @@ html {
     .stadistics_box-icon {
       height: 45px;
       width: 45px;
-      margin-right: 5px;
+      margin-right: var(--space-1);
       img{
         height: 100%;
         width: 100%;
@@ -102,7 +102,7 @@ html {
 }
 
 .text-black-fade {
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--grey);
 }
 
 .hide-mobile {
@@ -167,7 +167,7 @@ html {
   }
 
   .main {
-    padding-top: 68px;
+    padding-top: var(--space-8);
   }
 }
 
@@ -179,7 +179,7 @@ html {
 /* Tablet - Laptop */
 @media screen and (min-width: 48rem) {
   .main {
-    padding-top: 68px;
+    padding-top: var(--space-8);
     max-width: 1280px;
   }
 
@@ -188,11 +188,11 @@ html {
   }
 
   .main__container-stadistics {
-    margin-top: 24px;
+    margin-top: var(--space-5);
   }
 
   .main__stadistics-data {
-    padding-top: 24px;
+    padding-top: var(--space-5);
   }
   .show-mobile {
     display: none;
@@ -202,10 +202,10 @@ html {
   }
 
   .main {
-    padding-top: 24px;
+    padding-top: var(--space-5);
     .main__portada {
       .title {
-        margin-top: 16px;
+        margin-top: var(--space-4);
       }
       .text {
         text-align: left;

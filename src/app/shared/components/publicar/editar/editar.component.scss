@@ -1,13 +1,13 @@
 .main {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 0 14px;
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
+  padding: 0 var(--space-3);
 }
 
 .title {
   font-size: var(--text-lg);
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-2);
 }
 
 .titleSection{
@@ -16,15 +16,15 @@
 }
 
 .backButton{
-  padding: 9px 9px;
+  padding: var(--space-2) var(--space-2);
   font-weight: 600;
   background-color: var(--yellow);
   border-radius: 6px;
-  margin-right: 8px;
+  margin-right: var(--space-2);
 }
 
 .formBox {
-  margin-top: 12px;
+  margin-top: var(--space-3);
 }
 
 .form-container {
@@ -33,8 +33,8 @@
 }
 
 .form-element-section {
-  padding: 10px 9px;
-  margin-bottom: 15px;
+  padding: var(--space-2) var(--space-2);
+  margin-bottom: var(--space-4);
 }
 
 .flex {
@@ -50,8 +50,8 @@
 }
 
 .form-elements {
-  padding: 9px 0px;
-  margin-top: 15px;
+  padding: var(--space-2) 0px;
+  margin-top: var(--space-4);
 }
 
 .textDescription {
@@ -59,7 +59,7 @@
 }
 
 .inputFileElement {
-  margin-top: 15px;
+  margin-top: var(--space-4);
 }
 
 .message {
@@ -73,7 +73,7 @@
 
 .uploadedImgs {
   display: none;
-  margin-top: 20px;
+  margin-top: var(--space-4);
   img {
     width: 100%;
   }
@@ -85,7 +85,7 @@
   max-width: 300px;
   position: relative;
   display: none;
-  margin-bottom: 5px;
+  margin-bottom: var(--space-1);
 }
 
 .deleteIcon {
@@ -101,8 +101,8 @@
 .progressBar {
   display: none;
   width: 100%;
-  border: gray 1px solid;
-  margin-top: 15px;
+  border: var(--grey) 1px solid;
+  margin-top: var(--space-4);
   border-radius: 8px;
   background-color: var(--blue);
 }
@@ -115,36 +115,36 @@
 }
 
 .submit-btn {
-  padding: 9px 16px;
+  padding: var(--space-2) var(--space-4);
   font-weight: 700;
   background-color: var(--yellow);
   font-size: var(--text-base);
   line-height: 1.15;
-  margin-top: 5px;
-  margin-bottom: 20px;
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-4);
 }
 
 .contactInput{
   display: inline-block;
   width: 100%;
-  margin-right: 8px;
+  margin-right: var(--space-2);
 }
 
 .addContactField{
   display: inline-block;
-  padding: 8px 8px;
+  padding: var(--space-2) var(--space-2);
   background-color: var(--yellow);
   font-weight: 600;
   border-radius: 5px;
 }
 
 .formArrayElement{
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .files-uploader{
-  margin-top: 15px;
-  padding: 9px;
+  margin-top: var(--space-4);
+  padding: var(--space-2);
 }
 
 .full-width {
@@ -174,8 +174,8 @@
 
 @media screen and (min-width: 30rem) {
   .main {
-    margin: 18px auto;
-    padding: 0px 18px;
+    margin: var(--space-4) auto;
+    padding: 0px var(--space-4);
   }
   .flex {
     flex-direction: row;
@@ -184,7 +184,7 @@
 
   .form-elements {
     width: 50%;
-    padding: 9px;
+    padding: var(--space-2);
 
     &.inputFileElement {
       width: auto;
@@ -206,15 +206,15 @@
 
 @media screen and (min-width: 48rem) {
   .main {
-    margin: 40px auto;
+    margin: var(--space-7) auto;
     max-width: 750px;
-    padding: 0px 24px;
+    padding: 0px var(--space-5);
   }
 }
 
 @media screen and (min-width: 64rem) {
   .main {
-    margin: 60px auto;
+    margin: var(--space-8) auto;
   }
 }
 

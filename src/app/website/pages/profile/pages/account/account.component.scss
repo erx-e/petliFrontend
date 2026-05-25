@@ -2,11 +2,11 @@
   font-weight: 600;
   font-size: var(--text-xl);
   height: 34px;
-  padding: 6px 0px;
+  padding: var(--space-2) 0px;
 }
 
 .form-field {
-  padding: 10px 0px;
+  padding: var(--space-2) 0px;
   max-width: 342px;
 }
 
@@ -16,11 +16,11 @@
 
 .changePassword__button{
   background-color: var(--blue);
-  padding: 9px 16px;
+  padding: var(--space-2) var(--space-4);
   font-weight: 600;
-  color: white;
+  color: var(--white);
   border-radius: 6px;
-  margin-top: 8px;
+  margin-top: var(--space-2);
 }
 
 .passChanged{
@@ -29,20 +29,20 @@
 }
 
 .accountPage__delete{
-  margin-top: 42px;
+  margin-top: var(--space-7);
 }
 
 .delete__text{
-  margin-top: 10px;
+  margin-top: var(--space-2);
 }
 
 .delete__button{
   background-color: var(--blue);
-  padding: 9px 16px;
+  padding: var(--space-2) var(--space-4);
   font-weight: 600;
-  color: white;
+  color: var(--white);
   border-radius: 6px;
-  margin-top: 8px;
+  margin-top: var(--space-2);
 }
 
 
@@ -68,7 +68,7 @@
 
 .icon-eye{
   position: absolute;
-  fill: gray;
+  fill: var(--grey);
   right: 15px;
   cursor: pointer;
   top: 45px;

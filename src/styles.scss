@@ -40,30 +40,32 @@ h6,
   line-height: 1.15;
 }
 
-// Acento "luz del faro": dorado marigold cálido (antes #faff00, lima eléctrico).
-// Representa el haz del faro/linterna que encuentra a la mascota, sobre el azul noche.
-$yellow: #ffb703;
-$blue: #06003eff;
-$blue-transparent: #06003e5c;
-// Neutros tintados hacia el indigo de marca (antes tiraban a cian). Croma bajo.
-// $grey se oscureció un punto para cumplir contraste AA como texto secundario.
-$grey: #5f5e7a;
-$light-blue: #ebebf5;
-$darker-light-blue: #d9d8e6;
-$lighter-light-blue: #f4f4fa;
-$green: #2ba84a;
-$red: #ff1d15;
-
 :root {
-  --yellow: #{$yellow};
-  --blue: #{$blue};
-  --blue-transparent: #{$blue-transparent};
-  --grey: #{$grey};
-  --light-blue: #{$light-blue};
-  --darker-light-blue: #{$darker-light-blue};
-  --lighter-light-blue: #{$lighter-light-blue};
-  --green: #{$green};
-  --red: #{$red};
+  /* Paleta en OKLCH (L C H). Neutros unificados al tono indigo de marca (~272°),
+     croma bajo, solo varía la luminosidad: forman una familia coherente.
+     Cada color lleva fallback hex para navegadores sin soporte de oklch(). */
+  --yellow: #ffb703;
+  --yellow: oklch(0.825 0.171 80);              /* acento "luz del faro" (marigold) */
+  --blue: #06003e;
+  --blue: oklch(0.17 0.11 272);                 /* indigo noche: texto / oscuro */
+  --blue-transparent: #06003e5c;
+  --blue-transparent: oklch(0.17 0.11 272 / 0.36);
+  --grey: #5f5e7a;
+  --grey: oklch(0.49 0.04 272);                 /* texto secundario / mudo */
+  --lighter-light-blue: #f4f4fa;
+  --lighter-light-blue: oklch(0.97 0.008 272);  /* inputs / fondos sutiles */
+  --light-blue: #ebebf5;
+  --light-blue: oklch(0.945 0.013 272);         /* fondo de página */
+  --darker-light-blue: #d9d8e6;
+  --darker-light-blue: oklch(0.89 0.018 272);   /* superficies / tarjetas */
+  --green: #2ba84a;
+  --green: oklch(0.64 0.17 147);                /* éxito / validación */
+  --red: #ff1d15;
+  --red: oklch(0.64 0.25 29);                   /* error / validación */
+  --ink: #03091e;
+  --ink: oklch(0.15 0.05 272);                  /* casi-negro: texto sobre CTAs amarillas */
+  --white: #fcfcff;
+  --white: oklch(0.99 0.004 272);               /* blanco tintado: superficies / texto en oscuro */
 
   /* Tipografía: Fraunces (serif cálido) para titulares, Mulish para cuerpo/UI */
   --font-heading: "Fraunces", Georgia, "Times New Roman", serif;
@@ -87,6 +89,20 @@ $red: #ff1d15;
   --space-6: 2rem;    /* 32px */
   --space-7: 3rem;    /* 48px */
   --space-8: 4rem;    /* 64px */
+
+  /* Elevación: sombras tintadas con el indigo de marca (no negro puro) */
+  --shadow-sm: 0 1px 2px oklch(0.17 0.11 272 / 0.08),
+               0 2px 6px oklch(0.17 0.11 272 / 0.06);
+  --shadow-md: 0 4px 14px oklch(0.17 0.11 272 / 0.12);
+  --shadow-lg: 0 12px 32px oklch(0.17 0.11 272 / 0.18);
+
+  /* Motion: ease-out exponencial, sin bounce. Duraciones de feedback/estado. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur: 220ms;
+
+  /* Estado hover del acento (un punto más oscuro, mismo tono) */
+  --yellow-hover: oklch(0.78 0.171 80);
 }
 
 .invalid-feedback {
@@ -118,5 +134,58 @@ $red: #ff1d15;
 }
 
 .body {
-  background-color: $light-blue;
+  background-color: var(--light-blue);
+}
+
+/* ===== Microinteracciones globales ===== */
+
+/* Botones y enlaces de acción: transición suave de color/sombra/transform. */
+button,
+.btn,
+a {
+  transition: filter var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out);
+}
+
+/* Feedback de hover y "press" en botones (no en los deshabilitados). */
+button:not(:disabled):hover {
+  filter: brightness(0.96);
+}
+button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+/* Foco visible y on-brand (accesibilidad WCAG AA). */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* Anillo de foco de formularios en color de marca (en vez del azul de Bootstrap). */
+.form-control,
+.form-select {
+  transition: border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px oklch(0.17 0.11 272 / 0.15);
+  outline: none;
+}
+
+/* Respeta a quienes prefieren menos movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

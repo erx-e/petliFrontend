@@ -1,12 +1,12 @@
 .title__container{
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: var(--space-2);
   height: 34px;
 }
 
 .editButton{
-  padding: 9px 12px;
+  padding: var(--space-2) var(--space-3);
   border-radius: 6px;
   background-color: var(--yellow);
   font-weight: 600;
@@ -19,23 +19,23 @@
 }
 
 .form-field {
-  padding: 10px 0px;
+  padding: var(--space-2) 0px;
 }
 
 .formArrayElement{
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .contactInput{
   display: inline-block;
   width: 100%;
-  margin-right: 8px;
+  margin-right: var(--space-2);
 }
 
 .addContactField{
   display: inline-block;
-  margin-top: 6px;
-  padding: 9px 9px;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-2);
   background-color: var(--yellow);
   font-weight: 600;
   border-radius: 5px;
@@ -46,16 +46,16 @@
 }
 
 .cancelButton{
-  padding: 9px 12px;
+  padding: var(--space-2) var(--space-3);
   border-radius: 6px;
   background-color: var(--red);
-  margin-left: 5px;
+  margin-left: var(--space-1);
   font-weight: 600;
 }
 
 .profilePublicPage__info{
   p{
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
     line-height: 1.15;
   }
 }
@@ -94,7 +94,7 @@
   }
 
   .editButton{
-    margin-left: 150px;
+    margin-left: var(--space-8);
   }
 
 }
@@ -102,7 +102,7 @@
 @media screen and (min-width: 64rem){
 
   .editButton{
-    margin-right: 150px;
+    margin-right: var(--space-8);
   }
 
   .form-control{

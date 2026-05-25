@@ -4,9 +4,9 @@
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: var(--space-2);
   height: 200px;
-  padding: 20px;
+  padding: var(--space-4);
   border-radius: 6px;
   border: 2px dashed var(--grey);
   background-color: var(--lighter-light-blue);
@@ -22,7 +22,7 @@
 
 .text {
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
   line-height: 1.15;
 }
 
@@ -31,20 +31,20 @@
 }
 
 .file-label {
-  padding: 9px 16px;
+  padding: var(--space-2) var(--space-4);
   border-radius: 5px;
-  color: white;
+  color: var(--white);
   background-color: var(--grey);
   cursor: pointer;
 }
 
 .uploaded-files {
   width: 100%;
-  margin-top: 10px;
+  margin-top: var(--space-2);
 }
 
 .imgUploaded {
-  margin-bottom: 10px;
+  margin-bottom: var(--space-2);
 }
 
 @media screen and (min-width: 48rem) {

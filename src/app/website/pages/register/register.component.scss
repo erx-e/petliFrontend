@@ -1,11 +1,11 @@
 .register-container {
-  margin: 58px auto;
+  margin: var(--space-8) auto;
   width: 300px;
 }
 
 .nav__logo {
   display: flex;
-  margin: 12px auto;
+  margin: var(--space-3) auto;
   align-items: center;
   height: 100%;
   width: min-content;
@@ -13,9 +13,9 @@
   a {
     font-weight: bold;
     text-decoration: none;
-    color: black;
+    color: var(--blue);
     img {
-      margin-right: 5px;
+      margin-right: var(--space-1);
       width: 50px;
       height: 50px;
     }
@@ -25,23 +25,24 @@
 .register-texto {
   margin: 0 auto;
   font-size: var(--text-2xl);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
   text-align: center;
 }
 
 .auth-subtitle {
   display: block;
-  margin-top: 8px;
+  margin-top: var(--space-2);
   font-size: var(--text-sm);
   line-height: 1.3;
   color: var(--grey);
 }
 
 .form-box {
-  padding: 16px;
-  padding-top: 25px;
-  border: 1px solid gray;
+  padding: var(--space-4);
+  padding-top: var(--space-5);
+  border: 1px solid var(--darker-light-blue);
   border-radius: 6px;
+  box-shadow: var(--shadow-sm);
 }
 
 .form-flex {
@@ -50,22 +51,22 @@
 }
 
 .form-items {
-  margin-bottom: 20px;
+  margin-bottom: var(--space-4);
 }
 
 .form-button {
   width: 100%;
   background-color: var(--yellow);
-  padding: 9px 19px;
+  padding: var(--space-2) var(--space-4);
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .login {
   text-align: center;
-  margin-top: 16px;
-  padding: 16px;
-  border: 1px solid gray;
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--grey);
   border-radius: 6px;
   a {
     text-decoration: none;
@@ -94,7 +95,7 @@
 
 .icon-eye{
   position: absolute;
-  fill: gray;
+  fill: var(--grey);
   right: 15px;
   cursor: pointer;
   top: 35px;

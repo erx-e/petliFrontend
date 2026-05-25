@@ -5,8 +5,11 @@
   box-sizing: content-box;
   background-color: var(--darker-light-blue);
   border-radius: 5px;
-  padding: 12px;
-  margin-bottom: 15px;
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
 }
 
 .postpetHome {
@@ -14,8 +17,19 @@
   box-sizing: content-box;
   background-color: var(--darker-light-blue);
   border-radius: 5px;
-  padding: 12px;
-  margin: 0px 5px;
+  padding: var(--space-3);
+  margin: 0px var(--space-1);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+
+// Las tarjetas con contenido se elevan al pasar el cursor (las del esqueleto
+// de carga no tienen enlace, pero el efecto es inofensivo).
+.postpet:hover,
+.postpetHome:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
 
 .container__postpet-img {
@@ -28,7 +42,7 @@
   display: flex;
   min-width: 200px;
   min-height: 200px;
-  background-color: white;
+  background-color: var(--white);
   align-items: center;
 }
 
@@ -45,9 +59,9 @@
   line-height: 1.15;
   padding-top: 0px;
   p {
-    padding-bottom: 4px;
+    padding-bottom: var(--space-1);
     &:first-child {
-      padding-top: 8px;
+      padding-top: var(--space-2);
     }
   }
 }
@@ -60,7 +74,7 @@
   }
 
   .postpetHome{
-    margin: 0px 10px;
+    margin: 0px var(--space-2);
   }
 
   .container__postpet-img {
@@ -75,7 +89,7 @@
   .flex-justify-center {
     display: flex;
     justify-content: center;
-    background-color: white;
+    background-color: var(--white);
     height: 210px;
   }
 
