@@ -1,18 +1,15 @@
 @if (postpet) {
-  <div [class]="home ? 'postpetHome' : 'postpet'">
+  <a
+    [class]="home ? 'postpetHome' : 'postpet'"
+    [routerLink]="['/pet', postpet.id]"
+  >
     <div class="container__postpet-img">
       @if (postpet.urlImgs) {
         <div class="postpet-img">
-          <a [routerLink]="['/pet', postpet.id]">
-            <!-- <app-image
-            [img]="postpet.urlImgs[0].url"
-            [alt]="postpet.petSpecie"
-          ></app-image> -->
           <img class="postpetImg" [src]="postpet.urlImgs[0].url" [alt]="postpet.petName || 'Mascota publicada'" />
-        </a>
-      </div>
-    }
-  </div>
+        </div>
+      }
+    </div>
   <div class="postpet-info">
     @if (postpet.petName) {
       <p>
@@ -47,7 +44,7 @@
     </div>
   }
 </div>
-</div>
+</a>
 } @else {
   <div [class]="home ? 'postpetHome' : 'postpet'">
     <div class="container__postpet-img">
