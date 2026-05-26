@@ -63,6 +63,7 @@ a {
   margin-top: var(--space-3);
   p {
     font-size: var(--text-lg);
+    font-weight: 700;
   }
 }
 
@@ -71,7 +72,38 @@ a {
 }
 
 .form-filter-element {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+// Etiquetas de filtro: pequeñas y mudas, para que el panel respire.
+.form-label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--grey);
+}
+
+// Encabezado de grupo (p. ej. "Ubicación") con separador sutil.
+.filter-group {
+  margin: var(--space-3) 0 var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--darker-light-blue);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--blue);
+}
+
+// Botones Perro/Gato en colores de marca (no el azul por defecto de Bootstrap).
+.btn-outline-primary {
+  --bs-btn-color: var(--blue);
+  --bs-btn-border-color: var(--darker-light-blue);
+  --bs-btn-hover-color: var(--white);
+  --bs-btn-hover-bg: var(--blue);
+  --bs-btn-hover-border-color: var(--blue);
+  --bs-btn-active-color: var(--white);
+  --bs-btn-active-bg: var(--blue);
+  --bs-btn-active-border-color: var(--blue);
 }
 
 .submitButtons {
@@ -272,7 +304,8 @@ a {
   }
 
   .filter-title {
-    font-weight: 600;
+    font-size: var(--text-lg);
+    font-weight: 700;
   }
 
   aside {

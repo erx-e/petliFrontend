@@ -29,4 +29,20 @@ export class PostpetComponent implements OnInit {
       );
     }
   }
+
+  // Etiqueta del estado del post, para el badge de la tarjeta.
+  get stateLabel(): string {
+    switch (this.postpet?.petStateId) {
+      case "B":
+        return "Perdido";
+      case "E":
+        return "Encontrado";
+      case "A":
+        return "En adopción";
+      case "H":
+        return "Necesita ayuda";
+      default:
+        return "";
+    }
+  }
 }

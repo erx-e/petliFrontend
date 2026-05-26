@@ -18,7 +18,7 @@
         </div>
         <form [formGroup]="form" class="form-container">
           <div class="form-filter-element">
-            <p class="form-label">Tipo de mascota</p>
+            <p class="form-label">Mascota</p>
             <div
               class="btn-group full-width"
               role="group"
@@ -47,14 +47,14 @@
                 </div>
               </div>
               <div class="form-filter-element">
-                <label class="form-label" for="formRaza">Raza: </label>
+                <label class="form-label" for="formRaza">Raza</label>
                 <select
                   class="form-select"
                   formControlName="idPetBreed"
                   name="raza"
                   id="formRaza"
                   >
-                  <option value="">Escoja la raza</option>
+                  <option value="">Todas las razas</option>
                   @for (breed of breeds; track breed; let i = $index) {
                     <option
                       [value]="breeds[i].id"
@@ -65,14 +65,15 @@
                 </select>
               </div>
               <div class="form-filter-element">
-                <label class="form-label" for="formProvincia">Provincia: </label>
+                <p class="filter-group">Ubicación</p>
+                <label class="form-label" for="formProvincia">Provincia</label>
                 <select
                   class="form-select"
                   formControlName="idProvincia"
                   name="idProvincia"
                   id="formProvincia"
                   >
-                  <option value="">Escoja la provincia</option>
+                  <option value="">Todas las provincias</option>
                   @for (provincia of provincias; track provincia) {
                     <option [value]="provincia.id">
                       {{ provincia.name }}
@@ -81,14 +82,14 @@
                 </select>
               </div>
               <div class="form-filter-element">
-                <label class="form-label" for="formCanton">Canton: </label>
+                <label class="form-label" for="formCanton">Cantón</label>
                 <select
                   class="form-select"
                   formControlName="idCanton"
                   name="idCanton"
                   id="formCanton"
                   >
-                  <option value="">Escoja el canton</option>
+                  <option value="">Todos los cantones</option>
                   @for (canton of cantones; track canton) {
                     <option [value]="canton.id">
                       {{ canton.name }}
@@ -98,14 +99,14 @@
               </div>
               @if (sectores.length > 0) {
                 <div class="form-filter-element">
-                  <label class="form-label" for="formSector">Sector: </label>
+                  <label class="form-label" for="formSector">Sector</label>
                   <select
                     class="form-select"
                     formControlName="idSector"
                     name="sector"
                     id="formSector"
                     >
-                    <option value="">Escoja el sector</option>
+                    <option value="">Todos los sectores</option>
                     @for (sector of sectores; track sector) {
                       <option [value]="sector.id">
                         {{ sector.name }}
@@ -117,7 +118,7 @@
               @if (stateId == 'B' || stateId == 'E') {
                 <div class="form-filter-element">
                   <label class="form-label" for="formLastTime"
-                    >Cuando fue visto por ultima vez:</label
+                    >Visto por última vez</label
                     >
                     <input
                       class="form-control"
@@ -134,7 +135,7 @@
                           <p
                             class="invalid-feedback"
                             >
-                            Debe colocar una fecha correcta
+                            Indica una fecha válida
                           </p>
                         }
                       </div>
@@ -142,7 +143,7 @@
                   }
                   @if (stateId == 'B' || stateId == 'E') {
                     <div class="form-filter-element">
-                      <label class="form-label" for="order">Ordernar por: </label>
+                      <label class="form-label" for="order">Ordenar por</label>
                       <select
                         class="form-select"
                         formControlName="order"
@@ -230,7 +231,7 @@
                               <p class="filter-title">Filtro</p>
                               <form [formGroup]="form" class="form-container">
                                 <div class="form-filter-element">
-                                  <p class="form-label">Tipo de mascota</p>
+                                  <p class="form-label">Mascota</p>
                                   <div
                                     class="btn-group full-width"
                                     role="group"
@@ -261,14 +262,14 @@
                                         </div>
                                       </div>
                                       <div class="form-filter-element">
-                                        <label class="form-label" for="formRaza">Raza: </label>
+                                        <label class="form-label" for="formRaza">Raza</label>
                                         <select
                                           class="form-select"
                                           formControlName="idPetBreed"
                                           name="raza"
                                           id="formRaza"
                                           >
-                                          <option value="">Escoja la raza</option>
+                                          <option value="">Todas las razas</option>
                                           @for (breed of breeds; track breed; let i = $index) {
                                             <option
                                               [value]="breeds[i].id"
@@ -279,14 +280,15 @@
                                         </select>
                                       </div>
                                       <div class="form-filter-element">
-                                        <label class="form-label" for="formProvincia">Provincia: </label>
+                                        <p class="filter-group">Ubicación</p>
+                <label class="form-label" for="formProvincia">Provincia</label>
                                         <select
                                           class="form-select"
                                           formControlName="idProvincia"
                                           name="idProvincia"
                                           id="formProvincia"
                                           >
-                                          <option value="">Escoja la provincia</option>
+                                          <option value="">Todas las provincias</option>
                                           @for (provincia of provincias; track provincia) {
                                             <option
                                               [value]="provincia.id"
@@ -297,14 +299,14 @@
                                         </select>
                                       </div>
                                       <div class="form-filter-element">
-                                        <label class="form-label" for="formCanton">Canton: </label>
+                                        <label class="form-label" for="formCanton">Cantón</label>
                                         <select
                                           class="form-select"
                                           formControlName="idCanton"
                                           name="idCanton"
                                           id="formCanton"
                                           >
-                                          <option value="">Escoja el canton</option>
+                                          <option value="">Todos los cantones</option>
                                           @for (canton of cantones; track canton) {
                                             <option [value]="canton.id">
                                               {{ canton.name }}
@@ -314,14 +316,14 @@
                                       </div>
                                       @if (sectores.length > 0) {
                                         <div class="form-filter-element">
-                                          <label class="form-label" for="formSector">Sector: </label>
+                                          <label class="form-label" for="formSector">Sector</label>
                                           <select
                                             class="form-select"
                                             formControlName="idSector"
                                             name="sector"
                                             id="formSector"
                                             >
-                                            <option value="">Escoja el sector</option>
+                                            <option value="">Todos los sectores</option>
                                             @for (sector of sectores; track sector) {
                                               <option [value]="sector.id">
                                                 {{ sector.name }}
@@ -333,7 +335,7 @@
                                       @if (stateId == 'B' || stateId == 'E') {
                                         <div class="form-filter-element">
                                           <label class="form-label" for="formLastTime"
-                                            >Cuando fue visto por ultima vez:</label
+                                            >Visto por última vez</label
                                             >
                                             <input
                                               class="form-control"
@@ -350,7 +352,7 @@
                                                   <p
                                                     class="invalid-feedback"
                                                     >
-                                                    Debe colocar una fecha correcta
+                                                    Indica una fecha válida
                                                   </p>
                                                 }
                                               </div>
@@ -358,7 +360,7 @@
                                           }
                                           @if (stateId == 'B' || stateId == 'E') {
                                             <div class="form-filter-element">
-                                              <label class="form-label" for="order">Ordernar por: </label>
+                                              <label class="form-label" for="order">Ordenar por</label>
                                               <select
                                                 class="form-select"
                                                 formControlName="order"

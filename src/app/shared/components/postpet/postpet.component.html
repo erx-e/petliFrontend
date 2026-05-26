@@ -9,47 +9,48 @@
           <img class="postpetImg" [src]="postpet.urlImgs[0].url" [alt]="postpet.petName || 'Mascota publicada'" />
         </div>
       }
+      <span class="stateBadge" [class]="'state--' + postpet.petStateId">{{ stateLabel }}</span>
     </div>
-  <div class="postpet-info">
-    @if (postpet.petName) {
-      <p>
-        Nombre: {{postpet.petName}}
+    <div class="postpet-info">
+      <h3 class="postpet-name">
+        {{ (postpet.petName | titlecase) || (postpet.petSpecie | titlecase) || 'Mascota' }}
+      </h3>
+
+      <p class="postpet-location">
+        <svg class="pin" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" />
+        </svg>
+        <span>{{ postpet.cantonName | titlecase }}, {{ postpet.provinciaName | titlecase }}</span>
       </p>
-    }
-    @if (postpet.petStateId == 'B' || postpet.petStateId == 'E') {
-      <p>
-        Visto por ultima vez en {{ postpet.cantonName | titlecase }},
-        {{ postpet.provinciaName | titlecase }}@if (postpet.lastTimeSeen) {
-        <span>, {{ lastTimeSeen }}</span>
+
+      @if (
+        (postpet.petStateId == 'B' || postpet.petStateId == 'E') &&
+        postpet.lastTimeSeen
+      ) {
+        <p class="postpet-date">Visto {{ lastTimeSeen }}</p>
       }
-    </p>
-  }
-  @if (postpet.petStateId == 'A' || postpet.petStateId == 'H') {
-    <p>
-      Se encuentra en {{ postpet.cantonName | titlecase }}, {{ postpet.provinciaName | titlecase }}
-    </p>
-  }
-  @if (postpet.petBreed) {
-    <p>Raza: {{ postpet.petBreed }}</p>
-  }
-  @if (postpet.petStateId == 'B') {
-    <div>
-      @if (postpet.reward) {
-        <p>
-          Recompensa: {{ postpet.reward | currency }}
-        </p>
-      } @else {
-        <p>Recompensa: -</p>
+
+      @if (postpet.petBreed || postpet.reward) {
+        <div class="postpet-tags">
+          @if (postpet.petBreed) {
+            <span class="tag">{{ postpet.petBreed | titlecase }}</span>
+          }
+          @if (postpet.reward) {
+            <span class="tag tag--reward">Recompensa {{ postpet.reward | currency }}</span>
+          }
+        </div>
       }
     </div>
-  }
-</div>
-</a>
+  </a>
 } @else {
   <div [class]="home ? 'postpetHome' : 'postpet'">
     <div class="container__postpet-img">
-      <div class="postpet-imgLoading"></div>
+      <div class="skeleton skeleton-img"></div>
     </div>
-    <div class="postpet-info"></div>
+    <div class="postpet-info">
+      <div class="skeleton skeleton-line skeleton-title"></div>
+      <div class="skeleton skeleton-line skeleton-text"></div>
+      <div class="skeleton skeleton-line skeleton-tag"></div>
+    </div>
   </div>
 }
