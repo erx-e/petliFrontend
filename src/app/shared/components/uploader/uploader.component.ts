@@ -71,14 +71,12 @@ export class UploaderComponent {
     } else if (this.updating) {
       this.imgsUrlUpdating = this.imgsUrlUpdating.map((imgg) => {
         if (imgg.idImage == img.idImage) {
-          console.log(imgg.idImage, img.idImage)
           return {idImage: img.idImage, url: null} as updateImg;
         }
         return imgg
       });
 
       this.imgsUrlUpdatingToShow = this.imgsUrlUpdatingToShow.filter((imgg) => imgg.idImage != img.idImage)
-      console.log(this.imgsUrlUpdatingToShow)
 
       this.changeUpdate.emit(this.imgsUrlUpdating);
     }
@@ -96,7 +94,6 @@ export class UploaderComponent {
   removeFile(imgName: string) {
     let dt = new DataTransfer();
     let inputFile = document.getElementById("inputElement") as HTMLInputElement;
-    console.log(inputFile);
     let { files } = inputFile;
     if (files.length == 1) {
       inputFile.value = "";
@@ -107,6 +104,5 @@ export class UploaderComponent {
       }
       inputFile.files = dt.files;
     }
-    console.log(inputFile.files);
   }
 }

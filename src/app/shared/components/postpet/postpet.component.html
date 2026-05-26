@@ -8,7 +8,7 @@
             [img]="postpet.urlImgs[0].url"
             [alt]="postpet.petSpecie"
           ></app-image> -->
-          <img class="postpetImg" [src]="postpet.urlImgs[0].url" alt="" />
+          <img class="postpetImg" [src]="postpet.urlImgs[0].url" [alt]="postpet.petName || 'Mascota publicada'" />
         </a>
       </div>
     }

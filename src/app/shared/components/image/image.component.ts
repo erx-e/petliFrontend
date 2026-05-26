@@ -19,7 +19,6 @@ export class ImageComponent implements OnInit {
   @Output() imgLoaded = new EventEmitter<HTMLImageElement>();
 
   reload(){
-    console.log(this.img)
     this.img = this.img
   }
 

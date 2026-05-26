@@ -43,7 +43,7 @@
       <div class="petContainer">
         <div class="petGallery">
           @for (img of postpet?.urlImgs; track img.url) {
-            <img class="imgPet" [src]="img.url" alt="imagen mascota" />
+            <img class="imgPet" [src]="img.url" [alt]="postpet?.petName ? 'Foto de ' + postpet.petName : 'Foto de la mascota'" />
           }
         </div>
         <div class="petData">

@@ -30,7 +30,6 @@ export class AuthService {
     const token = this.tokenService.getToken();
     if (token) {
       this.getProfile().subscribe();
-      console.log(this.router.url);
       if (this.location.isCurrentPathEqualTo('/')) {
         this.router.navigate(['/home']);
       }
@@ -47,7 +46,6 @@ export class AuthService {
           if (error.status === HttpStatusCode.BadRequest) {
             return throwError('El email o contraseña estan incorrectos');
           }
-          console.log(error);
           return throwError('El email o contraseña estan incorrectos');
         }),
         tap((response) => {

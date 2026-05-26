@@ -12,7 +12,7 @@
 @if (downloadUrl; as url) {
   <div class="img-container" [id]="downloadUrl ? downloadUrl : null" >
     <a [href]="url" target="_blank" rel="noopener">
-      <img class="img" [src]="url" alt="animal" (load)="onLoaded()"/>
+      <img class="img" [src]="url" alt="Imagen de la mascota" (load)="onLoaded()"/>
     </a>
     <button class="delete__button" type="button" (click)="deleteImg()">
       @if (!isLoading) {

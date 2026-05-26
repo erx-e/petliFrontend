@@ -40,7 +40,7 @@
 .form-box {
   padding: var(--space-4);
   border: 1px solid var(--darker-light-blue);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
 }
 
@@ -66,14 +66,14 @@
   margin-top: var(--space-4);
   padding: var(--space-4);
   border: 1px solid var(--grey);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   button{
     margin-top: var(--space-2);
     width: 100%;
     padding: var(--space-2) var(--space-4);
     background-color: transparent;
     border: 1px solid;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     border-color: var(--blue);
     color: var(--blue);
     text-decoration: none;

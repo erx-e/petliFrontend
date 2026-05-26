@@ -93,9 +93,7 @@ export class EditarComponent implements OnInit {
           );
           if(this.postpet.contact){
             this.contactNumbers = this.postpet.contact.match(/\S+/g);
-            console.log(this.contactNumbers.length);
             for (let i = 1; i < this.contactNumbers.length; i++) {
-              console.log(i);
               this.addContactField();
             }
             this.contactField.patchValue(this.contactNumbers);
@@ -104,7 +102,6 @@ export class EditarComponent implements OnInit {
           this.lastTimeSeenField.setValue(this.postpet.lastTimeSeen);
           this.imgUrls = this.postpet.urlImgs;
           this.imgUrlsOrigin = this.postpet.urlImgs;
-          console.log(this.imgUrls);
 
           this.urlImgsField.clearValidators();
           this.urlImgsField.updateValueAndValidity();
@@ -288,7 +285,6 @@ export class EditarComponent implements OnInit {
       this.updatePost.urlImgs = this.imgUrls;
       this.updatePost.idUser = this.user.idUser;
       this.updatePost.idState = this.stateId;
-      console.log(this.updatePost);
       this.published = true;
       this.postpetService.update(this.updatePost).subscribe(() => {
         this.isLoading = false;
@@ -299,7 +295,6 @@ export class EditarComponent implements OnInit {
   }
 
   onUrlsChange(event: updateImg[]) {
-    console.log(event);
     this.imgUrls = event;
   }
 
@@ -360,7 +355,6 @@ export class EditarComponent implements OnInit {
     this.provinciaField.valueChanges
       .pipe(
         switchMap((id) => {
-          console.log(id);
           return this.categoryService.getCantonesByProv(id);
         })
       )
@@ -379,7 +373,6 @@ export class EditarComponent implements OnInit {
         })
       )
       .subscribe((sectores: sector[] | null) => {
-        console.log(sectores);
         if (sectores) {
           this.sectores = sectores;
         }

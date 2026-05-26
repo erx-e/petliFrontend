@@ -90,6 +90,11 @@ h6,
   --space-7: 3rem;    /* 48px */
   --space-8: 4rem;    /* 64px */
 
+  /* Radios de borde */
+  --radius-sm: 6px;   /* botones, inputs, chips */
+  --radius-md: 8px;   /* tarjetas, paneles */
+  --radius-full: 50%; /* círculos / pills */
+
   /* Elevación: sombras tintadas con el indigo de marca (no negro puro) */
   --shadow-sm: 0 1px 2px oklch(0.17 0.11 272 / 0.08),
                0 2px 6px oklch(0.17 0.11 272 / 0.06);
@@ -157,6 +162,10 @@ button:not(:disabled):hover {
 }
 button:not(:disabled):active {
   transform: translateY(1px);
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 /* Foco visible y on-brand (accesibilidad WCAG AA). */

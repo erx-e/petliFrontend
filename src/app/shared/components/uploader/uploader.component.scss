@@ -7,7 +7,7 @@
   margin-top: var(--space-2);
   height: 200px;
   padding: var(--space-4);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: 2px dashed var(--grey);
   background-color: var(--lighter-light-blue);
 }
@@ -32,7 +32,7 @@
 
 .file-label {
   padding: var(--space-2) var(--space-4);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   color: var(--white);
   background-color: var(--grey);
   cursor: pointer;

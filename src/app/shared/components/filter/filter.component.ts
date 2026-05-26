@@ -103,7 +103,6 @@ export class FilterComponent implements OnInit {
       }
       if (parseInt(params.get('raza'))) {
         this.petBreedField.setValue(params.get('raza'));
-        console.log(this.petBreedField.value)
         this.petBreedId = parseInt(params.get('raza'));
       }
       if (parseInt(params.get('provincia'))) {
@@ -184,7 +183,6 @@ export class FilterComponent implements OnInit {
       .subscribe((data) => {
         if (data) {
           this.isLoadingMore = false;
-          console.log(this.isLoadingMore);
           this.postspet = this.postspet.concat(data);
           if (data.length < 12) {
             this.morePostspet = false;
@@ -388,7 +386,6 @@ export class FilterComponent implements OnInit {
         })
       )
       .subscribe((sectores: sector[] | null) => {
-        console.log(sectores);
         this.sectores = sectores;
       });
   }

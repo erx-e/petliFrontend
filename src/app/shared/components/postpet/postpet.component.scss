@@ -4,7 +4,7 @@
   margin: 0 auto;
   box-sizing: content-box;
   background-color: var(--darker-light-blue);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: var(--space-3);
   margin-bottom: var(--space-4);
   box-shadow: var(--shadow-sm);
@@ -16,7 +16,7 @@
   min-width: 265px;
   box-sizing: content-box;
   background-color: var(--darker-light-blue);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: var(--space-3);
   margin: 0px var(--space-1);
   box-shadow: var(--shadow-sm);

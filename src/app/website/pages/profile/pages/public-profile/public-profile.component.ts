@@ -56,7 +56,6 @@ export class PublicProfileComponent implements OnInit {
           : null;
       this.userService.update(this.userUpdate).subscribe((newUser) => {
         this.user = newUser;
-        console.log(newUser);
         this.patchForm(newUser);
         this.toggleForm();
       });
@@ -71,7 +70,6 @@ export class PublicProfileComponent implements OnInit {
     this.form.patchValue({ name: usr.name, email: usr.email });
     if (usr.cellNumber) {
       this.cellNumbers = usr.cellNumber.match(/\S+/g);
-      console.log(this.cellNumbers.length);
       if (this.cellNumberField.length > 1) {
         while (this.cellNumberField.length > 1) {
           this.cellNumberField.removeAt(0);
@@ -87,7 +85,6 @@ export class PublicProfileComponent implements OnInit {
       }
       for (let i = 1; i < this.cellNumbers.length; i++) {
         this.addContactField();
-        console.log(i);
       }
       this.cellNumberField.patchValue(this.cellNumbers);
     }

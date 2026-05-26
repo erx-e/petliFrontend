@@ -47,14 +47,12 @@ export class UserService {
             } as userErrors);
           }
         }
-        console.log(error);
         return throwError('User could not be cretated - Bad Request');
       }),
       tap((response: Response) => {
         if (response.token) {
           this.tokenService.saveToken(response.token);
           this.authService.getCurrentUser();
-          console.log(response.token);
         }
       })
     );

@@ -58,7 +58,6 @@ export class RegisterComponent implements OnInit {
           this.router.navigate(["home"]);
         },
         (error: userErrors) => {
-          console.log(error);
           this.isLoading = false;
           if(error.email){
             this.emailAlreadyRegistered = true;

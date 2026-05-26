@@ -37,14 +37,12 @@ export class LoadingInterceptor implements HttpInterceptor {
         this.cacheService.getResponse(request.urlWithParams);
 
       if (cachedResponse) {
-        console.log(cachedResponse);
         this.loadingSerivce.hide()
         return of(cachedResponse);
       }
 
       if (request.context.get(CHECK_LOADING)) {
         this.loadingSerivce.show();
-        console.log(request)
         return next.handle(request).pipe(
           tap((event) => {
             if (event instanceof HttpResponse) {
@@ -64,7 +62,6 @@ export class LoadingInterceptor implements HttpInterceptor {
     } else {
       if(request.context.get(CHECK_LOADING)){
         this.loadingSerivce.show();
-        console.log(request)
         return next.handle(request).pipe(
           finalize(() => this.loadingSerivce.hide())
         );

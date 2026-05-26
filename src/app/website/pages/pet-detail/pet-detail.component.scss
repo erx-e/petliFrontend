@@ -22,7 +22,7 @@ a {
   padding: var(--space-2) var(--space-2);
   font-weight: 600;
   background-color: var(--yellow);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .deleteButton {
@@ -30,7 +30,7 @@ a {
   font-weight: 600;
   background-color: var(--blue);
   color: var(--white);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .editButton {
@@ -38,7 +38,7 @@ a {
   font-weight: 600;
   color: var(--white);
   background-color: var(--grey);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   margin-right: var(--space-1);
 }
 
@@ -49,7 +49,7 @@ a {
 
 .petGallery {
   margin-bottom: var(--space-2);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   min-width: 296px;
   min-height: 233px;
   display: flex;
@@ -63,7 +63,7 @@ a {
 
 .petData {
   margin-bottom: var(--space-2);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: var(--space-4);
   line-height: 1.15;
   background: var(--darker-light-blue);

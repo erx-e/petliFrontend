@@ -9,7 +9,7 @@
   top: 4px;
   width: 11px;
   height: 11px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--blue);
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }

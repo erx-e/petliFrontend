@@ -152,7 +152,6 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
           try {
             await firstValueFrom(this.s3StorageService.deleteImage(this.imgKey));
             this.deleted.emit({ file: this.file, key: this.imgKey });
-            console.log(`Imagen eliminada ${this.imgKey}`);
             this.downloadUrl = null;
           } catch (error) {
             console.error("Error al eliminar la imagen:", error);
@@ -168,7 +167,6 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
         try {
           await firstValueFrom(this.s3StorageService.deleteImage(this.imgKey));
           this.deleted.emit({ file: this.file, key: this.imgKey });
-          console.log(`Imagen eliminada ${this.imgKey}`);
           this.downloadUrl = null;
         } catch (error) {
           console.error("Error al eliminar la imagen:", error);

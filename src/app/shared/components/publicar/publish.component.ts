@@ -248,7 +248,6 @@ export class PublishComponent implements OnInit {
     this.provinciaField.valueChanges
       .pipe(
         switchMap((id) => {
-          console.log(id);
           return this.categoryService.getCantonesByProv(id);
         })
       )
@@ -267,7 +266,6 @@ export class PublishComponent implements OnInit {
         })
       )
       .subscribe((sectores: sector[] | null) => {
-        console.log(sectores);
         this.sectores = sectores;
       });
   }

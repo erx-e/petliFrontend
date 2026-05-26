@@ -88,7 +88,6 @@ export class AccountComponent implements OnInit {
           this.wrongPass = false;
           this.passChanged = true;
           this.isLoading = false;
-          console.log("Contraseña cambiada");
         },
         (error: string) => {
           this.isLoading = false;

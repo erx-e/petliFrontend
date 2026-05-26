@@ -14,7 +14,6 @@ export class DropzoneDirective {
 
   @HostListener('drop', ['$event'])
   onDrop($event) {
-    console.log($event, "drop")
     $event.preventDefault();
     this.dropped.emit($event.dataTransfer.files);
     this.hovered.emit(false);
@@ -22,14 +21,12 @@ export class DropzoneDirective {
 
   @HostListener('dragover', ['$event'])
   onDragOver($event) {
-    console.log($event, "dragover")
     $event.preventDefault();
     this.hovered.emit(true);
   }
 
   @HostListener('dragleave', ['$event'])
   onDragLeave($event) {
-    console.log($event, "dragleave")
     $event.preventDefault();
     this.hovered.emit(false);
   }

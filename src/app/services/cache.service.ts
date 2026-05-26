@@ -16,7 +16,6 @@ export class CacheService {
   }
 
   getResponse(url: string){
-    console.log(url)
     return this.requests[url]
   }
 

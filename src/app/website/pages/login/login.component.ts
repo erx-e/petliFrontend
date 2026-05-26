@@ -49,7 +49,6 @@ export class LoginComponent implements OnInit {
         },
         (error: string) => {
           this.isLoading = false;
-          console.log(error);
           this.wrongUser = true;
         }
       );

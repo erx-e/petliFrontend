@@ -12,7 +12,13 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: QuicklinkStrategy }),
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: QuicklinkStrategy,
+      // Al navegar hacia adelante sube al inicio; al volver atrás restaura la
+      // posición previa. Evita que la página nueva quede scrolleada como la anterior.
+      scrollPositionRestoration: 'enabled',
+      anchorScrolling: 'enabled',
+    }),
   ],
   exports: [RouterModule],
 })
