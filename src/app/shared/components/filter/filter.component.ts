@@ -60,6 +60,12 @@ export class FilterComponent implements OnInit {
   morePostspet: boolean = true;
   isLoadingMore: boolean = false;
 
+  // Filtros avanzados (sector, fecha, orden) ocultos por defecto.
+  showMoreFilters: boolean = false;
+  toggleMoreFilters() {
+    this.showMoreFilters = !this.showMoreFilters;
+  }
+
   postspetLoading = [null, null, null, null, null, null, null, null];
   onInit = true;
 

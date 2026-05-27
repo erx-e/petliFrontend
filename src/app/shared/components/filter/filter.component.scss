@@ -44,6 +44,7 @@ a {
   right: 0;
   left: 0;
   bottom: 0;
+  z-index: 40;
   transition: transform linear 0.2s, opacity linear 0.2s;
 
   display: flex;
@@ -104,6 +105,18 @@ a {
   --bs-btn-active-color: var(--white);
   --bs-btn-active-bg: var(--blue);
   --bs-btn-active-border-color: var(--blue);
+}
+
+.moreFiltersToggle {
+  display: inline-block;
+  margin-bottom: var(--space-3);
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .submitButtons {

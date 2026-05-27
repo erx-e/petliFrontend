@@ -1,7 +1,7 @@
 <div class="petpost-page">
   <div class="navButtons" *ngIf="postpet && user; else elseNav">
-    <button class="backBotton" (click)="goToBack()">Back</button>
-    <div *ngIf="user.idUser == postpet.idUser">
+    <button class="backBotton" (click)="goToBack()">← Volver</button>
+    <div class="ownerActions" *ngIf="user.idUser == postpet.idUser">
       <div [ngSwitch]="postpet.petStateId" [style.display]="'inline'">
         <button
           *ngSwitchCase="'E'"
@@ -36,189 +36,137 @@
     </div>
   </div>
   <ng-template #elseNav>
-    <button class="backBotton" (click)="goToBack()">Back</button>
+    <button class="backBotton" (click)="goToBack()">← Volver</button>
   </ng-template>
+
   <div *ngIf="!isLoading; else loading">
     <div *ngIf="postpet; else notFound">
       <div class="petContainer">
-        <div class="petGallery">
+        <swiper-container
+          class="petGallery"
+          pagination="true"
+          navigation="true"
+          auto-height="true"
+          [attr.loop]="postpet.urlImgs && postpet.urlImgs.length > 1 ? 'true' : null"
+        >
           @for (img of postpet?.urlImgs; track img.url) {
-            <img class="imgPet" [src]="img.url" [alt]="postpet?.petName ? 'Foto de ' + postpet.petName : 'Foto de la mascota'" />
+            <swiper-slide>
+              <img
+                class="imgPet"
+                [src]="img.url"
+                [alt]="postpet?.petName ? 'Foto de ' + postpet.petName : 'Foto de la mascota'"
+              />
+            </swiper-slide>
           }
-        </div>
-        <div class="petData">
-          <div *ngIf="postpet.petStateId == 'E'">
-            <div class="petData__direction">
-              <h3 class="data__question">¿Dónde y cuando fui encontrado?</h3>
-              <p>
-                El <span class="highlight">{{ lastTimeSeen }}</span> fui
-                encontrado en la provincia de
-                <span class="highlight">{{
-                  postpet?.provinciaName | titlecase
-                }}</span
-                >, especificamente en el
-                <span *ngIf="postpet?.sectorName"
-                  >sector
-                  <span class="highlight">{{
-                    postpet?.sectorName | titlecase
-                  }}</span>
-                  del</span
-                >
-                canton
-                <span class="highlight">{{
-                  postpet?.cantonName | titlecase
-                }}</span
-                >.
-              </p>
-            </div>
-            <div>
-              <h3 class="data__question">¿Quién me encontró?</h3>
-              <p>
-                La persona que me encontro fue
-                <a [routerLink]="['/profile', postpet.idUser]">{{
-                  postpet.userName
-                }}</a
-                >.
-              </p>
-            </div>
-            <div *ngIf="postpet.contact">
-              <h3 class="data__question">Medios de contacto</h3>
-              <p>
-                Si necesitas más información contacta
-                <span *ngIf="contactNum.length > 1; else otherNumber"
-                  >con los siguientes números</span
-                >
-                <ng-template #otherNumber>
-                  <span>con el siguiente número</span> </ng-template
-                >: {{ postpet.contact }}
-              </p>
-            </div>
-            <div>
-              <h3 class="data__question">
-                Más detalles acerca de mi situación
-              </h3>
-              <p>
-                {{ postpet?.description }}
-              </p>
-            </div>
-          </div>
-          <div *ngIf="postpet.petStateId == 'B'">
-            <div>
-              <h3 class="data__question">Acerca de mí</h3>
-              <p *ngIf="postpet?.petName">
-                Mi nombre es {{ postpet?.petName | titlecase}} y estoy siendo buscado por
-                mi dueño
-                <a [routerLink]="['/profile', postpet.idUser]">{{
-                  postpet.userName
-                }}</a
-                >.
-                <span *ngIf="postpet.petBreed"
-                  >Soy un {{ postpet.petBreed }}</span
-                >
-                <span *ngIf="postpet.petAge"> de {{ postpet.petAge | lowercase}}</span>
-              </p>
-            </div>
-            <div class="petData__direction">
-              <h3 class="data__question">¿Dónde y cuando me perdí?</h3>
-              <p>
-                Me perdi en {{ postpet?.provinciaName | titlecase }},
-                {{ postpet?.cantonName | titlecase }} el {{ lastTimeSeen }}
+        </swiper-container>
 
-                <span *ngIf="postpet?.sectorName">
-                  Sector: {{ postpet?.sectorName | titlecase }}
-                </span>
-              </p>
-            </div>
-            <div *ngIf="postpet.contact">
-              <h3 class="data__question">Medio de contacto</h3>
-              <p>
-                Si tienes información sobre mí por favor contacta con
-                <span *ngIf="contactNum.length > 1; else otherNumber"
-                  >los siguientes números</span
-                >
-                <ng-template #otherNumber>
-                  <span>el siguiente número</span> </ng-template
-                >:
-                {{ postpet.contact }}
-              </p>
-            </div>
-            <div>
-              <h3 class="data__question">Recompensa</h3>
-              <p *ngIf="postpet?.reward; else noReward">
-                Recompensa al que me encuentre: {{ postpet?.reward | currency }}
-              </p>
-              <ng-template #noReward>
-                <p>No existe recompensa</p>
-              </ng-template>
-            </div>
-            <div>
-              <h3 class="data__question">
-                Más detalles acerca de mi situación
-              </h3>
-              <p>
-                {{ postpet?.description }}
-              </p>
-            </div>
+        <div class="petData">
+          <span class="stateBadge" [class]="'state--' + postpet.petStateId">{{
+            stateLabel
+          }}</span>
+
+          <h1 class="pet-title">
+            {{
+              (postpet.petName | titlecase) ||
+                (postpet.petSpecie | titlecase) ||
+                "Mascota"
+            }}
+          </h1>
+
+          <div class="pet-meta">
+            @if (postpet.petName && postpet.petSpecie) {
+              <span class="chip">{{ postpet.petSpecie | titlecase }}</span>
+            }
+            @if (postpet.petBreed) {
+              <span class="chip">{{ postpet.petBreed | titlecase }}</span>
+            }
+            @if (postpet.petAge) {
+              <span class="chip">{{ postpet.petAge | titlecase }}</span>
+            }
           </div>
-          <div *ngIf="postpet.petStateId == 'H' || postpet.petStateId == 'A'">
-            <div>
-              <h3 class="data__question">Acerca de mí</h3>
-              <p *ngIf="postpet?.petName">
-                Mi nombre es {{ postpet?.petName | titlecase}} y mi dueño es
-                <a [routerLink]="['/profile', postpet.idUser]">{{
-                  postpet.userName
-                }}</a
-                >.
-                <span *ngIf="postpet.petBreed"
-                  >Soy un {{ postpet.petSpecie | lowercase}} de raza
-                  {{ postpet.petBreed }}</span
+
+          <ul class="pet-facts">
+            <li>
+              <svg class="fact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"
+                />
+              </svg>
+              <span>
+                @if (postpet.sectorName) {
+                  {{ postpet.sectorName | titlecase }},
+                }
+                {{ postpet.cantonName | titlecase }},
+                {{ postpet.provinciaName | titlecase }}
+              </span>
+            </li>
+
+            @if (
+              (postpet.petStateId == 'B' || postpet.petStateId == 'E') &&
+              lastTimeSeen
+            ) {
+              <li>
+                <svg class="fact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 10V7h-2v6l5 3 1-1.73-4-2.27z"
+                  />
+                </svg>
+                <span
+                  >{{ postpet.petStateId == "E" ? "Encontrado" : "Visto" }} el
+                  {{ lastTimeSeen }}</span
                 >
-                <span *ngIf="postpet.petAge">
-                  y mi edad es de {{ postpet.petAge | lowercase}}</span
-                >
-              </p>
-            </div>
-            <div>
-              <h3 class="data__question">¿En donde me encuentro?</h3>
-              <p>
-                Estoy ubicado en la provincia de {{ postpet.provinciaName | titlecase}},
-                especificamente en el
-                <span *ngIf="postpet?.sectorName"
-                  >sector
-                  <span class="highlight">{{
-                    postpet?.sectorName | titlecase
-                  }}</span>
-                  del</span
-                >
-                canton
-                <span class="highlight">{{
-                  postpet?.cantonName | titlecase
-                }}</span
-                >.
-              </p>
-            </div>
-            <div *ngIf="postpet.contact">
-              <h3 class="data__question">Medio de contacto</h3>
-              <p>
-                Contactame conmigo con
-                <span *ngIf="contactNum.length > 1; else otherNumber"
-                  >los siguientes números</span
-                >
-                <ng-template #otherNumber>
-                  <span>el siguiente número</span> </ng-template
-                >:
-                {{ postpet.contact }}
-              </p>
-            </div>
-            <div>
-              <h3 class="data__question">
-                Más detalles acerca de mi situación
-              </h3>
-              <p>
-                {{ postpet?.description }}
-              </p>
-            </div>
-          </div>
+              </li>
+            }
+
+            @if (postpet.petStateId == 'B' && postpet.reward) {
+              <li class="fact--reward">
+                <svg class="fact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7A1.5 1.5 0 1 1 5.5 4a1.5 1.5 0 0 1 0 3z"
+                  />
+                </svg>
+                <span>Recompensa de {{ postpet.reward | currency }}</span>
+              </li>
+            }
+          </ul>
+
+          @if (postpet.description) {
+            <section class="pet-section">
+              <h2 class="pet-section__title">Sobre la situación</h2>
+              <p>{{ postpet.description }}</p>
+            </section>
+          }
+
+          <p class="pet-owner">
+            Publicado por
+            <a [routerLink]="['/profile', postpet.idUser]">{{
+              postpet.userName
+            }}</a>
+          </p>
+
+          @if (postpet.contact && contactNum.length) {
+            <section class="pet-section">
+              <h2 class="pet-section__title">
+                @if (postpet.petStateId == 'B' || postpet.petStateId == 'E') {
+                  ¿Tienes información?
+                } @else {
+                  Contacto
+                }
+              </h2>
+              <div class="contact-buttons">
+                @for (num of contactNum; track num) {
+                  <a class="contact-btn" [href]="'tel:' + num">
+                    <svg class="fact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                      />
+                    </svg>
+                    {{ num }}
+                  </a>
+                }
+              </div>
+            </section>
+          }
         </div>
       </div>
     </div>
@@ -230,8 +178,18 @@
   </div>
   <ng-template #loading>
     <div class="petContainer">
-      <div class="petGallery"></div>
-      <div class="petData"></div>
+      <div class="petGallery">
+        <div class="skeleton skeleton-gallery"></div>
+      </div>
+      <div class="petData">
+        <div class="skeleton skeleton-badge"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-chips"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line short"></div>
+        <div class="skeleton skeleton-block"></div>
+        <div class="skeleton skeleton-btn"></div>
+      </div>
     </div>
   </ng-template>
 </div>

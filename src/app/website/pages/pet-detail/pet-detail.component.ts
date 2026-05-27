@@ -78,4 +78,20 @@ export class PetDetailComponent implements OnInit {
   goToBack() {
     this.location.back();
   }
+
+  // Etiqueta del estado para el badge del detalle.
+  get stateLabel(): string {
+    switch (this.postpet?.petStateId) {
+      case "B":
+        return "Perdido";
+      case "E":
+        return "Encontrado";
+      case "A":
+        return "En adopción";
+      case "H":
+        return "Necesita ayuda";
+      default:
+        return "";
+    }
+  }
 }

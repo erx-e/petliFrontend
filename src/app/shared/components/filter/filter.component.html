@@ -97,6 +97,10 @@
                   }
                 </select>
               </div>
+              <button type="button" class="moreFiltersToggle" (click)="toggleMoreFilters()">
+                {{ showMoreFilters ? "Menos filtros −" : "Más filtros +" }}
+              </button>
+              @if (showMoreFilters) {
               @if (sectores.length > 0) {
                 <div class="form-filter-element">
                   <label class="form-label" for="formSector">Sector</label>
@@ -154,6 +158,7 @@
                         <option value="1">Vistos (más antiguos)</option>
                       </select>
                     </div>
+                  }
                   }
                   <div class="submitButtons">
                     <a
@@ -314,7 +319,11 @@
                                           }
                                         </select>
                                       </div>
-                                      @if (sectores.length > 0) {
+                                      <button type="button" class="moreFiltersToggle" (click)="toggleMoreFilters()">
+                {{ showMoreFilters ? "Menos filtros −" : "Más filtros +" }}
+              </button>
+              @if (showMoreFilters) {
+              @if (sectores.length > 0) {
                                         <div class="form-filter-element">
                                           <label class="form-label" for="formSector">Sector</label>
                                           <select
@@ -372,7 +381,8 @@
                                               </select>
                                             </div>
                                           }
-                                          <div class="submitButtons">
+                                          }
+                  <div class="submitButtons">
                                             <a
                                               class="btnSubmit btn-clear"
                                               routerLink="."

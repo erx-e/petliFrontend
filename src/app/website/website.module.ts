@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { WebsiteRoutingModule } from './website-routing.module';
@@ -34,6 +34,8 @@ import { DifundeModule } from './pages/difunde/difunde.module'
   ],
   exports: [
     LayoutComponent
-  ]
+  ],
+  // Permite los custom elements de Swiper (<swiper-container>/<swiper-slide>).
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class WebsiteModule { }
