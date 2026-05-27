@@ -6,7 +6,7 @@
     <div class="container__postpet-img">
       @if (postpet.urlImgs) {
         <div class="postpet-img">
-          <img class="postpetImg" [src]="postpet.urlImgs[0].url" [alt]="postpet.petName || 'Mascota publicada'" />
+          <img class="postpetImg" [src]="postpet.urlImgs[0].url" loading="lazy" decoding="async" [alt]="postpet.petName || 'Mascota publicada'" />
         </div>
       }
       <span class="stateBadge" [class]="'state--' + postpet.petStateId">{{ stateLabel }}</span>

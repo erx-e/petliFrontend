@@ -1,14 +1,34 @@
 <app-nav></app-nav>
 <router-outlet></router-outlet>
-<footer class="landPage__footer">
-  <div class="logo__container">
-    <img class="logoImg" src="./assets/imgs/logoWhite.png" alt="" />
-    <p>Pet's Lighthouse</p>
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <a class="footer__logo" [routerLink]="['/']">
+        <img
+          ngSrc="assets/imgs/logoWhite.png"
+          width="230"
+          height="236"
+          alt="Pet's Lighthouse"
+        />
+        <span>Pet's Lighthouse</span>
+      </a>
+      <p class="footer__tagline">
+        Donde la luz guía a tu mascota de vuelta a casa.
+      </p>
+    </div>
+
+    <nav class="footer__nav" aria-label="Enlaces del pie de página">
+      <p class="footer__heading">Explorar</p>
+      <ul>
+        <li><a routerLink="/encuentra">Encuentra</a></li>
+        <li><a routerLink="/difunde">Difunde</a></li>
+        <li><a routerLink="/adopta">Adopta</a></li>
+        <li><a routerLink="/ayuda">Ayuda</a></li>
+      </ul>
+    </nav>
   </div>
-  <ul class="navLinks">
-    <li><a routerLink="/encuentra">Encuentra</a></li>
-    <li><a routerLink="/difunde">Difunde</a></li>
-    <li><a routerLink="/adopta">Adopta</a></li>
-    <li><a routerLink="/ayuda">Ayuda</a></li>
-  </ul>
+
+  <div class="footer__bottom">
+    <p>© {{ year }} Pet's Lighthouse · Reuniendo mascotas con su familia</p>
+  </div>
 </footer>

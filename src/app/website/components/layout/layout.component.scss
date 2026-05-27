@@ -1,36 +1,79 @@
-.landPage__footer{
+.footer {
   background-color: var(--blue);
-  width: 100%;
-  height: 350px;
-  margin-top: var(--space-7);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  color: var(--light-blue);
+  margin-top: var(--space-8);
 }
 
-.logo__container{
-  width: 80px;
-  text-align: center;
-  color: var(--light-blue);
-  p{
-    margin-top: var(--space-1);
+.footer__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  color: var(--white);
+  img {
+    width: 44px;
+    height: auto;
+  }
+  span {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
   }
 }
 
-.logoImg{
-  width: 100%;
+.footer__tagline {
+  margin-top: var(--space-3);
+  max-width: 36ch;
+  line-height: 1.5;
+  color: var(--darker-light-blue);
 }
 
-.navLinks{
-  margin-top: var(--space-6);
+.footer__nav {
+  .footer__heading {
+    margin-bottom: var(--space-3);
+    font-weight: 700;
+    color: var(--white);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  a {
+    text-decoration: none;
+    color: var(--light-blue);
+  }
+  a:hover {
+    color: var(--yellow);
+  }
+}
+
+.footer__bottom {
+  border-top: 1px solid oklch(0.95 0.01 272 / 0.15);
+  padding: var(--space-4) var(--space-5);
   text-align: center;
-  padding: 0;
-  li{
-    margin-bottom: var(--space-2);
-    a{
-      text-decoration: none;
-      color: var(--lighter-light-blue);
-    }
+  font-size: var(--text-sm);
+  color: var(--darker-light-blue);
+}
+
+@media screen and (min-width: 48rem) {
+  .footer__inner {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-7);
   }
 }

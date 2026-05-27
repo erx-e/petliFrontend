@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { PostpetComponent } from './components/postpet/postpet.component';
 import { FilterComponent } from './components/filter/filter.component';
 import { PostspetComponent } from './components/postspet/postspet.component';
@@ -34,6 +34,7 @@ import { EditarComponent } from './components/publicar/editar/editar.component';
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    NgOptimizedImage,
   ],
   exports: [
     PostpetComponent,
@@ -44,7 +45,8 @@ import { EditarComponent } from './components/publicar/editar/editar.component';
     NotfoundComponent,
     DropzoneDirective,
     PublishComponent,
-    EditarComponent
+    EditarComponent,
+    NgOptimizedImage,
   ]
 })
 export class SharedModule { }
