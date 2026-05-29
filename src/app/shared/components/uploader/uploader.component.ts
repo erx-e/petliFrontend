@@ -19,10 +19,16 @@ export class UploaderComponent {
   @Input() imgsUrlUpdating: updateImg[] = [];
   @Input() imgsUrlUpdatingToShow: updateImg[] = [];
 
-  imgUrls = new Map<string, string>();
+  // Map keyed por el File object (no por file.name). Antes era Map<string,
+  // string> por nombre y si dos archivos llegaban con el mismo nombre
+  // (móviles que nombran "IMG_0001.jpg" / "image.jpeg" / screenshots con
+  // timestamp idéntico al segundo, o el mismo archivo subido dos veces) el
+  // segundo set() sobrescribía al primero y solo se enviaba la última URL al
+  // backend, aunque las 4 subieran bien a S3.
+  imgUrls = new Map<File, string>();
   @Output() change = new EventEmitter<string[]>();
   @Output() changeUpdate = new EventEmitter<updateImg[]>();
-  @Output() maxSixLimit = new EventEmitter<boolean>();
+  @Output() maxFourLimit = new EventEmitter<boolean>();
   @Input() published: boolean = false;
 
   toggleHover(event: boolean) {
@@ -30,17 +36,19 @@ export class UploaderComponent {
   }
 
   onDrop(files: FileList) {
-    if (files.length + this.imgsUrlUpdating.length <= 6) {
+    // Cuenta de fotos visibles: archivos nuevos (this.files) + imágenes
+    // existentes que se siguen mostrando (imgsUrlUpdatingToShow).
+    // NO usar imgsUrlUpdating porque ya incluye las URLs de los archivos
+    // recién subidos que también viven en this.files → se contarían dos veces
+    // y el "máximo 4" se dispara antes de tiempo (a las 3 reales).
+    const currentVisible = this.files.length + this.imgsUrlUpdatingToShow.length;
+    if (files.length + currentVisible <= 4) {
       for (let i = 0; i < files.length; i++) {
-        if (this.files.length + this.imgsUrlUpdating.length <= 6) {
-          this.files.push(files.item(i));
-          this.maxSixLimit.emit(false);
-        } else {
-          this.maxSixLimit.emit(true);
-        }
+        this.files.push(files.item(i));
       }
+      this.maxFourLimit.emit(false);
     } else {
-      this.maxSixLimit.emit(true);
+      this.maxFourLimit.emit(true);
     }
     // Reseteamos el <input file>: sin esto, el evento change no vuelve a
     // dispararse al elegir el mismo archivo y solo se puede subir una imagen.
@@ -65,7 +73,7 @@ export class UploaderComponent {
         });
         this.changeUpdate.emit(this.imgsUrlUpdating);
       } else {
-        this.imgUrls.delete(img.file.name);
+        this.imgUrls.delete(img.file);
         this.change.emit(Array.from(this.imgUrls.values()));
       }
     } else if (this.updating) {
@@ -82,13 +90,15 @@ export class UploaderComponent {
     }
   }
 
-  onUpload(img: { name?: string; url?: string }) {
+  onUpload(img: { file?: File; url?: string }) {
     if (this.updating) {
       this.imgsUrlUpdating.push({ idImage: null, url: img.url });
       this.changeUpdate.emit(this.imgsUrlUpdating);
     }
-    this.imgUrls.set(img.name, img.url);
-    this.change.emit(Array.from(this.imgUrls.values()));
+    if (img.file) {
+      this.imgUrls.set(img.file, img.url);
+      this.change.emit(Array.from(this.imgUrls.values()));
+    }
   }
 
   removeFile(imgName: string) {

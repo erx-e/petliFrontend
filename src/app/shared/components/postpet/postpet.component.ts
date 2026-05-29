@@ -20,6 +20,11 @@ export class PostpetComponent implements OnInit {
   @Input() home: boolean = false;
   lastTimeSeen: string = null;
 
+  // Marca cuando el <img> de la card falla (típicamente 403 de S3 por objeto
+  // borrado del bucket). Una card solo muestra una imagen, así que basta un
+  // booleano; no necesitamos un Set como en el detalle.
+  imgFailed = false;
+
   ngOnInit(): void {
     if (this.postpet) {
       this.lastTimeSeen = formatDistance(
@@ -28,6 +33,10 @@ export class PostpetComponent implements OnInit {
         { addSuffix: true, locale: es }
       );
     }
+  }
+
+  onImgError() {
+    this.imgFailed = true;
   }
 
   // Etiqueta del estado del post, para el badge de la tarjeta.

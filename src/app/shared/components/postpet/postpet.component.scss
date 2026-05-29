@@ -92,6 +92,21 @@
   display: block;
 }
 
+// Fallback cuando la imagen de la card falla (objeto S3 borrado / 403). El
+// contenedor .container__postpet-img ya pinta el cuadrado de fondo: aquí solo
+// centramos un icono encima para que se entienda que la imagen falta, sin
+// romper la cuadrícula ni mostrar el icono de imagen rota del navegador.
+.postpet-img--missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.postpet-img__missing-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--darker-light-blue);
+}
+
 // Esqueleto de carga: imita la estructura de la card real (imagen + líneas).
 .skeleton {
   background-color: var(--light-blue);

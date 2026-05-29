@@ -5,8 +5,22 @@
   (dropped)="onDrop($event)"
   [class.hovering]="isHovering"
   >
-  <h3 class="text title">Arrastra y suelta una o más imagenes</h3>
-  <p class="text">o...</p>
+  <svg
+    class="dropzone__icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    >
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 9 12 4 17 9" />
+    <line x1="12" y1="4" x2="12" y2="16" />
+  </svg>
+  <h3 class="dropzone__title">Arrastra y suelta tus fotos aquí</h3>
+  <p class="dropzone__hint">o</p>
   <div class="file">
     <label class="file-label">
       <input
@@ -17,9 +31,10 @@
         accept="image/*"
         (change)="onDrop($any($event.target).files)"
         />
-        <span>Elige una o más imagenes</span>
+        <span>Elige imágenes</span>
       </label>
     </div>
+    <p class="dropzone__meta">PNG o JPG · hasta 4 fotos</p>
   </div>
 
   @if (!updating) {

@@ -1,14 +1,14 @@
 <main class="main">
   <div class="titleSection">
-    <button class="backButton" (click)="goBack()">Back</button>
-    <p class="title">Publicar mascota</p>
+    <button class="backButton" (click)="goBack()">← Volver</button>
+    <p class="title">{{ submitLabel }}</p>
   </div>
   <div class="formBox">
-    <form [formGroup]="form" (ngSubmit)="crearPost()">
+    <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="form-container">
         @if (!user) {
           <p class="validateUser">
-            *Necesitas una cuenta para publicar
+            Necesitas una cuenta para publicar.
           </p>
         }
         <div class="form-element-section">
@@ -317,86 +317,68 @@
                             </div>
                           </div>
                           <div class="form-elements formContact">
-                            @for (contact of contactField.controls; track contact; let i = $index) {
-                              <div
-                                formArrayName="contact"
-                                >
-                                <div class="formArrayElement">
-                                  @if (i == 0) {
-                                    <label class="form-label" for="contact"
-                                      >Número de contacto:
-                                    </label>
-                                  }
-                                  <div>
+                            <label class="form-label">Números de contacto</label>
+                            <!--
+                              Un único formArrayName envolviendo el @for. Antes la
+                              directiva estaba DENTRO del bucle, así que cada iteración
+                              registraba su propio FormArrayName para el mismo array y
+                              el binding view-modelo se pisaba al añadir/poblar campos
+                              en el modo editar.
+                            -->
+                            <div formArrayName="contact">
+                              @for (contact of contactField.controls; track contact; let i = $index) {
+                                <div class="contact-field">
+                                  <div class="contact-row">
                                     <input
                                       type="tel"
-                                      class="form-control contactInput"
-                                      [style.width.%]="i == 0 ? '87.65' : '100'"
+                                      class="form-control"
                                       [formControlName]="i"
-                                      placeholder="Número de contacto"
+                                      placeholder="Ej: 0991234567"
                                       [name]="i"
                                       [id]="i == 0 ? 'contact' : null"
-                      [class.is-valid]="
-                        contact.touched && contact.valid
-                      "
-                      [class.is-invalid]="
-                        contact.touched && contact.invalid
-                      "
-                                      />
-                                      @if (i == 0) {
-                                        <button
-                                          class="addContactField"
-                                          type="button"
-                                          (click)="addContactField()"
-                                          >
-                                          +
-                                        </button>
-                                      }
-                                    </div>
-                                    <div
-                                      class="validationMessage"
-                    [class.active]="
-                      contact.touched && contact.invalid
-                    "
+                                      [class.is-valid]="contact.touched && contact.valid"
+                                      [class.is-invalid]="contact.touched && contact.invalid"
+                                    />
+                                    @if (i > 0) {
+                                      <button
+                                        type="button"
+                                        class="contact-remove"
+                                        (click)="removeContactField(i)"
+                                        aria-label="Quitar este número"
                                       >
-                                      @if (contact.hasError('required')) {
-                                        <p
-                                          class="invalid-feedback"
-                                          >
-                                          Ingresa un número de contacto
-                                        </p>
-                                      }
-                                      @if (contact.hasError('pattern')) {
-                                        <p
-                                          class="invalid-feedback"
-                                          >
-                                          Ingresa solo números
-                                        </p>
-                                      }
-                                      @if (contact.hasError('minlength')) {
-                                        <p
-                                          class="invalid-feedback"
-                                          >
-                                          El número de teléfono no es válido
-                                        </p>
-                                      }
-                                      @if (contact.hasError('maxlength')) {
-                                        <p
-                                          class="invalid-feedback"
-                                          >
-                                          El número de teléfono no es válido
-                                        </p>
-                                      }
-                                    </div>
+                                        ×
+                                      </button>
+                                    }
+                                  </div>
+                                  <div
+                                    class="validationMessage"
+                                    [class.active]="contact.touched && contact.invalid"
+                                  >
+                                    @if (contact.hasError('required')) {
+                                      <p class="invalid-feedback">Ingresa un número de contacto</p>
+                                    }
+                                    @if (contact.hasError('pattern')) {
+                                      <p class="invalid-feedback">Ingresa solo números</p>
+                                    }
+                                    @if (contact.hasError('minlength') || contact.hasError('maxlength')) {
+                                      <p class="invalid-feedback">El número de teléfono no es válido</p>
+                                    }
                                   </div>
                                 </div>
                               }
-                              @if (maxFourContactNumbers) {
-                                <p class="invalid-feedback">
-                                  Máximo cuatro números de contacto
-                                </p>
-                              }
                             </div>
+                            @if (contactField.length < 4) {
+                              <button
+                                type="button"
+                                class="contact-add"
+                                (click)="addContactField()"
+                              >
+                                + Añadir otro número
+                              </button>
+                            } @else {
+                              <p class="contact-max">Puedes agregar hasta 4 números.</p>
+                            }
+                          </div>
                             @if (stateId == 'B') {
                               <div class="form-elements">
                                 <label class="form-label" for="reward">Recompensa:</label>
@@ -428,23 +410,37 @@
                               }
                               <div class="files-uploader">
                                 <label for="inputElement">Fotos de la mascota</label>
-                                <app-uploader
-                                  [published]="published"
-                                  [updating]="false"
-                                  (maxSixLimit)="onLimit($event)"
-                                  (change)="onUrlsChange($event)"
-                                ></app-uploader>
-                                @if (maxSixFiles) {
+                                @if (updating) {
+                                  <app-uploader
+                                    [published]="published"
+                                    [imgsUrlUpdating]="imgsUrlUpdating"
+                                    [imgsUrlUpdatingToShow]="imgsUrlUpdatingToShow"
+                                    [updating]="true"
+                                    (maxFourLimit)="onLimit($event)"
+                                    (changeUpdate)="onUrlsChange($event)"
+                                  ></app-uploader>
+                                } @else {
+                                  <app-uploader
+                                    [published]="published"
+                                    [updating]="false"
+                                    (maxFourLimit)="onLimit($event)"
+                                    (change)="onUrlsChange($event)"
+                                  ></app-uploader>
+                                }
+                                @if (maxFourFiles) {
                                   <p class="invalid-feedback">
-                                    Puedes subir máximo 6 fotos
+                                    Puedes subir máximo 4 fotos
                                   </p>
                                 }
                               </div>
                             </div>
                           </div>
+                          @if (submitError) {
+                            <p class="submit-error" role="alert">{{ submitError }}</p>
+                          }
                           <button class="submit-btn" type="submit" [disabled]="disableSubmit">
                             @if (!isLoading) {
-                              <span> Publicar mascota </span>
+                              <span> {{ submitLabel }} </span>
                             } @else {
                               <app-spinner></app-spinner>
                             }

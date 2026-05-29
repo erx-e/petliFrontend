@@ -58,6 +58,11 @@ a {
 .petGallery {
   display: block;
   width: 100%;
+  // Piso de altura: si Swiper computa 0 en un frame intermedio (resize muy
+  // rápido o cambio de breakpoint), el contenedor no colapsa y la imagen
+  // sigue visible vía object-fit. Sin esto, overflow:hidden recorta todo y
+  // el swiper "desaparece".
+  min-height: 240px;
   margin-bottom: var(--space-2);
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -206,6 +211,31 @@ a {
   display: block;
 }
 
+// Fallback cuando el <img> dispara (error): típicamente objetos de S3 que
+// devuelven 403 (eliminados del bucket pero todavía referenciados en la BD).
+// Mantiene el slide a una proporción razonable para que el swiper no colapse
+// ni muestre el icono de imagen rota del navegador.
+.imgPet--missing {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background-color: var(--lighter-light-blue);
+  color: var(--grey);
+}
+.imgPet__missing-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--darker-light-blue);
+}
+.imgPet__missing-text {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
 .notFound__container{
   width: 100%;
   height: 550px;
@@ -261,6 +291,161 @@ a {
 .skeleton-btn {
   width: 150px;
   height: 44px;
+}
+
+// Confirmación de borrado: diálogo modal con velo. Pausa deliberada antes de
+// una acción destructiva (no se puede deshacer) y feedback claro durante la
+// request, en lugar del clic-y-desaparece anterior.
+.delete-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: delete-dialog-fade var(--dur) var(--ease-out);
+}
+
+.delete-dialog__scrim {
+  position: absolute;
+  inset: 0;
+  // Velo azul de marca a 55% para mantener el contexto visible debajo.
+  background-color: oklch(0.17 0.11 272 / 0.55);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.delete-dialog__scrim:disabled {
+  cursor: not-allowed;
+}
+
+.delete-dialog__panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-5);
+  background-color: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: delete-dialog-rise var(--dur) var(--ease-out);
+}
+
+.delete-dialog__title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1.2;
+  margin-bottom: var(--space-2);
+}
+
+.delete-dialog__body {
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--grey);
+  margin-bottom: var(--space-4);
+
+  strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+}
+
+.delete-dialog__error {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--red);
+}
+
+.delete-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.delete-dialog__cancel,
+.delete-dialog__confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 132px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    filter var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.delete-dialog__cancel {
+  color: var(--blue);
+  background-color: var(--white);
+  border: 1px solid var(--darker-light-blue);
+}
+.delete-dialog__cancel:hover:not(:disabled) {
+  background-color: var(--lighter-light-blue);
+}
+
+.delete-dialog__confirm {
+  color: var(--white);
+  background-color: var(--red);
+  border: 1px solid var(--red);
+}
+.delete-dialog__confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.delete-dialog__cancel:disabled,
+.delete-dialog__confirm:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.delete-dialog__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid oklch(1 0 0 / 0.4);
+  border-top-color: var(--white);
+  border-radius: var(--radius-full);
+  animation: delete-dialog-spin 0.6s linear infinite;
+}
+
+@keyframes delete-dialog-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes delete-dialog-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes delete-dialog-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delete-dialog,
+  .delete-dialog__panel,
+  .delete-dialog__spinner {
+    animation: none;
+  }
 }
 
 @media screen and (min-width: 48rem) {

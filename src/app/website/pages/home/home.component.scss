@@ -1,71 +1,110 @@
 .homePage {
-  padding: var(--space-3);
+  padding: var(--space-4) var(--space-3);
   overflow: hidden;
 }
 
-.homePage__info {
-  margin-bottom: var(--space-4);
-  line-height: 1.15;
+// Intro cálida y breve: bienvenida orientada a la acción, no un hero de marca
+// (eso es la landing). El ancho del párrafo se limita para una lectura cómoda.
+.home-intro {
+  margin-bottom: var(--space-6);
 }
 
-.homeInfo__title {
+.home-intro__title {
+  font-size: var(--text-2xl);
   font-weight: 600;
-  font-size: var(--text-lg);
-  margin-bottom: var(--space-2);
+  line-height: 1.15;
+  color: var(--blue);
+  margin-bottom: var(--space-3);
 }
 
-
+.home-intro__text {
+  max-width: 60ch;
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--grey);
+}
 
 .seccion {
-  margin: var(--space-3) 0px;
+  margin-bottom: var(--space-6);
 }
 
+// Encabezado de sección: título + descripción a la izquierda, enlace "Ver
+// todas" a la derecha.
 .seccionTitle {
   display: flex;
-  align-items: center;
-  margin-bottom: var(--space-1);
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .seccionTitle__text {
+  font-size: var(--text-xl);
   font-weight: 600;
-  font-size: var(--text-lg);
-
-  margin-right: var(--space-1);
+  line-height: 1.1;
+  color: var(--blue);
 }
 
-.link_icon {
-  width: 20px;
+.seccionTitle__desc {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--grey);
+}
+
+.seccionTitle__link {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--blue);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out), gap var(--dur-fast) var(--ease-out);
+
+  svg {
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+}
+.seccionTitle__link:hover {
+  color: var(--yellow-hover);
+
+  svg {
+    transform: translateX(3px);
+  }
 }
 
 .seccion__postspet {
   display: flex;
-  align-items: center;
-  overflow-x: overlay;
-  // height: 400px;
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  align-items: stretch;
+  overflow-x: auto;
+  scroll-padding-left: var(--space-1);
+  scroll-behavior: smooth;
+  padding-bottom: var(--space-2);
+  /* Ocultar scrollbar en IE, Edge y Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Ocultar scrollbar en Chrome, Safari y Opera */
 .seccion__postspet::-webkit-scrollbar {
   display: none;
+}
+
+.seccion__empty {
+  padding: var(--space-4) var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--grey);
 }
 
 @media screen and (min-width: 64rem) {
   .homePage {
     max-width: 1280px;
     margin: 0 auto;
+    padding: var(--space-6) var(--space-5);
   }
 
-  .seccion__postspet {
-    /* Hide scrollbar for IE, Edge and Firefox */
-    -ms-overflow-style: block; /* IE and Edge */
-    scrollbar-width: 10px; /* Firefox */
-  }
-
-  .seccion__postspet::-webkit-scrollbar {
-    display: block;
-    height: 150px;
+  .home-intro__title {
+    font-size: var(--text-3xl);
   }
 }

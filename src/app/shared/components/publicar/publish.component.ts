@@ -6,7 +6,11 @@ import {
   UntypedFormGroup,
   Validators,
 } from '@angular/forms';
-import { createImgDTO, CreatePostpetDTO } from 'src/app/models/postpet.model';
+import {
+  createImgDTO,
+  CreatePostpetDTO,
+  updateImg,
+} from 'src/app/models/postpet.model';
 import { Location } from '@angular/common';
 import { CategoryService } from 'src/app/services/category.service';
 import {
@@ -26,8 +30,8 @@ import { Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-publish',
-    templateUrl: './publish.component.html',
-    styleUrls: ['./publish.component.scss'],
+    templateUrl: './pet-form.component.html',
+    styleUrls: ['./pet-form.component.scss'],
     standalone: false
 })
 export class PublishComponent implements OnInit {
@@ -43,8 +47,17 @@ export class PublishComponent implements OnInit {
 
   @Input() stateId: string = '';
 
+  // API unificada con la plantilla compartida pet-form (modo crear).
+  submitLabel = 'Publicar mascota';
+  updating = false;
+  imgsUrlUpdating: updateImg[] = [];
+  imgsUrlUpdatingToShow: updateImg[] = [];
+
   published: boolean = false;
   isLoading: boolean = false;
+  // Mensaje de error del submit. Se muestra encima del botón cuando la
+  // creación falla, para no dejar al usuario con un spinner colgado.
+  submitError: string | null = null;
 
   urlBucket = `${environment.BUCKET_URL}`;
   form: UntypedFormGroup;
@@ -80,7 +93,7 @@ export class PublishComponent implements OnInit {
   imgUrls: string[] = [];
 
   disableSubmit: boolean = false;
-  maxSixFiles: boolean = false;
+  maxFourFiles: boolean = false;
 
   maxFourContactNumbers: boolean = false;
 
@@ -145,6 +158,11 @@ export class PublishComponent implements OnInit {
     }
   }
 
+  removeContactField(index: number) {
+    this.contactField.removeAt(index);
+    this.maxFourContactNumbers = false;
+  }
+
   private CreateContactField() {
     return new UntypedFormControl('', [
       Validators.minLength(10),
@@ -157,38 +175,60 @@ export class PublishComponent implements OnInit {
     this.location.back();
   }
 
-  crearPost() {
+  submit() {
+    this.submitError = null;
     if (this.user && this.form.valid && this.imgUrls.length > 0) {
       this.isLoading = true;
-      this.createdPost = this.form.value;
+      try {
+        this.createdPost = this.form.value;
 
-      if (!this.sectorField.value) {
-        this.createdPost.idSector = null;
-      }
-      if (!this.rewardField.value) {
-        this.createdPost.reward = null;
-      }
+        if (!this.sectorField.value) {
+          this.createdPost.idSector = null;
+        }
+        if (!this.rewardField.value) {
+          this.createdPost.reward = null;
+        }
 
-      this.createdPost.urlImgs = this.imgUrls.map((url) => {
-        return { url: url } as createImgDTO;
-      });
-      this.createdPost.contact = this.contactField.value.join(' ');
-      this.createdPost.idUser = this.user.idUser;
+        this.createdPost.urlImgs = this.imgUrls.map((url) => {
+          return { url: url } as createImgDTO;
+        });
+        this.createdPost.contact = this.contactField.value.join(' ');
+        this.createdPost.idUser = this.user.idUser;
 
-      this.createdPost.idState = this.stateId;
-      this.published = true;
-      this.postpetService.create(this.createdPost).subscribe(() => {
+        this.createdPost.idState = this.stateId;
+        this.published = true;
+        this.postpetService.create(this.createdPost).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.location.back();
+          },
+          error: (err) => {
+            // Sin este handler, isLoading nunca volvía a false en fallos de
+            // red/servidor y el botón giraba para siempre.
+            this.isLoading = false;
+            this.published = false;
+            this.submitError =
+              typeof err === 'string'
+                ? err
+                : 'No pudimos publicar. Inténtalo de nuevo en un momento.';
+            console.error('Error al crear la publicación:', err);
+          },
+        });
+      } catch (err) {
         this.isLoading = false;
-        this.location.back();
-      });
+        this.published = false;
+        this.submitError = 'No pudimos preparar la publicación. Recarga la página e inténtalo de nuevo.';
+        console.error('Error preparando la publicación:', err);
+      }
     } else {
       this.published = false;
     }
     this.form.markAllAsTouched();
   }
 
-  onUrlsChange(event: string[]) {
-    this.imgUrls = event;
+  // Firma ampliada por la plantilla compartida; en modo crear siempre llega string[].
+  onUrlsChange(event: string[] | updateImg[]) {
+    this.imgUrls = event as string[];
   }
 
   toggleDisabledBreed() {
@@ -271,7 +311,7 @@ export class PublishComponent implements OnInit {
   }
 
   onLimit(event: boolean) {
-    this.maxSixFiles = event;
+    this.maxFourFiles = event;
   }
 
   get petNameField() {
@@ -382,14 +422,14 @@ export class PublishComponent implements OnInit {
     return (
       this.urlImgsField.touched &&
       this.urlImgsField.valid &&
-      this.maxSixFiles == false
+      this.maxFourFiles == false
     );
   }
 
   get urlImgsFieldInvalid() {
     return (
       this.urlImgsField.touched &&
-      (this.imgUrls.length == 0 || this.maxSixFiles)
+      (this.imgUrls.length == 0 || this.maxFourFiles)
     );
   }
 

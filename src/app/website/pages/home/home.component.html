@@ -1,100 +1,102 @@
 <div class="homePage">
-  <div class="homePage__info">
-    <h1 class="homeInfo__title">
-      Centro virtual de acogida de Mascotas del Ecuador
-    </h1>
-    <p class="homeInfo__text">
-      Nosotros pensamos que cada animal merece una vida digna y prospera, que
-      cada uno de ellos debe ser tratado con respeto y cuidado como cualquier
-      ser humano. Nuestro proposito es ayudar a que la vida de cada mascota
-      domestica pueda tener el amor que se merece, debe tener el derecho de
-      estar con sus seres queridos, de estar en casa con los que ama y la aman.
+  <header class="home-intro">
+    <h1 class="home-intro__title">Cada mascota merece volver a casa</h1>
+    <p class="home-intro__text">
+      Publica una mascota perdida o encontrada, busca entre los reportes de tu
+      zona y ayuda a que más familias se reencuentren. Aquí cada publicación
+      acerca a una mascota a su hogar.
     </p>
-  </div>
-  <div>
-    <section class="seccion">
-      <div class="seccionTitle">
+  </header>
+
+  <section class="seccion">
+    <div class="seccionTitle">
+      <div class="seccionTitle__head">
         <h2 class="seccionTitle__text">Encuentra</h2>
-        <a routerLink="/encuentra">
-          <i
-            ><img
-            class="link_icon"
-            src="./assets/imgs/link_icon.png"
-            alt=""
-          /></i>
-        </a>
+        <p class="seccionTitle__desc">Mascotas encontradas que buscan a su familia.</p>
       </div>
-      <div class="seccion__postspet">
-        @for (postpet of postspetEncuentra; track postpet) {
-          <app-postpet
-            [home]="true"
-            [postpet]="postpet"
-          ></app-postpet>
-        }
-      </div>
-    </section>
-    <section class="seccion">
-      <div class="seccionTitle">
+      <a class="seccionTitle__link" routerLink="/encuentra">
+        Ver todas
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
+    </div>
+    <div class="seccion__postspet">
+      @for (postpet of postspetEncuentra; track postpet) {
+        <app-postpet [home]="true" [postpet]="postpet"></app-postpet>
+      } @empty {
+        <p class="seccion__empty">Aún no hay mascotas encontradas publicadas.</p>
+      }
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="seccionTitle">
+      <div class="seccionTitle__head">
         <h2 class="seccionTitle__text">Difunde</h2>
-        <a routerLink="/encuentra">
-          <i
-            ><img
-            class="link_icon"
-            src="./assets/imgs/link_icon.png"
-            alt=""
-          /></i>
-        </a>
+        <p class="seccionTitle__desc">Mascotas perdidas que su familia está buscando.</p>
       </div>
-      <div class="seccion__postspet">
-        @for (postpet of postspetDifunde; track postpet) {
-          <app-postpet
-            [home]="true"
-            [postpet]="postpet"
-          ></app-postpet>
-        }
-      </div>
-    </section>
-    <section class="seccion">
-      <div class="seccionTitle">
+      <a class="seccionTitle__link" routerLink="/difunde">
+        Ver todas
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
+    </div>
+    <div class="seccion__postspet">
+      @for (postpet of postspetDifunde; track postpet) {
+        <app-postpet [home]="true" [postpet]="postpet"></app-postpet>
+      } @empty {
+        <p class="seccion__empty">Aún no hay mascotas perdidas publicadas.</p>
+      }
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="seccionTitle">
+      <div class="seccionTitle__head">
         <h2 class="seccionTitle__text">Adopta</h2>
-        <a routerLink="/encuentra">
-          <i
-            ><img
-            class="link_icon"
-            src="./assets/imgs/link_icon.png"
-            alt=""
-          /></i>
-        </a>
+        <p class="seccionTitle__desc">Animales en adopción esperando un hogar.</p>
       </div>
-      <div class="seccion__postspet">
-        @for (postpet of postspetAdopta; track postpet) {
-          <app-postpet
-            [home]="true"
-            [postpet]="postpet"
-          ></app-postpet>
-        }
-      </div>
-    </section>
-    <section class="seccion">
-      <div class="seccionTitle">
+      <a class="seccionTitle__link" routerLink="/adopta">
+        Ver todas
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
+    </div>
+    <div class="seccion__postspet">
+      @for (postpet of postspetAdopta; track postpet) {
+        <app-postpet [home]="true" [postpet]="postpet"></app-postpet>
+      } @empty {
+        <p class="seccion__empty">Aún no hay animales en adopción publicados.</p>
+      }
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="seccionTitle">
+      <div class="seccionTitle__head">
         <h2 class="seccionTitle__text">Ayuda</h2>
-        <a routerLink="/encuentra">
-          <i
-            ><img
-            class="link_icon"
-            src="./assets/imgs/link_icon.png"
-            alt=""
-          /></i>
-        </a>
+        <p class="seccionTitle__desc">Animales heridos o en peligro que necesitan auxilio.</p>
       </div>
-      <div class="seccion__postspet">
-        @for (postpet of postspetAyuda; track postpet) {
-          <app-postpet
-            [home]="true"
-            [postpet]="postpet"
-          ></app-postpet>
-        }
-      </div>
-    </section>
-  </div>
+      <a class="seccionTitle__link" routerLink="/ayuda">
+        Ver todas
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
+    </div>
+    <div class="seccion__postspet">
+      @for (postpet of postspetAyuda; track postpet) {
+        <app-postpet [home]="true" [postpet]="postpet"></app-postpet>
+      } @empty {
+        <p class="seccion__empty">Aún no hay casos de ayuda publicados.</p>
+      }
+    </div>
+  </section>
 </div>

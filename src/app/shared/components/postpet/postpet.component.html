@@ -4,9 +4,17 @@
     [routerLink]="['/pet', postpet.id]"
   >
     <div class="container__postpet-img">
-      @if (postpet.urlImgs) {
+      @if (postpet.urlImgs && !imgFailed) {
         <div class="postpet-img">
-          <img class="postpetImg" [src]="postpet.urlImgs[0].url" loading="lazy" decoding="async" [alt]="postpet.petName || 'Mascota publicada'" />
+          <img class="postpetImg" [src]="postpet.urlImgs[0].url" loading="lazy" decoding="async" [alt]="postpet.petName || 'Mascota publicada'" (error)="onImgError()" />
+        </div>
+      } @else if (imgFailed) {
+        <div class="postpet-img postpet-img--missing" role="img" aria-label="Imagen no disponible">
+          <svg class="postpet-img__missing-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="9" cy="9" r="2" />
+            <path d="m21 15-5-5L5 21" />
+          </svg>
         </div>
       }
       <span class="stateBadge" [class]="'state--' + postpet.petStateId">{{ stateLabel }}</span>

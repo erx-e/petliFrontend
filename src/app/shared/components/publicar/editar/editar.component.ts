@@ -27,8 +27,8 @@ import { Location } from '@angular/common';
 
 @Component({
     selector: 'app-editar',
-    templateUrl: './editar.component.html',
-    styleUrls: ['./editar.component.scss'],
+    templateUrl: '../pet-form.component.html',
+    styleUrls: ['../pet-form.component.scss'],
     standalone: false
 })
 export class EditarComponent implements OnInit {
@@ -91,17 +91,28 @@ export class EditarComponent implements OnInit {
           this.petSpecialConditionField.setValue(
             this.postpet.petSpecialCondition
           );
-          if(this.postpet.contact){
-            this.contactNumbers = this.postpet.contact.match(/\S+/g);
-            for (let i = 1; i < this.contactNumbers.length; i++) {
-              this.addContactField();
+          if (this.postpet.contact) {
+            // match() devuelve null si solo hay espacios; ?? [] lo neutraliza
+            // antes de leer .length.
+            const numbers = this.postpet.contact.match(/\S+/g) ?? [];
+            if (numbers.length > 0) {
+              this.contactNumbers = numbers;
+              for (let i = 1; i < numbers.length; i++) {
+                this.addContactField();
+              }
+              this.contactField.patchValue(numbers);
             }
-            this.contactField.patchValue(this.contactNumbers);
           }
           this.descriptionField.setValue(this.postpet.description);
           this.lastTimeSeenField.setValue(this.postpet.lastTimeSeen);
-          this.imgUrls = this.postpet.urlImgs;
-          this.imgUrlsOrigin = this.postpet.urlImgs;
+          // CRÍTICO: clonar dos arrays independientes. imgUrls es lo que el
+          // uploader muta al subir/eliminar (se envía al backend al guardar);
+          // imgUrlsOrigin solo se usa para el @for "imagenes ya subidas" del
+          // template. Si comparten referencia, cada push del uploader mete la
+          // foto recién subida también en imgUrlsOrigin → el segundo @for la
+          // pinta otra vez y la imagen se ve duplicada en la UI.
+          this.imgUrls = this.postpet.urlImgs.map((img) => ({ ...img }));
+          this.imgUrlsOrigin = this.postpet.urlImgs.map((img) => ({ ...img }));
 
           this.urlImgsField.clearValidators();
           this.urlImgsField.updateValueAndValidity();
@@ -120,8 +131,15 @@ export class EditarComponent implements OnInit {
   form: UntypedFormGroup;
   @Input() stateId: string = '';
 
+  // API unificada con la plantilla compartida pet-form (modo editar).
+  submitLabel = 'Editar publicación';
+  updating = true;
+
   published: boolean = false;
   isLoading: boolean = false;
+  // Mensaje de error del submit (HTTP o sincrónico). Se muestra encima del
+  // botón para que el usuario sepa qué pasó cuando la edición falla.
+  submitError: string | null = null;
 
   urlBucket = environment.BUCKET_URL;
   species: specie[] = [];
@@ -139,7 +157,7 @@ export class EditarComponent implements OnInit {
   imgUrlsOrigin: updateImg[] = [];
 
   disableSubmit: boolean = false;
-  maxSixFiles: boolean = false;
+  maxFourFiles: boolean = false;
 
   postpetId: string | null;
   postpet!: UpdatePostpetDTO | null;
@@ -212,6 +230,11 @@ export class EditarComponent implements OnInit {
     }
   }
 
+  removeContactField(index: number) {
+    this.contactField.removeAt(index);
+    this.maxFourContactNumbers = false;
+  }
+
   private CreateContactField() {
     return new UntypedFormControl('', [
       Validators.minLength(10),
@@ -220,9 +243,11 @@ export class EditarComponent implements OnInit {
     ]);
   }
 
-  editPost() {
+  submit() {
+    this.submitError = null;
     if (this.form.valid && this.imgUrls.length > 0) {
       this.isLoading = true;
+      try {
       this.updatePost.idPostPet = this.postpet.idPostPet;
       this.updatePost.petName =
         this.postpet.petName != this.petNameField.value
@@ -286,16 +311,53 @@ export class EditarComponent implements OnInit {
       this.updatePost.idUser = this.user.idUser;
       this.updatePost.idState = this.stateId;
       this.published = true;
-      this.postpetService.update(this.updatePost).subscribe(() => {
-        this.isLoading = false;
-        this.location.back();
+      this.postpetService.update(this.updatePost).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.location.back();
+        },
+        error: (err) => {
+          // El servicio convierte 400 → "Post Id incorrecto" y otros → "Error
+          // del servidor". Sin este handler, isLoading se quedaba en true y el
+          // botón giraba para siempre (típico al editar con imágenes huérfanas
+          // que el backend rechaza al recibir url:null).
+          this.isLoading = false;
+          this.published = false;
+          this.submitError =
+            typeof err === 'string'
+              ? err
+              : 'No pudimos guardar los cambios. Inténtalo de nuevo en un momento.';
+          console.error('Error al actualizar la publicación:', err);
+        },
       });
+      } catch (err) {
+        // Error sincrónico armando el payload (p.ej. postpet/user nulos).
+        this.isLoading = false;
+        this.published = false;
+        this.submitError = 'No pudimos preparar los cambios. Recarga la página e inténtalo de nuevo.';
+        console.error('Error preparando la actualización:', err);
+      }
     }
     this.form.markAllAsTouched();
   }
 
-  onUrlsChange(event: updateImg[]) {
-    this.imgUrls = event;
+  // Firma ampliada por la plantilla compartida; en modo editar siempre llega updateImg[].
+  onUrlsChange(event: string[] | updateImg[]) {
+    this.imgUrls = event as updateImg[];
+  }
+
+  onLimit(event: boolean) {
+    this.maxFourFiles = event;
+  }
+
+  // Alias para la plantilla compartida: el uploader en modo editar lee
+  // imgsUrlUpdating / imgsUrlUpdatingToShow.
+  get imgsUrlUpdating() {
+    return this.imgUrls;
+  }
+
+  get imgsUrlUpdatingToShow() {
+    return this.imgUrlsOrigin;
   }
 
   toggleDisabledBreed() {
@@ -487,14 +549,14 @@ export class EditarComponent implements OnInit {
     return (
       this.urlImgsField.touched &&
       this.urlImgsField.valid &&
-      this.maxSixFiles == false
+      this.maxFourFiles == false
     );
   }
 
   get urlImgsFieldInvalid() {
     return (
       this.urlImgsField.touched &&
-      (this.imgUrls.length == 0 || this.maxSixFiles)
+      (this.imgUrls.length == 0 || this.maxFourFiles)
     );
   }
 

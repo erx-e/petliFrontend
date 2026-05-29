@@ -1,0 +1,324 @@
+.main {
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
+  padding: 0 var(--space-3);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+.titleSection{
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.backButton{
+  padding: var(--space-2) var(--space-3);
+  font-weight: 600;
+  color: var(--blue);
+  background-color: var(--white);
+  border: 1px solid var(--darker-light-blue);
+  border-radius: var(--radius-sm);
+}
+
+// Aviso de "necesitas cuenta" como alerta (no como texto suelto).
+.validateUser{
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--lighter-light-blue);
+  border: 1px solid var(--darker-light-blue);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--blue);
+}
+
+// Etiquetas pequeñas y mudas, consistentes con el resto.
+.form-label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--grey);
+}
+
+// Botones Perro/Gato en colores de marca (no el azul de Bootstrap).
+.btn-outline-primary {
+  --bs-btn-color: var(--blue);
+  --bs-btn-border-color: var(--darker-light-blue);
+  --bs-btn-hover-color: var(--white);
+  --bs-btn-hover-bg: var(--blue);
+  --bs-btn-hover-border-color: var(--blue);
+  --bs-btn-active-color: var(--white);
+  --bs-btn-active-bg: var(--blue);
+  --bs-btn-active-border-color: var(--blue);
+}
+
+.formBox {
+  margin-top: var(--space-3);
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+// Cada sección del formulario como tarjeta, para agrupar y dar jerarquía.
+.form-element-section {
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  background-color: var(--white);
+  border: 1px solid var(--darker-light-blue);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+// Encabezado de cada sección (Fraunces).
+.form-element-section > p {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+
+.flex {
+  display: flex;
+  flex-direction: column;
+}
+
+.containerImgs {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+
+.form-elements {
+  padding: var(--space-2) 0px;
+  margin-top: var(--space-4);
+}
+
+.textDescription {
+  height: 200px;
+}
+
+.inputFileElement {
+  margin-top: var(--space-4);
+}
+
+.message {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: var(--text-sm);
+  &.invalid {
+    color: var(--red);
+  }
+}
+
+.uploadedImgs {
+  display: none;
+  margin-top: var(--space-4);
+  img {
+    width: 100%;
+  }
+}
+
+.imgContainer {
+  width: 100%;
+  margin: 0 auto;
+  max-width: 300px;
+  position: relative;
+  display: none;
+  margin-bottom: var(--space-1);
+}
+
+.deleteIcon {
+  display: none;
+  position: absolute;
+  fill: blueviolet;
+  cursor: pointer;
+  width: 40px;
+  right: 10px;
+  top: 10px;
+}
+
+.progressBar {
+  display: none;
+  width: 100%;
+  border: var(--grey) 1px solid;
+  margin-top: var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--blue);
+}
+
+.bar {
+  width: 1%;
+  border-radius: var(--radius-md);
+  height: 10px;
+  background-color: var(--yellow);
+}
+
+// Banner de error de submit (HTTP o sincrónico). Aparece encima del botón
+// para que el usuario sepa por qué la edición/publicación no avanzó, en lugar
+// de quedarse con un spinner colgado sin feedback.
+.submit-error {
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: oklch(0.65 0.2 27 / 0.1);
+  color: var(--red);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-weight: 700;
+  background-color: var(--yellow);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  line-height: 1.15;
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+
+
+// Cada número de contacto: input + botón de quitar (salvo el primero).
+.contact-field {
+  margin-bottom: var(--space-2);
+}
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  .form-control {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+.contact-remove {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+  line-height: 1;
+  color: var(--red);
+  background-color: var(--lighter-light-blue);
+  border: 1px solid var(--darker-light-blue);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.contact-remove:hover {
+  color: var(--white);
+  background-color: var(--red);
+  border-color: var(--red);
+}
+
+// Botón para añadir otro número (estilo discreto, punteado).
+.contact-add {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: 1px dashed var(--grey);
+  border-radius: var(--radius-sm);
+  color: var(--blue);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.contact-add:hover {
+  border-color: var(--blue);
+  background-color: var(--lighter-light-blue);
+}
+.contact-max {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--grey);
+}
+
+.files-uploader{
+  margin-top: var(--space-4);
+  padding: var(--space-2);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.validationMessage {
+  display: none;
+  &.active {
+    display: block;
+  }
+}
+
+.is-valid {
+  background-image: none !important;
+  padding-right: 0px !important;
+}
+
+.is-invalid {
+  background-image: none !important;
+  padding-right: 0px !important;
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+@media screen and (min-width: 30rem) {
+  .main {
+    margin: var(--space-4) auto;
+    padding: 0px var(--space-4);
+  }
+  .flex {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .form-elements {
+    width: 50%;
+    padding: var(--space-2);
+
+    &.inputFileElement {
+      width: auto;
+    }
+
+    &.textarea {
+      width: auto;
+    }
+  }
+
+  .textDescription {
+    height: 150px;
+  }
+
+  .formContact{
+    width: 56.7%;
+  }
+}
+
+@media screen and (min-width: 48rem) {
+  .main {
+    margin: var(--space-7) auto;
+    max-width: 750px;
+    padding: 0px var(--space-5);
+  }
+}
+
+@media screen and (min-width: 64rem) {
+  .main {
+    margin: var(--space-8) auto;
+  }
+}

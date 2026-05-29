@@ -1,8 +1,10 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   HostListener,
   Input,
+  NgZone,
   OnDestroy,
   OnInit,
   Output,
@@ -23,7 +25,9 @@ import { TokenService } from "src/app/services/token.service";
 export class UploadTaskComponent implements OnInit, OnDestroy {
   constructor(
     private s3StorageService: S3StorageService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   @Input() imgUpdating: updateImg = null;
@@ -36,10 +40,23 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
   downloadUrl: string = null;
   @Input() published: boolean = false;
   @Output() deleted = new EventEmitter<{ file: File; key: string }>();
-  @Output() uploaded = new EventEmitter<{ name: string; url: string }>();
+  // Emite el File además de la URL: el padre lo usa como clave única en su
+  // Map<File, string>. Antes emitía { name, url } y el padre keyeaba por
+  // name → archivos con nombres iguales se sobreescribían y se perdían URLs.
+  @Output() uploaded = new EventEmitter<{ file: File; url: string }>();
 
-  percentage: number = 0;
+  // Empieza en null (no en 0) para que el @if del progress-container solo se
+  // active cuando arranca una subida real. Si lo dejamos en 0, las imágenes
+  // que solo se muestran (existentes en modo editar: file=null, imgUpdating
+  // con URL) renderizarían un "Subiendo imagen" fantasma a 0% hasta que la
+  // <img> dispara (load), lo que se veía como una segunda subida en paralelo
+  // a la del archivo nuevo. startUpload() pone percentage = 0 al empezar.
+  percentage: number | null = null;
   isImgLoaded: boolean = false;
+  // True cuando el <img> dispara (error): URL inalcanzable (404/403 de S3 por
+  // objeto huérfano). Mostramos un placeholder dentro del .img-container y
+  // mantenemos visible el botón de borrar para limpiar la referencia.
+  imgFailed: boolean = false;
   isLoading: boolean = false;
   imgKey: string = "";
   // Mensaje de error de la subida; se muestra en la tarjeta de la imagen.
@@ -80,6 +97,21 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Genera un nombre de archivo único conservando la extensión original (para
+  // que el backend infiera bien el Content-Type / extensión de la key). Usa
+  // crypto.randomUUID() cuando está disponible (https/localhost) y, si no, un
+  // fallback con timestamp + aleatorio. Evita colisiones de key en S3 entre
+  // archivos que comparten nombre.
+  private uniqueFileName(originalName: string): string {
+    const dot = originalName.lastIndexOf(".");
+    const ext = dot >= 0 ? originalName.slice(dot) : "";
+    const unique =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return `${unique}${ext}`;
+  }
+
   startUpload() {
     this.errorMessage = null;
     // Sin sesión, el backend rechazaría la URL firmada con 401: no intentamos
@@ -91,8 +123,15 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
     }
     this.percentage = 0;
     // 1) Pedimos al backend la URL firmada; 2) subimos el archivo directo a S3.
+    // Enviamos un nombre ÚNICO por archivo (no el original): el backend deriva
+    // la key del objeto S3 a partir del fileName, así que dos archivos con el
+    // mismo nombre (p. ej. varias "image.jpg" desde el móvil) generaban la misma
+    // key, se sobreescribían en el bucket y devolvían la MISMA publicUrl. Como
+    // el padre acumula las URLs, todas terminaban siendo idénticas y solo se
+    // guardaba/mostraba una imagen. Un nombre único garantiza una key, un objeto
+    // y una publicUrl distintos por archivo.
     this.s3StorageService
-      .getPresignedUploadUrl(this.file.name, this.file.type)
+      .getPresignedUploadUrl(this.uniqueFileName(this.file.name), this.file.type)
       .pipe(
         switchMap((presigned) => {
           this.imgKey = presigned.key;
@@ -120,7 +159,7 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
               this.uploadedUpdate.emit({ url: this.downloadUrl });
             } else {
               this.uploaded.emit({
-                name: this.file.name,
+                file: this.file,
                 url: this.downloadUrl,
               });
             }
@@ -177,10 +216,22 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
   }
 
   onLoaded() {
-    let imgDiv = document.getElementById(this.downloadUrl);
-    if (imgDiv) {
-      imgDiv.style.display = "flex";
-    }
-    this.isImgLoaded = true;
+    // Imágenes cacheadas pueden disparar (load) sincrónicamente al insertar el
+    // <img>, en algunas implementaciones fuera de la zona de Angular: forzamos
+    // que el flag y la CD ocurran en el mismo tick para que el swap progress
+    // → thumbnail sea atómico y no se vea brevemente como "dos cuadros".
+    this.ngZone.run(() => {
+      this.isImgLoaded = true;
+      this.cdr.markForCheck();
+    });
+  }
+
+  onImgError() {
+    // Mismo motivo que en onLoaded: (error) puede llegar fuera de la zona si
+    // la URL falla de forma síncrona desde caché del navegador.
+    this.ngZone.run(() => {
+      this.imgFailed = true;
+      this.cdr.markForCheck();
+    });
   }
 }
