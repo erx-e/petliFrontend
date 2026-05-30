@@ -54,11 +54,10 @@ export class ProfileComponent implements OnInit {
     return this.user?.name?.trim().charAt(0).toUpperCase() || "?";
   }
 
-  // Normaliza el perfil de Facebook a una URL navegable (puede venir como URL
-  // completa o solo el usuario/identificador).
-  get facebookUrl(): string | null {
-    const fb = this.user?.facebookProfile?.trim();
-    if (!fb) return null;
-    return /^https?:\/\//i.test(fb) ? fb : `https://facebook.com/${fb}`;
+  // El campo cellNumber puede traer varios números separados por espacios:
+  // los devolvemos por separado para mostrar uno por chip.
+  get contactNumbers(): string[] {
+    const raw = this.user?.cellNumber?.trim();
+    return raw ? raw.split(/\s+/) : [];
   }
 }

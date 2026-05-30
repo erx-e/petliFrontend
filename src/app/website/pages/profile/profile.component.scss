@@ -73,13 +73,15 @@
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-full);
-  background-color: var(--lighter-light-blue);
+  border: 1px solid var(--blue);
+  border-radius: var(--radius-sm);
+  background-color: var(--white);
   color: var(--blue);
   font-size: var(--text-sm);
   font-weight: 600;
   text-decoration: none;
   transition: background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
     transform var(--dur) var(--ease-out),
     box-shadow var(--dur) var(--ease-out);
 
@@ -91,8 +93,8 @@
 }
 
 .contactChip:hover {
-  background-color: var(--yellow);
-  color: var(--ink);
+  background-color: var(--blue);
+  color: var(--white);
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
 }
