@@ -1,25 +1,75 @@
 <main class="profilePage">
-  @if (!isLoading) {
-    <div>
-      @if (user) {
-        <div>
-          <h1 class="profile__title">Perfil público</h1>
-          <div class="profile__info">
-            <p><span class="highlight">Nombre:</span> {{ user.name }}</p>
-            <p><span class="highlight">Número:</span> {{ user.cellNumber }}</p>
-            <p>
-              <span class="highlight">Correo electrónico:</span> {{ user.email }}
-            </p>
-          </div>
-          <div>
-            <app-filter [userId]="user.idUser"></app-filter>
-          </div>
-        </div>
-      } @else {
-        <app-notfound message="Usuario no encontrado"></app-notfound>
-      }
+  @if (isLoading) {
+    <div class="profileHeader">
+      <div class="skeleton profileSkeletonAvatar"></div>
+      <div class="profileHeader__body">
+        <div class="skeleton skeletonLine skeletonLine--title"></div>
+        <div class="skeleton skeletonLine"></div>
+        <div class="skeleton skeletonLine skeletonLine--short"></div>
+      </div>
     </div>
+  } @else if (user) {
+    <header class="profileHeader">
+      <div class="profileAvatar" aria-hidden="true">{{ initial }}</div>
+      <div class="profileHeader__body">
+        <p class="profileHeader__eyebrow">Perfil público</p>
+        <h1 class="profileHeader__name">{{ user.name | titlecase }}</h1>
+
+        <ul class="profileContacts">
+          @if (user.cellNumber) {
+            <li>
+              <a class="contactChip" [href]="'tel:' + user.cellNumber">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                  />
+                </svg>
+                <span>{{ user.cellNumber }}</span>
+              </a>
+            </li>
+          }
+          @if (user.email) {
+            <li>
+              <a class="contactChip" [href]="'mailto:' + user.email">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"
+                  />
+                </svg>
+                <span>{{ user.email }}</span>
+              </a>
+            </li>
+          }
+          @if (facebookUrl) {
+            <li>
+              <a
+                class="contactChip"
+                [href]="facebookUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"
+                  />
+                </svg>
+                <span>Facebook</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    </header>
+
+    <section class="profilePosts">
+      <h2 class="profilePosts__title">
+        Publicaciones de {{ user.name | titlecase }}
+      </h2>
+      <app-filter [userId]="user.idUser"></app-filter>
+    </section>
   } @else {
-    <div></div>
+    <div class="profileNotFound">
+      <app-notfound message="Usuario no encontrado"></app-notfound>
+    </div>
   }
 </main>

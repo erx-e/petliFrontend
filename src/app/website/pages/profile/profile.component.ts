@@ -1,11 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { Subscription } from "rxjs";
-import { postpetView } from "src/app/models/postpet.model";
 import { UserView } from "src/app/models/user.model";
 import { AuthService } from "src/app/services/auth.service";
-import { LoadingService } from "src/app/services/loading.service";
-import { PostpetService } from "src/app/services/postpet.service";
 
 @Component({
     selector: "app-profile",
@@ -15,25 +11,54 @@ import { PostpetService } from "src/app/services/postpet.service";
 })
 export class ProfileComponent implements OnInit {
   constructor(
-    private router: ActivatedRoute,
-    private authService: AuthService,
+    private route: ActivatedRoute,
+    private authService: AuthService
   ) {}
 
   userId: number = null;
   user: UserView = null;
-  postspet: postpetView[] = [];
-  isLoading: boolean = false;
+  // Arranca en true: sin esto, el primer render ocurría con user=null y
+  // isLoading=false, mostrando "Usuario no encontrado" durante un instante
+  // hasta que respondía getProfile. El "no encontrado" solo debe aparecer
+  // cuando la carga termina sin usuario.
+  isLoading: boolean = true;
 
   ngOnInit(): void {
-    this.router.paramMap.subscribe((params) => {
-      if (params.get("id")) {
-        this.userId = parseInt(params.get("id"));
-        if (!Number.isNaN(this.userId)) {
-          this.authService
-            .getProfile(this.userId)
-            .subscribe((data) => (this.user = data));
-        }
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get("id");
+      this.userId = id ? parseInt(id) : NaN;
+
+      if (!id || Number.isNaN(this.userId)) {
+        this.user = null;
+        this.isLoading = false;
+        return;
       }
+
+      this.isLoading = true;
+      this.user = null;
+      this.authService.getProfile(this.userId).subscribe({
+        next: (data) => {
+          this.user = data;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.user = null;
+          this.isLoading = false;
+        },
+      });
     });
+  }
+
+  // Inicial para el avatar (no hay imagen de perfil en el modelo).
+  get initial(): string {
+    return this.user?.name?.trim().charAt(0).toUpperCase() || "?";
+  }
+
+  // Normaliza el perfil de Facebook a una URL navegable (puede venir como URL
+  // completa o solo el usuario/identificador).
+  get facebookUrl(): string | null {
+    const fb = this.user?.facebookProfile?.trim();
+    if (!fb) return null;
+    return /^https?:\/\//i.test(fb) ? fb : `https://facebook.com/${fb}`;
   }
 }
