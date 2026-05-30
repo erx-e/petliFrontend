@@ -466,13 +466,15 @@
                                               }
                                             </div>
                                           } @else {
-                                            <div class="postsLoading" [class.profilePosts] = "userId">
-                                              <app-postspet
-                                                [morePostspet]="false"
-                                                [profilePosts]="userId != null"
-                                                [postspet]="postspetLoading"
-                                                (loadMore)="onLoadMore()"
-                                              ></app-postspet>
+                                            <div class="posts" [class.profilePosts] = "userId">
+                                              <div>
+                                                <app-postspet
+                                                  [morePostspet]="false"
+                                                  [profilePosts]="userId != null"
+                                                  [postspet]="postspetLoading"
+                                                  (loadMore)="onLoadMore()"
+                                                ></app-postspet>
+                                              </div>
                                             </div>
                                           }
                                         </div>

@@ -107,6 +107,18 @@
   color: var(--darker-light-blue);
 }
 
+// La card del esqueleto (el @else del template) es un <div class="postpet">,
+// mientras que la card real es un <a class="postpet">: por eso este selector
+// por elemento apunta SOLO al esqueleto. Su contenido no tiene ancho intrínseco
+// (imagen y líneas usan %), así que dentro del contenedor que se ajusta al
+// contenido (.posts) la cuadrícula colapsaba y las cards salían diminutas. Con
+// un ancho definido (el mismo tope que la card real) la cuadrícula se dimensiona
+// igual que con los posts ya cargados. max-width:100% evita desborde en móvil.
+div.postpet {
+  width: 340px;
+  max-width: 100%;
+}
+
 // Esqueleto de carga: imita la estructura de la card real (imagen + líneas).
 .skeleton {
   background-color: var(--light-blue);

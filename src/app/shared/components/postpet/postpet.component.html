@@ -1,7 +1,7 @@
 @if (postpet) {
   <a
     [class]="home ? 'postpetHome' : 'postpet'"
-    [routerLink]="['/pet', postpet.id]"
+    [routerLink]="['/pet', postpet.id]" 
   >
     <div class="container__postpet-img">
       @if (postpet.urlImgs && !imgFailed) {

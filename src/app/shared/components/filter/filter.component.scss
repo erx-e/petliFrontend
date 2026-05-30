@@ -152,6 +152,7 @@ a {
 
 .icon-closeFilter {
   width: 44px;
+  cursor: pointer;
 }
 
 .full-width {
@@ -180,13 +181,6 @@ a {
 
 .profilePosts{
   padding: 0px;
-}
-
-.postsLoading {
-  padding: var(--space-3);
-  padding-top: var(--space-4);
-  max-width: 1280px;
-  min-height: 781px;
 }
 
 .notFound {
