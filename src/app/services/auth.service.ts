@@ -81,9 +81,11 @@ export class AuthService {
 
   getProfile(id?: number) {
     if (id != undefined) {
-      return this.http.get<UserView>(`${this.apiUrl}/get/${id}`, {
-        context: checkToken(),
-      });
+      // Perfil PÚBLICO (visible por cualquiera, se enlaza desde el detalle de
+      // mascota que es público). No lleva checkToken() a propósito: así la
+      // petición va siempre anónima y un token local caducado no provoca un
+      // 401 (el backend debe permitir acceso anónimo a /user/get/:id).
+      return this.http.get<UserView>(`${this.apiUrl}/get/${id}`);
     }
 
     // const headers = new HttpHeaders();

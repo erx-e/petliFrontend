@@ -1,7 +1,19 @@
+// El layout ocupa al menos toda la altura de la ventana y se apila en columna
+// (nav · contenido · footer). Sin esto, cuando el contenido es corto (p. ej.
+// el perfil mientras carga) el footer subía y quedaba un hueco blanco debajo.
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 .footer {
   background-color: var(--blue);
   color: var(--light-blue);
-  margin-top: var(--space-8);
+  // Empuja el footer al fondo cuando el contenido no llena la pantalla; en
+  // páginas largas el margen automático se reduce a 0 y fluye tras el contenido.
+  margin-top: auto;
 }
 
 .footer__inner {
