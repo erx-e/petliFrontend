@@ -1,10 +1,11 @@
 import { Component } from "@angular/core";
+import { PetStatus } from "src/app/models/postpet.model";
 
 @Component({
     selector: "app-editarEncuentra",
-    template: ` <app-editar [stateId]="stateId"></app-editar>`,
+    template: ` <app-editar [status]="status"></app-editar>`,
     standalone: false
 })
 export class EditarComponent {
-  stateId = "E";
+  status: PetStatus = "Encontrado";
 }

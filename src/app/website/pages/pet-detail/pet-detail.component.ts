@@ -2,7 +2,11 @@ import { Component, ElementRef, HostListener, OnInit, ViewChild } from "@angular
 import { ActivatedRoute } from "@angular/router";
 import { Location } from "@angular/common";
 import { switchMap } from "rxjs/operators";
-import { img, postpetView } from "src/app/models/postpet.model";
+import {
+  imgView,
+  PET_STATUS_LABELS,
+  postpetView,
+} from "src/app/models/postpet.model";
 import { UserView } from "src/app/models/user.model";
 import { PostpetService } from "src/app/services/postpet.service";
 import { AuthService } from "src/app/services/auth.service";
@@ -34,7 +38,7 @@ export class PetDetailComponent implements OnInit {
   // esas entradas se colapsaban en un solo slide, pero el `loop` del swiper se
   // activaba según urlImgs.length → Swiper quedaba con 1 slide real y loop
   // activo ("not enough slides for loop mode") y dejaba de funcionar.
-  galleryImgs: img[] = [];
+  galleryImgs: imgView[] = [];
   user: UserView | null;
   lastTimeSeen: string = "";
   notFound: boolean = false;
@@ -156,7 +160,7 @@ export class PetDetailComponent implements OnInit {
 
   // Quita imágenes con URL repetida o vacía conservando el orden. Mantiene la
   // galería y la condición de `loop` del swiper alineadas con los slides reales.
-  private dedupeImgsByUrl(imgs: img[] | null | undefined): img[] {
+  private dedupeImgsByUrl(imgs: imgView[] | null | undefined): imgView[] {
     const seen = new Set<string>();
     return (imgs ?? []).filter((image) => {
       if (!image?.url || seen.has(image.url)) return false;
@@ -173,19 +177,10 @@ export class PetDetailComponent implements OnInit {
     this.location.back();
   }
 
-  // Etiqueta del estado para el badge del detalle.
+  // Etiqueta del estado para el badge del detalle. Mismo mapa compartido que la
+  // tarjeta (PostpetComponent), para que no vuelvan a divergir.
   get stateLabel(): string {
-    switch (this.postpet?.petStateId) {
-      case "B":
-        return "Perdido";
-      case "E":
-        return "Encontrado";
-      case "A":
-        return "En adopción";
-      case "H":
-        return "Necesita ayuda";
-      default:
-        return "";
-    }
+    const status = this.postpet?.status;
+    return status ? PET_STATUS_LABELS[status] ?? "" : "";
   }
 }

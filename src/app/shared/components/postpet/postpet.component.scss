@@ -66,17 +66,17 @@
   color: var(--white);
   box-shadow: var(--shadow-sm);
 }
-.state--B {
+.state--Buscado {
   background-color: var(--red);
 }
-.state--E {
+.state--Encontrado {
   background-color: var(--green);
 }
-.state--A {
+.state--EnAdopcion {
   background-color: var(--yellow);
   color: var(--ink);
 }
-.state--H {
+.state--NecesitadoDeAyuda {
   background-color: var(--blue);
 }
 
@@ -154,9 +154,13 @@ div.postpet {
 
 .postpet-info {
   flex: 1 1 auto;
-  // Reserva un alto consistente: así el esqueleto y las cards (con o sin
-  // recompensa/fecha) miden lo mismo y la cuadrícula queda simétrica.
-  min-height: 6.25rem;
+  // Reserva el alto del PEOR caso (nombre + ubicación + fecha + tags ≈ 6.8rem),
+  // así el esqueleto mide exactamente lo mismo que cualquier card ya cargada y
+  // no hay salto al llegar los datos. Antes reservaba 6.25rem, menos de lo que
+  // ocupan las cards de difunde/encuentra (con fecha y recompensa), por lo que
+  // al cargar la fila crecía ~9px. El contenido se acota (tags en una sola
+  // línea) para no superar este alto.
+  min-height: 7rem;
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
@@ -198,9 +202,17 @@ div.postpet {
 
 .postpet-tags {
   display: flex;
-  flex-wrap: wrap;
+  // Una sola línea: así el alto de la card queda acotado y coincide con el
+  // espacio reservado por el esqueleto (evita el salto al cargar). Si los tags
+  // no caben, se recortan en lugar de saltar a una segunda línea.
+  flex-wrap: nowrap;
+  overflow: hidden;
   gap: var(--space-1);
   margin-top: var(--space-1);
+}
+
+.postpet-tags .tag {
+  flex-shrink: 0;
 }
 
 .tag {

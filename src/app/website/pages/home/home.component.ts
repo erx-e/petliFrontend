@@ -17,17 +17,20 @@ export class HomeComponent implements OnInit {
   postspetAyuda: postpetView[] = [null, null, null, null, null];
 
   ngOnInit(): void {
+    // Nombres del enum PetStatus, no los codigos "E"/"B"/"H"/"A": el backend
+    // bindea PetStatus y una letra no resuelve a ningun valor, asi que estas
+    // cuatro llamadas fallaban y las secciones de la home quedaban vacias.
     this.postpetService
-      .getByState("E", 5, 0)
+      .getByState("Encontrado", 5, 0)
       .subscribe((data) => (this.postspetEncuentra = data));
     this.postpetService
-      .getByState("B", 5, 0)
+      .getByState("Buscado", 5, 0)
       .subscribe((data) => (this.postspetDifunde = data));
     this.postpetService
-      .getByState("H", 5, 0)
+      .getByState("NecesitadoDeAyuda", 5, 0)
       .subscribe((data) => (this.postspetAyuda = data));
     this.postpetService
-      .getByState("A", 5, 0)
+      .getByState("EnAdopcion", 5, 0)
       .subscribe((data) => (this.postspetAdopta = data));
   }
 }

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { PetStatus } from "src/app/models/postpet.model";
 
 @Component({
     selector: 'app-ayuda',
-    template: `<app-filter [stateId]="stateId"></app-filter>`,
+    template: `<app-filter [status]="status"></app-filter>`,
     standalone: false
 })
 export class AyudaComponent implements OnInit {
@@ -12,6 +13,5 @@ export class AyudaComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  stateId: string = "H"
-
+  status: PetStatus = "NecesitadoDeAyuda";
 }

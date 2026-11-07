@@ -15,7 +15,12 @@ import {
   sector,
   specie,
 } from 'src/app/models/category.model';
-import { UpdatePostpetDTO, updateImg } from 'src/app/models/postpet.model';
+import {
+  PetStatus,
+  UpdatePostpetDTO,
+  UpdatePostpetView,
+  updateImg,
+} from 'src/app/models/postpet.model';
 import { UserView } from 'src/app/models/user.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
@@ -118,18 +123,18 @@ export class EditarComponent implements OnInit {
           this.urlImgsField.updateValueAndValidity();
         }
       });
-    if (this.stateId == 'E' || this.stateId == 'A') {
+    if (this.status === 'Encontrado' || this.status === 'EnAdopcion') {
       this.petNameField.clearValidators();
       this.petNameField.updateValueAndValidity();
     }
-    if (this.stateId == 'A' || this.stateId == 'H') {
+    if (this.status === 'EnAdopcion' || this.status === 'NecesitadoDeAyuda') {
       this.lastTimeSeenField.clearValidators();
       this.lastTimeSeenField.updateValueAndValidity();
     }
   }
 
   form: UntypedFormGroup;
-  @Input() stateId: string = '';
+  @Input() status: PetStatus | null = null;
 
   // API unificada con la plantilla compartida pet-form (modo editar).
   submitLabel = 'Editar publicación';
@@ -160,10 +165,9 @@ export class EditarComponent implements OnInit {
   maxFourFiles: boolean = false;
 
   postpetId: string | null;
-  postpet!: UpdatePostpetDTO | null;
+  postpet!: UpdatePostpetView | null;
   updatePost: UpdatePostpetDTO = {
     idPostPet: null,
-    idUser: null,
     petName: null,
     idCanton: null,
     idPetBreed: null,
@@ -173,7 +177,7 @@ export class EditarComponent implements OnInit {
     idPetSpecie: null,
     idProvincia: null,
     idSector: null,
-    idState: null,
+
     description: null,
     reward: null,
     lastTimeSeen: null,
@@ -308,8 +312,7 @@ export class EditarComponent implements OnInit {
       }
 
       this.updatePost.urlImgs = this.imgUrls;
-      this.updatePost.idUser = this.user.idUser;
-      this.updatePost.idState = this.stateId;
+
       this.published = true;
       this.postpetService.update(this.updatePost).subscribe({
         next: () => {

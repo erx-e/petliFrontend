@@ -17,7 +17,7 @@
           </svg>
         </div>
       }
-      <span class="stateBadge" [class]="'state--' + postpet.petStateId">{{ stateLabel }}</span>
+      <span class="stateBadge" [class]="'state--' + postpet.status">{{ stateLabel }}</span>
     </div>
     <div class="postpet-info">
       <h3 class="postpet-name">
@@ -32,7 +32,7 @@
       </p>
 
       @if (
-        (postpet.petStateId == 'B' || postpet.petStateId == 'E') &&
+        (postpet.status === 'Buscado' || postpet.status === 'Encontrado') &&
         postpet.lastTimeSeen
       ) {
         <p class="postpet-date">Visto {{ lastTimeSeen }}</p>

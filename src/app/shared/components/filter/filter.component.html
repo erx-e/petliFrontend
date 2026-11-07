@@ -119,7 +119,7 @@
                   </select>
                 </div>
               }
-              @if (stateId == 'B' || stateId == 'E') {
+              @if (status === 'Buscado' || status === 'Encontrado') {
                 <div class="form-filter-element">
                   <label class="form-label" for="formLastTime"
                     >Visto por última vez</label
@@ -145,7 +145,7 @@
                       </div>
                     </div>
                   }
-                  @if (stateId == 'B' || stateId == 'E') {
+                  @if (status === 'Buscado' || status === 'Encontrado') {
                     <div class="form-filter-element">
                       <label class="form-label" for="order">Ordenar por</label>
                       <select
@@ -211,16 +211,16 @@
                         </svg>
                       </i>
                       <a routerLink="publicar" class="publicPet show-mobile"
-                        >@if (stateId == 'E') {
+                        >@if (status === 'Encontrado') {
                         <span>Publica una mascota que encontraste</span
                           >
-                        }@if (stateId == 'B') {
+                        }@if (status === 'Buscado') {
                         <span>Publica tu mascota perdida</span>
                       }
-                      @if (stateId == 'A') {
+                      @if (status === 'EnAdopcion') {
                         <span>Publica una mascota en adopción</span>
                       }
-                      @if (stateId == 'H') {
+                      @if (status === 'NecesitadoDeAyuda') {
                         <span
                           >Publica un caso que necesita ayuda</span
                           >
@@ -341,7 +341,7 @@
                                           </select>
                                         </div>
                                       }
-                                      @if (stateId == 'B' || stateId == 'E') {
+                                      @if (status === 'Buscado' || status === 'Encontrado') {
                                         <div class="form-filter-element">
                                           <label class="form-label" for="formLastTime"
                                             >Visto por última vez</label
@@ -367,7 +367,7 @@
                                               </div>
                                             </div>
                                           }
-                                          @if (stateId == 'B' || stateId == 'E') {
+                                          @if (status === 'Buscado' || status === 'Encontrado') {
                                             <div class="form-filter-element">
                                               <label class="form-label" for="order">Ordenar por</label>
                                               <select
@@ -422,16 +422,16 @@
                                       <div class="post-container" [class.profilePostsContainer] = "userId">
                                         @if (!userId) {
                                           <a routerLink="publicar" class="publicPet hide-mobile"
-                                            >@if (stateId == 'E') {
+                                            >@if (status === 'Encontrado') {
                                             <span>Publica una mascota que encontraste</span
                                               >
-                                            }@if (stateId == 'B') {
+                                            }@if (status === 'Buscado') {
                                             <span>Publica tu mascota perdida</span>
                                           }
-                                          @if (stateId == 'A') {
+                                          @if (status === 'EnAdopcion') {
                                             <span>Publica una mascota en adopción</span>
                                           }
-                                          @if (stateId == 'H') {
+                                          @if (status === 'NecesitadoDeAyuda') {
                                             <span
                                               >Publica un caso que necesita ayuda</span
                                               >

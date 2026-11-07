@@ -1,11 +1,12 @@
 import { Component, OnInit } from "@angular/core";
+import { PetStatus } from "src/app/models/postpet.model";
 
 @Component({
     selector: "app-encuentra",
-    template: `<app-filter [stateId]="stateId"></app-filter>`,
+    template: `<app-filter [status]="status"></app-filter>`,
     standalone: false
 })
 export class EncuentraComponent implements OnInit {
   ngOnInit(): void {}
-  stateId = "E";
+  status: PetStatus = "Encontrado";
 }

@@ -1,0 +1,21 @@
+# graphify: build artifacts and IDE state are not source of truth
+dist/
+.angular/
+.vs/
+.idea/
+coverage/
+
+# Vendored third-party agent skill (pbakaus/impeccable, see skills-lock.json).
+# Generic design reference docs, not project knowledge.
+.agents/skills/
+.claude/skills/
+
+# Icon/logo raster assets: no architectural information worth a vision pass.
+src/assets/imgs/
+
+# keep CLAUDE.md indexed even though .gitignore lists a lowercase claude.md
+!CLAUDE.md
+# .gitignore excludes all of /docs; these two are real design docs, index them
+!docs/
+!docs/backend-geolocalizacion.md
+!docs/BACKEND_PRESIGNED.md

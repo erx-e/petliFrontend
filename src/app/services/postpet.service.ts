@@ -4,8 +4,12 @@ import { environment } from "src/environments/environment";
 import { Response } from "../models/response.model";
 import {
   CreatePostpetDTO,
+  mapPointView,
+  PetSex,
+  PetStatus,
   postpetView,
   UpdatePostpetDTO,
+  UpdatePostpetView,
 } from "../models/postpet.model";
 import { checkToken } from "../interceptors/token.interceptor";
 import { checkLoading } from "../interceptors/loading.interceptor";
@@ -20,10 +24,23 @@ export class PostpetService {
 
   private apiUrl = `${environment.API_URL}`;
 
+  /** Añade un query param solo si tiene valor. `params.set(k, undefined)` manda
+   *  literalmente `k=undefined`, que el backend no puede bindear a `int?` y
+   *  responde 400: por eso cada parametro opcional pasa por aqui. */
+  private static withParam(
+    params: HttpParams,
+    key: string,
+    value: string | number | null | undefined
+  ): HttpParams {
+    return value === null || value === undefined || value === ""
+      ? params
+      : params.set(key, value);
+  }
+
   getAll(limit?: number, offset?: number) {
     let params = new HttpParams();
-    params = params.set("limit", limit);
-    params = params.set("offset", offset);
+    params = PostpetService.withParam(params, "limit", limit);
+    params = PostpetService.withParam(params, "offset", offset);
     return this.http.get<postpetView[]>(`${this.apiUrl}/postpet/get`, {
       params,
       context: checkLoading(),
@@ -48,7 +65,7 @@ export class PostpetService {
 
   getByIdUpdate(id: number) {
     return this.http
-      .get<UpdatePostpetDTO>(`${this.apiUrl}/postpet/getUpdate/${id}`)
+      .get<UpdatePostpetView>(`${this.apiUrl}/postpet/getUpdate/${id}`)
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === HttpStatusCode.BadRequest) {
@@ -60,19 +77,22 @@ export class PostpetService {
       );
   }
 
-  getByState(id: string, limit?: number, offset?: number) {
+  /** GET /postpet/getByState/{status}. El segmento de ruta es el NOMBRE del enum
+   *  (`Buscado`, `Encontrado`, ...): el binding de ASP.NET acepta el nombre o el
+   *  valor numerico, nunca los codigos de una letra que se usaban antes. */
+  getByState(status: PetStatus, limit?: number, offset?: number) {
     let params = new HttpParams();
-    params = params.set("limit", limit);
-    params = params.set("offset", offset);
+    params = PostpetService.withParam(params, "limit", limit);
+    params = PostpetService.withParam(params, "offset", offset);
     return this.http
-      .get<postpetView[]>(`${this.apiUrl}/postpet/getByState/${id}`, {
+      .get<postpetView[]>(`${this.apiUrl}/postpet/getByState/${status}`, {
         params,
         context: checkLoading(),
       })
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === HttpStatusCode.BadRequest) {
-            return throwError(() => "Id state must be sent");
+            return throwError(() => "Estado de mascota invalido");
           } else {
             return throwError(() => "Error del servidor");
           }
@@ -80,8 +100,15 @@ export class PostpetService {
       );
   }
 
-   GetByFilter(
-    stateId?: string,
+  /** GET /postpet/getByFilter.
+   *
+   *  El primer parametro se llamaba `stateId` y se enviaba con ese nombre, pero
+   *  el backend bindea `[FromQuery] PetStatus? status`. Un query param que no
+   *  coincide se descarta en silencio, asi que filtrar por estado devolvia
+   *  resultados SIN filtrar en vez de fallar. Ahora se manda como `status` y con
+   *  el nombre del enum. `sex` tambien existia en el backend y no se enviaba. */
+  GetByFilter(
+    status?: PetStatus | null,
     petSpecieId?: number | null,
     petBreedId?: number | null,
     provinciaId?: number | null,
@@ -91,49 +118,65 @@ export class PostpetService {
     date?: string | null,
     order?: number | null,
     limit?: number,
-    offset?: number
+    offset?: number,
+    sex?: PetSex | null
   ) {
     let params = new HttpParams();
-    if (limit != undefined || offset != undefined) {
-      params = params.set("limit", limit);
-      params = params.set("offset", offset);
-    }
+    const add = (k: string, v: string | number | null | undefined) =>
+      (params = PostpetService.withParam(params, k, v));
 
-    params =
-      stateId != null || stateId != undefined
-        ? params.set("stateId", stateId)
-        : params;
-    params =
-      petSpecieId != null || petSpecieId != undefined
-        ? params.set("petSpecieId", petSpecieId)
-        : params;
-    params =
-      petBreedId != null || petBreedId != undefined
-        ? params.set("petBreedId", petBreedId)
-        : params;
-    params =
-      provinciaId != null || provinciaId != undefined
-        ? params.set("provinciaId", provinciaId)
-        : params;
-    params =
-      cantonId != null || cantonId != undefined
-        ? params.set("cantonId", cantonId)
-        : params;
-    params =
-      sectorId != null || sectorId != undefined
-        ? params.set("sectorId", sectorId)
-        : params;
-    params =
-      userId != null || userId != undefined
-        ? params.set("userId", userId)
-        : params;
-    params =
-      date != null || date != undefined ? params.set("date", date) : params;
-    params =
-      order != null || order != undefined ? params.set("order", order) : params;
+    add("limit", limit);
+    add("offset", offset);
+    add("status", status);
+    add("sex", sex);
+    add("petSpecieId", petSpecieId);
+    add("petBreedId", petBreedId);
+    add("provinciaId", provinciaId);
+    add("cantonId", cantonId);
+    add("sectorId", sectorId);
+    add("userId", userId);
+    add("date", date);
+    add("order", order);
 
     return this.http.get<postpetView[] | null>(
       `${this.apiUrl}/postpet/getByFilter`,
+      { params, context: checkLoading() }
+    );
+  }
+
+  /** GET /postpet/getMapPoints. Existia en el backend sin ningun consumidor en
+   *  el front (PL-X4); se expone aqui para que el mapa pueda construirse sin
+   *  volver a inventar el contrato. Misma forma de filtros que getByFilter,
+   *  sin paginacion. */
+  getMapPoints(
+    status?: PetStatus | null,
+    petSpecieId?: number | null,
+    petBreedId?: number | null,
+    provinciaId?: number | null,
+    cantonId?: number | null,
+    sectorId?: number | null,
+    userId?: number | null,
+    date?: string | null,
+    order?: number | null,
+    sex?: PetSex | null
+  ) {
+    let params = new HttpParams();
+    const add = (k: string, v: string | number | null | undefined) =>
+      (params = PostpetService.withParam(params, k, v));
+
+    add("status", status);
+    add("sex", sex);
+    add("petSpecieId", petSpecieId);
+    add("petBreedId", petBreedId);
+    add("provinciaId", provinciaId);
+    add("cantonId", cantonId);
+    add("sectorId", sectorId);
+    add("userId", userId);
+    add("date", date);
+    add("order", order);
+
+    return this.http.get<mapPointView[]>(
+      `${this.apiUrl}/postpet/getMapPoints`,
       { params, context: checkLoading() }
     );
   }

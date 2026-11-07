@@ -9,6 +9,7 @@ import {
 import {
   createImgDTO,
   CreatePostpetDTO,
+  PetStatus,
   updateImg,
 } from 'src/app/models/postpet.model';
 import { Location } from '@angular/common';
@@ -45,7 +46,7 @@ export class PublishComponent implements OnInit {
     this.buildForm();
   }
 
-  @Input() stateId: string = '';
+  @Input() status: PetStatus | null = null;
 
   // API unificada con la plantilla compartida pet-form (modo crear).
   submitLabel = 'Publicar mascota';
@@ -69,15 +70,16 @@ export class PublishComponent implements OnInit {
     idPetSpecie: null,
     idProvincia: null,
     idSector: null,
-    idState: null,
-    idUser: null,
+    status: null,
+    sex: 'Unknown',
+    lat: null,
+    lng: null,
     lastTimeSeen: null,
     petName: null,
     petSpecialCondition: null,
     description: null,
     reward: null,
     urlImgs: null,
-    linkMapSeen: null,
   };
   species: specie[] = [];
   specieId: number;
@@ -106,11 +108,11 @@ export class PublishComponent implements OnInit {
     this.getProvincias();
     this.getCantonesByProv();
     this.getSectoresByCanton();
-    if (this.stateId == 'E' || this.stateId == 'A') {
+    if (this.status === 'Encontrado' || this.status === 'EnAdopcion') {
       this.petNameField.clearValidators();
       this.petNameField.updateValueAndValidity();
     }
-    if (this.stateId == 'A' || this.stateId == 'H') {
+    if (this.status === 'EnAdopcion' || this.status === 'NecesitadoDeAyuda') {
       this.lastTimeSeenField.clearValidators();
       this.lastTimeSeenField.updateValueAndValidity();
     }
@@ -193,9 +195,8 @@ export class PublishComponent implements OnInit {
           return { url: url } as createImgDTO;
         });
         this.createdPost.contact = this.contactField.value.join(' ');
-        this.createdPost.idUser = this.user.idUser;
 
-        this.createdPost.idState = this.stateId;
+        this.createdPost.status = this.status;
         this.published = true;
         this.postpetService.create(this.createdPost).subscribe({
           next: () => {

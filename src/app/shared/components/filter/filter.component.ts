@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { postpetView } from 'src/app/models/postpet.model';
+import { PetStatus, postpetView } from 'src/app/models/postpet.model';
 import {
   breed,
   canton,
@@ -34,7 +34,7 @@ export class FilterComponent implements OnInit {
     this.buildForm();
   }
 
-  @Input() stateId: string = '';
+  @Input() status: PetStatus | null = null;
   @Input() userId: number = null;
 
   petSpecieId: number | null = null;
@@ -142,7 +142,7 @@ export class FilterComponent implements OnInit {
   async getPosts() {
     this.postpetService
       .GetByFilter(
-        this.stateId,
+        this.status,
         this.petSpecieId,
         this.petBreedId,
         this.provinciaId,
@@ -174,7 +174,7 @@ export class FilterComponent implements OnInit {
     this.isLoadingMore = true;
     this.postpetService
       .GetByFilter(
-        this.stateId,
+        this.status,
         this.petSpecieId,
         this.petBreedId,
         this.provinciaId,

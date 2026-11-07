@@ -98,17 +98,17 @@ a {
   font-weight: 700;
   color: var(--white);
 }
-.state--B {
+.state--Buscado {
   background-color: var(--red);
 }
-.state--E {
+.state--Encontrado {
   background-color: var(--green);
 }
-.state--A {
+.state--EnAdopcion {
   background-color: var(--yellow);
   color: var(--ink);
 }
-.state--H {
+.state--NecesitadoDeAyuda {
   background-color: var(--blue);
 }
 

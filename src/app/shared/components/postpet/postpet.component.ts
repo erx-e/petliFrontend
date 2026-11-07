@@ -1,5 +1,8 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { postpetView } from "src/app/models/postpet.model";
+import {
+  PET_STATUS_LABELS,
+  postpetView,
+} from "src/app/models/postpet.model";
 import { formatDistance, subDays } from "date-fns";
 import es from "date-fns/locale/es";
 import { RouterLink } from "@angular/router";
@@ -39,19 +42,11 @@ export class PostpetComponent implements OnInit {
     this.imgFailed = true;
   }
 
-  // Etiqueta del estado del post, para el badge de la tarjeta.
+  // Etiqueta del estado del post, para el badge de la tarjeta. El backend ya no
+  // manda un texto de estado (`petState` venia de la tabla pet_state, que se
+  // elimino), asi que se deriva del enum con el mapa compartido.
   get stateLabel(): string {
-    switch (this.postpet?.petStateId) {
-      case "B":
-        return "Perdido";
-      case "E":
-        return "Encontrado";
-      case "A":
-        return "En adopción";
-      case "H":
-        return "Necesita ayuda";
-      default:
-        return "";
-    }
+    const status = this.postpet?.status;
+    return status ? PET_STATUS_LABELS[status] ?? "" : "";
   }
 }

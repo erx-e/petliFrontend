@@ -14,7 +14,7 @@
         <div class="form-element-section">
           <p>Indica las características de la mascota</p>
           <div class="flex">
-            @if (stateId != 'E' && stateId != 'A') {
+            @if (status !== 'Encontrado' && status !== 'EnAdopcion') {
               <div class="form-elements">
                 <label class="form-label" for="petName">Nombre:</label>
                 <input
@@ -138,7 +138,7 @@
                           }
                         </div>
                       </div>
-                      @if (stateId != 'E') {
+                      @if (status !== 'Encontrado') {
                         <div class="form-elements">
                           <label class="form-label" for="petAge">Edad: </label>
                           <input
@@ -154,17 +154,17 @@
                       </div>
                     </div>
                     <div class="form-element-section">
-                      @if (stateId == 'E') {
+                      @if (status === 'Encontrado') {
                         <p>
                           Indica dónde y cuándo viste a la mascota
                         </p>
                       }
-                      @if (stateId == 'B') {
+                      @if (status === 'Buscado') {
                         <p>
                           Indica por dónde y cuándo se perdió la mascota
                         </p>
                       }
-                      @if (stateId == 'A' || stateId == 'H') {
+                      @if (status === 'EnAdopcion' || status === 'NecesitadoDeAyuda') {
                         <p>
                           Indica dónde se encuentra la mascota
                         </p>
@@ -252,7 +252,7 @@
                             </select>
                           </div>
                         }
-                        @if (stateId == 'E' || stateId == 'B') {
+                        @if (status === 'Encontrado' || status === 'Buscado') {
                           <div class="form-elements">
                             <label class="form-label" for="formLastTime">Fecha y hora:</label>
                             <input
@@ -379,7 +379,7 @@
                               <p class="contact-max">Puedes agregar hasta 4 números.</p>
                             }
                           </div>
-                            @if (stateId == 'B') {
+                            @if (status === 'Buscado') {
                               <div class="form-elements">
                                 <label class="form-label" for="reward">Recompensa:</label>
                                 <input
