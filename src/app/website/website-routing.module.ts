@@ -10,6 +10,16 @@ import { ProfileComponent } from "./pages/profile/profile.component";
 import { RegisterComponent } from "./pages/register/register.component";
 
 const routes: Routes = [
+  // login/register van ANTES del layout: no llevan nav/footer (por diseño) y
+  // deben resolverse antes de que la ruta "" del layout intente capturarlos.
+  {
+    path: "login",
+    component: LoginComponent,
+  },
+  {
+    path: "register",
+    component: RegisterComponent,
+  },
   {
     path: "",
     component: LayoutComponent,
@@ -54,19 +64,13 @@ const routes: Routes = [
         path: "pet/:id",
         component: PetDetailComponent,
       },
+      // Comodín DENTRO del layout: cualquier ruta no encontrada se muestra con
+      // nav y footer, en vez de una página pelada.
+      {
+        path: "**",
+        component: NotfoundComponent,
+      },
     ],
-  },
-  {
-    path: "login",
-    component: LoginComponent,
-  },
-  {
-    path: "register",
-    component: RegisterComponent,
-  },
-  {
-    path: "**",
-    component: NotfoundComponent,
   },
 ];
 
