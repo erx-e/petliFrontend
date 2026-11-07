@@ -1,5 +1,9 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
-claude.md
+# OJO: `claude.md` estaba aqui, pero core.ignorecase=true hace que tambien
+# capture CLAUDE.md, que es el documento de convenciones del repo y debe
+# viajar en git (PROJECT_STATE.md del backend lo referencia). Si necesitas
+# ignorar un borrador local, usa un nombre que no colisione (claude.local.md).
+claude.local.md
 /.vscode
 /.vs
 # Compiled output

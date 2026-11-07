@@ -17,14 +17,13 @@ export class PostspetComponent implements OnInit {
 
   @Input() postspet: postpetView[] = [];
   @Input() isLoadingMore: boolean;
-  @Input()
-  set morePostspet(more: boolean) {
-    if (!more) {
-      document.getElementById("load-button").style.display = "none";
-    } else {
-      document.getElementById("load-button").style.display = "block";
-    }
-  }
+  // Antes era un setter que hacia document.getElementById("load-button") para
+  // ocultar/mostrar el boton. Dos problemas: el id no es unico (filter renderiza
+  // dos <app-postspet>, movil y escritorio) asi que siempre tocaba el primero, y
+  // Angular asigna los inputs ANTES de crear la vista del componente, por lo que
+  // en el primer set el elemento aun no existe y .style reventaba. Ahora es un
+  // binding normal que la plantilla consulta con @if.
+  @Input() morePostspet: boolean = true;
   @Input() profilePosts: boolean = false;
 
   ngOnInit(): void {}

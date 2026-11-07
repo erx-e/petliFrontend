@@ -1,28 +1,21 @@
-@if (postspet[0]) {
+@if (postspet.length) {
   <div class="postpets--grid" [class.profileGrid]="profilePosts">
-    @for (postpet of postspet; track postpet) {
-      <app-postpet
-        [postpet]="postpet"
-      ></app-postpet>
-    }
-  </div>
-} @else {
-  <div class="postpets--grid" [class.profileGrid]="profilePosts">
-    @for (postpet of postspet; track postpet) {
-      <app-postpet
-        [postpet]="postpet"
-      ></app-postpet>
+    @for (postpet of postspet; track $index) {
+      <app-postpet [postpet]="postpet"></app-postpet>
     }
   </div>
 }
-<div>
-  <div class="load-container">
-    <button id="load-button" class="load-button" (click)="onLoadMore()">
-      @if (!isLoadingMore) {
-        <span>Cargar más</span>
-      } @else {
-        <app-spinner> </app-spinner>
-      }
-    </button>
+
+@if (morePostspet) {
+  <div>
+    <div class="load-container">
+      <button class="load-button" (click)="onLoadMore()">
+        @if (!isLoadingMore) {
+          <span>Cargar más</span>
+        } @else {
+          <app-spinner></app-spinner>
+        }
+      </button>
+    </div>
   </div>
-</div>
+}
