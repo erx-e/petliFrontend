@@ -13,9 +13,19 @@ coverage/
 # Icon/logo raster assets: no architectural information worth a vision pass.
 src/assets/imgs/
 
-# keep CLAUDE.md indexed even though .gitignore lists a lowercase claude.md
-!CLAUDE.md
-# .gitignore excludes all of /docs; these two are real design docs, index them
-!docs/
-!docs/backend-geolocalizacion.md
-!docs/BACKEND_PRESIGNED.md
+# Graphify is for SOURCE CODE only (deterministic AST, refreshed for free by the
+# git hooks). Markdown -- CLAUDE.md, PRODUCT.md, DESIGN.md, docs/ -- is read
+# directly as plain text and NEVER indexed: indexing it cost an LLM pass on every
+# edit and let the graph contradict the docs (ADR-13 in the backend memory repo,
+# memory-bank/lessonsLearned.md). This replaces the old !CLAUDE.md and !docs/
+# negations, which existed only to index those files.
+*.md
+docs/
+memory-bank/
+
+# Angular templates too: graphify has no AST extractor for them and treats them
+# as documents (an LLM pass that goes stale on every UI change). The template <->
+# component bindings they described are checked exactly by the Angular compiler
+# (`ng build` fails on a broken binding), so the graph keeps only the deterministic
+# TypeScript side. With this, nothing in this repo reaches graphify's LLM path.
+*.html
