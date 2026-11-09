@@ -19,7 +19,7 @@ import { CHECK_LOADING } from "./loading.interceptor";
  * - Stale-while-revalidate: si está vencida, devuelve lo cacheado al instante
  *   y refresca en segundo plano (sin spinner) para la próxima vez.
  * - Invalidación granular: una mutación (POST/PUT/DELETE) solo invalida el
- *   recurso afectado (ej. publicar borra la caché de "postpet", no la de
+ *   recurso afectado (ej. publicar borra la caché de "report", no la de
  *   categorías/geografía).
  */
 @Injectable()
@@ -29,9 +29,16 @@ export class CacheInterceptor implements HttpInterceptor {
     private loading: LoadingService
   ) {}
 
+  // Recursos cuya caché cambia por una mutación de OTRO recurso. Publicar una
+  // pérdida con mascota nueva crea un pet, y resolverla o borrarla cambia su
+  // `isLost`: todo eso altera GET /pet/mine.
+  private static readonly DEPENDENTS: Record<string, string[]> = {
+    report: ["pet"],
+  };
+
   // Ventana de frescura por grupo (ms). Pasada esta ventana: stale-while-revalidate.
   private ttlFor(url: string): number {
-    if (url.includes("/postpet")) return 20_000; // listados de posts: 20 s
+    if (url.includes("/report")) return 20_000; // listados de reportes: 20 s
     return 5 * 60_000; // categorías, geografía, perfiles, etc.: 5 min
   }
 
@@ -53,9 +60,15 @@ export class CacheInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
     if (request.method !== "GET") {
-      // Mutación: invalida solo el recurso afectado, no toda la caché.
+      // Mutación: invalida solo el recurso afectado (y los que dependen de él),
+      // no toda la caché.
       const resource = this.resourceOf(request.urlWithParams);
-      if (resource) this.cache.invalidateResource(resource);
+      if (resource) {
+        this.cache.invalidateResource(resource);
+        for (const dependent of CacheInterceptor.DEPENDENTS[resource] ?? []) {
+          this.cache.invalidateResource(dependent);
+        }
+      }
       return next.handle(request);
     }
 

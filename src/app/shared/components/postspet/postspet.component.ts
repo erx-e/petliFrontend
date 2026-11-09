@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
-import { postpetView } from "src/app/models/postpet.model";
+import { reportView } from "src/app/models/report.model";
 import { PostpetComponent } from "../postpet/postpet.component";
 import { SharedModule } from "../../shared.module";
 
@@ -15,7 +15,7 @@ export class PostspetComponent implements OnInit {
 
   @Output() loadMore = new EventEmitter();
 
-  @Input() postspet: postpetView[] = [];
+  @Input() postspet: reportView[] = [];
   @Input() isLoadingMore: boolean;
   // Antes era un setter que hacia document.getElementById("load-button") para
   // ocultar/mostrar el boton. Dos problemas: el id no es unico (filter renderiza

@@ -11,160 +11,158 @@
             Necesitas una cuenta para publicar.
           </p>
         }
+        @if (myPets.length > 0) {
+          <!-- Solo al publicar una pérdida, si el usuario ya tiene mascotas sin
+               reporte activo: elegir una evita volver a cargar sus datos y fotos. -->
+          <div class="form-element-section">
+            <p>¿Cuál de tus mascotas se perdió?</p>
+            <div class="pet-choices" role="radiogroup" aria-label="Elige tu mascota">
+              @for (pet of myPets; track pet.id) {
+                <button
+                  type="button"
+                  class="pet-choice"
+                  role="radio"
+                  [attr.aria-checked]="selectedPetId === pet.id"
+                  [class.pet-choice--selected]="selectedPetId === pet.id"
+                  (click)="selectPet(pet.id)"
+                >
+                  @if (pet.urlImgs.length) {
+                    <img class="pet-choice__img" [src]="pet.urlImgs[0].url" alt="" />
+                  } @else {
+                    <span class="pet-choice__img pet-choice__img--empty" aria-hidden="true"></span>
+                  }
+                  <span class="pet-choice__name">{{ pet.petName | titlecase }}</span>
+                </button>
+              }
+              <button
+                type="button"
+                class="pet-choice"
+                role="radio"
+                [attr.aria-checked]="selectedPetId === null"
+                [class.pet-choice--selected]="selectedPetId === null"
+                (click)="selectPet(null)"
+              >
+                <span class="pet-choice__img pet-choice__img--new" aria-hidden="true">+</span>
+                <span class="pet-choice__name">Otra mascota</span>
+              </button>
+            </div>
+          </div>
+        }
+        @if (usesExistingPet) {
+          <p class="pet-choice__note">
+            Publicaremos la pérdida de <strong>{{ selectedPet?.petName | titlecase }}</strong>
+            con los datos y las fotos de su ficha.
+          </p>
+        } @else {
         <div class="form-element-section">
           <p>Indica las características de la mascota</p>
           <div class="flex">
-            @if (status !== 'Encontrado' && status !== 'EnAdopcion') {
+            @if (showName) {
               <div class="form-elements">
-                <label class="form-label" for="petName">Nombre:</label>
+                <label class="form-label" for="petName">
+                  Nombre{{ type === 'Perdida' ? '' : ' (opcional)' }}:
+                </label>
                 <input
                   formControlName="petName"
                   id="petName"
                   class="form-control"
-                  placeholder="Nombre de tu mascota"
+                  placeholder="Nombre de la mascota"
                   [class.is-valid]="petNameFieldValid"
                   [class.is-invalid]="petNameFieldInvalid"
                   type="text"
                   />
-                  <div
-                    class="validationMessage"
-                    [class.active]="petNameFieldInvalid"
-                    >
-                    @if (petNameField.hasError('required')) {
-                      <p
-                        class="invalid-feedback"
-                        >
-                        Escribe el nombre de la mascota
-                      </p>
-                    }
-                    @if (petNameField.hasError('minlength')) {
-                      <p
-                        class="invalid-feedback"
-                        >
-                        El nombre debe tener más de dos caracteres
-                      </p>
-                    }
-                    @if (petNameField.hasError('maxlength')) {
-                      <p
-                        class="invalid-feedback"
-                        >
-                        El nombre debe tener menos de 12 caracteres
-                      </p>
-                    }
-                    @if (petNameField.hasError('pattern')) {
-                      <p
-                        class="invalid-feedback"
-                        >
-                        El nombre no puede tener números ni signos especiales
-                      </p>
-                    }
-                  </div>
+                <div class="validationMessage" [class.active]="petNameFieldInvalid">
+                  @if (petNameField.hasError('required')) {
+                    <p class="invalid-feedback">Escribe el nombre de la mascota</p>
+                  }
+                  @if (petNameField.hasError('minlength')) {
+                    <p class="invalid-feedback">El nombre debe tener más de dos caracteres</p>
+                  }
+                  @if (petNameField.hasError('maxlength')) {
+                    <p class="invalid-feedback">El nombre debe tener menos de 12 caracteres</p>
+                  }
+                  @if (petNameField.hasError('pattern')) {
+                    <p class="invalid-feedback">El nombre no puede tener números ni signos especiales</p>
+                  }
                 </div>
-              }
+              </div>
+            }
+            <div class="form-elements">
+              <p class="form-label">Tipo de mascota:</p>
+              <div class="btn-group full-width" role="group" aria-label="selector de especie">
+                <input formControlName="idPetSpecie" type="radio" name="idPetSpecie" value="1"
+                  id="especie1" class="btn-check" autocomplete="off" />
+                <label class="btn btn-outline-primary" for="especie1">Perro</label>
+                <input formControlName="idPetSpecie" type="radio" name="idPetSpecie" value="2"
+                  id="especie2" class="btn-check" autocomplete="off" />
+                <label class="btn btn-outline-primary" for="especie2">Gato</label>
+              </div>
+              <div class="validationMessage" [class.active]="petSpecieFieldInvalid">
+                @if (petSpecieField.hasError('required')) {
+                  <p class="invalid-feedback">Selecciona el tipo de mascota</p>
+                }
+              </div>
+            </div>
+            <div class="form-elements">
+              <label class="form-label" for="formRaza">Raza (opcional):</label>
+              <select class="form-select" formControlName="idPetBreed" name="raza" id="formRaza">
+                <option value="">No sé / prefiero no decir</option>
+                @for (breed of breeds; track breed.id) {
+                  <option [value]="breed.id">{{ breed.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-elements">
+              <p class="form-label">Sexo:</p>
+              <div class="btn-group full-width" role="group" aria-label="selector de sexo">
+                <input formControlName="sex" type="radio" name="sex" value="Unknown"
+                  id="sexUnknown" class="btn-check" autocomplete="off" />
+                <label class="btn btn-outline-primary" for="sexUnknown">No sé</label>
+                <input formControlName="sex" type="radio" name="sex" value="Male"
+                  id="sexMale" class="btn-check" autocomplete="off" />
+                <label class="btn btn-outline-primary" for="sexMale">Macho</label>
+                <input formControlName="sex" type="radio" name="sex" value="Female"
+                  id="sexFemale" class="btn-check" autocomplete="off" />
+                <label class="btn btn-outline-primary" for="sexFemale">Hembra</label>
+              </div>
+            </div>
+            @if (type === 'Perdida') {
+              <!-- El carné guarda una fecha de nacimiento aproximada: se pide la
+                   edad y se convierte al enviar (D12). -->
               <div class="form-elements">
-                <p class="form-label">Tipo de mascota:</p>
-                <div
-                  class="btn-group full-width"
-                  role="group"
-                  aria-label="selector de especie"
-                  >
-                  <input
-                    formControlName="idPetSpecie"
-                    type="radio"
-                    name="idPetSpecie"
-                    value="1"
-                    id="especie1"
-                    class="btn-check"
-                    autocomplete="off"
-                    />
-                    <label class="btn btn-outline-primary" for="especie1"
-                      >Perro</label
-                      >
-                      <input
-                        formControlName="idPetSpecie"
-                        type="radio"
-                        name="idPetSpecie"
-                        value="2"
-                        id="especie2"
-                        class="btn-check"
-                        autocomplete="off"
-                        />
-                        <label class="btn btn-outline-primary" for="especie2"
-                          >Gato</label
-                          >
-                        </div>
-                        <div
-                          class="validationMessage"
-                          [class.active]="petSpecieFieldInvalid"
-                          >
-                          @if (petSpecieField.hasError('required')) {
-                            <p
-                              class="invalid-feedback"
-                              >
-                              Selecciona el tipo de mascota
-                            </p>
-                          }
-                        </div>
-                      </div>
-                      <div class="form-elements">
-                        <label class="form-label" for="formRaza">Raza: </label>
-                        <select
-                          class="form-select"
-                          formControlName="idPetBreed"
-                          name="raza"
-                          id="formRaza"
-                          [class.is-valid]="petBreedFieldValid"
-                          [class.is-invalid]="petBreedFieldInvalid"
-                          >
-                          <option value="">Elige la raza de la mascota</option>
-                          @for (breed of breeds; track breed; let i = $index) {
-                            <option
-                              [value]="breeds[i].id"
-                              >
-                              {{ breeds[i].name }}
-                            </option>
-                          }
-                        </select>
-                        <div
-                          class="validationMessage"
-                          [class.active]="petBreedFieldInvalid"
-                          >
-                          @if (petBreedField.hasError('required')) {
-                            <p
-                              class="invalid-feedback"
-                              >
-                              Selecciona la raza
-                            </p>
-                          }
-                        </div>
-                      </div>
-                      @if (status !== 'Encontrado') {
-                        <div class="form-elements">
-                          <label class="form-label" for="petAge">Edad: </label>
-                          <input
-                            type="text"
-                            class="form-control"
-                            formControlName="petAge"
-                            placeholder="Edad de tu mascota"
-                            name="petAge"
-                            id="petAge"
-                            />
-                          </div>
-                        }
-                      </div>
-                    </div>
+                <p class="form-label">Edad aproximada (opcional):</p>
+                <div class="age-row">
+                  <input type="number" min="0" max="30" class="form-control" formControlName="ageYears"
+                    aria-label="Años" placeholder="Años" [class.is-invalid]="ageYearsField.invalid" />
+                  <input type="number" min="0" max="11" class="form-control" formControlName="ageMonths"
+                    aria-label="Meses" placeholder="Meses" [class.is-invalid]="ageMonthsField.invalid" />
+                </div>
+                <div class="validationMessage" [class.active]="ageYearsField.invalid || ageMonthsField.invalid">
+                  <p class="invalid-feedback">Indica hasta 30 años y entre 0 y 11 meses</p>
+                </div>
+              </div>
+            } @else if (type !== 'Encontrada') {
+              <div class="form-elements">
+                <label class="form-label" for="petAge">Edad (opcional):</label>
+                <input type="text" class="form-control" formControlName="petAge" maxlength="20"
+                  placeholder="Ej: cachorro, 2 años" name="petAge" id="petAge" />
+              </div>
+            }
+          </div>
+        </div>
+        }
                     <div class="form-element-section">
-                      @if (status === 'Encontrado') {
+                      @if (type === 'Encontrada') {
                         <p>
                           Indica dónde y cuándo viste a la mascota
                         </p>
                       }
-                      @if (status === 'Buscado') {
+                      @if (type === 'Perdida') {
                         <p>
                           Indica por dónde y cuándo se perdió la mascota
                         </p>
                       }
-                      @if (status === 'EnAdopcion' || status === 'NecesitadoDeAyuda') {
+                      @if (!requiresLastSeen(type)) {
                         <p>
                           Indica dónde se encuentra la mascota
                         </p>
@@ -252,7 +250,7 @@
                             </select>
                           </div>
                         }
-                        @if (status === 'Encontrado' || status === 'Buscado') {
+                        @if (requiresLastSeen(type)) {
                           <div class="form-elements">
                             <label class="form-label" for="formLastTime">Fecha y hora:</label>
                             <input
@@ -379,7 +377,7 @@
                               <p class="contact-max">Puedes agregar hasta 4 números.</p>
                             }
                           </div>
-                            @if (status === 'Buscado') {
+                            @if (type === 'Perdida') {
                               <div class="form-elements">
                                 <label class="form-label" for="reward">Recompensa:</label>
                                 <input
@@ -408,6 +406,7 @@
                                   </div>
                                 </div>
                               }
+                              @if (!usesExistingPet) {
                               <div class="files-uploader">
                                 <label for="inputElement">Fotos de la mascota</label>
                                 @if (updating) {
@@ -433,6 +432,7 @@
                                   </p>
                                 }
                               </div>
+                              }
                             </div>
                           </div>
                           @if (submitError) {

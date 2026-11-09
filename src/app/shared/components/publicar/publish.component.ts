@@ -7,11 +7,14 @@ import {
   Validators,
 } from '@angular/forms';
 import {
-  createImgDTO,
-  CreatePostpetDTO,
-  PetStatus,
+  birthDateFromAge,
+  CreateReportDTO,
+  petView,
+  PetSex,
+  ReportType,
+  requiresLastSeen,
   updateImg,
-} from 'src/app/models/postpet.model';
+} from 'src/app/models/report.model';
 import { Location } from '@angular/common';
 import { CategoryService } from 'src/app/services/category.service';
 import {
@@ -22,7 +25,8 @@ import {
   specie,
 } from '../../../models/category.model';
 import { switchMap } from 'rxjs/operators';
-import { PostpetService } from 'src/app/services/postpet.service';
+import { ReportService } from 'src/app/services/report.service';
+import { PetService } from 'src/app/services/pet.service';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserView } from 'src/app/models/user.model';
@@ -39,14 +43,23 @@ export class PublishComponent implements OnInit {
   constructor(
     private formBuilder: UntypedFormBuilder,
     private categoryService: CategoryService,
-    private postpetService: PostpetService,
+    private reportService: ReportService,
+    private petService: PetService,
     private location: Location,
     private authService: AuthService
   ) {
     this.buildForm();
   }
 
-  @Input() status: PetStatus | null = null;
+  @Input() type: ReportType | null = null;
+
+  // Regla compartida con el backend (RequiresLastSeen), para la plantilla.
+  readonly requiresLastSeen = requiresLastSeen;
+
+  // Pérdida: mascotas del usuario que pueden reportarse (las que no están ya
+  // perdidas). selectedPetId null = mascota nueva (se crea su ficha).
+  myPets: petView[] = [];
+  selectedPetId: number | null = null;
 
   // API unificada con la plantilla compartida pet-form (modo crear).
   submitLabel = 'Publicar mascota';
@@ -62,25 +75,6 @@ export class PublishComponent implements OnInit {
 
   urlBucket = `${environment.BUCKET_URL}`;
   form: UntypedFormGroup;
-  createdPost: CreatePostpetDTO = {
-    contact: null,
-    petAge: null,
-    idCanton: null,
-    idPetBreed: null,
-    idPetSpecie: null,
-    idProvincia: null,
-    idSector: null,
-    status: null,
-    sex: 'Unknown',
-    lat: null,
-    lng: null,
-    lastTimeSeen: null,
-    petName: null,
-    petSpecialCondition: null,
-    description: null,
-    reward: null,
-    urlImgs: null,
-  };
   species: specie[] = [];
   specieId: number;
   breeds: breed[] = [];
@@ -100,7 +94,10 @@ export class PublishComponent implements OnInit {
   maxFourContactNumbers: boolean = false;
 
   ngOnInit(): void {
-    this.authService.user$.subscribe((data) => (this.user = data));
+    this.authService.user$.subscribe((data) => {
+      this.user = data;
+      if (data && this.type === 'Perdida') this.loadMyPets();
+    });
     this.toggleDisabledBreed();
     this.toggleDisabledCanton();
     this.getSpecies();
@@ -108,13 +105,52 @@ export class PublishComponent implements OnInit {
     this.getProvincias();
     this.getCantonesByProv();
     this.getSectoresByCanton();
-    if (this.status === 'Encontrado' || this.status === 'EnAdopcion') {
-      this.petNameField.clearValidators();
+    this.applyTypeRules();
+  }
+
+  // El nombre: obligatorio en una pérdida (el carné lo exige), opcional en
+  // ayuda, oculto en encontrada/adopción. La fecha: solo en avistamientos.
+  private applyTypeRules() {
+    if (this.type !== 'Perdida') {
+      this.petNameField.removeValidators(Validators.required);
       this.petNameField.updateValueAndValidity();
     }
-    if (this.status === 'EnAdopcion' || this.status === 'NecesitadoDeAyuda') {
+    if (!requiresLastSeen(this.type)) {
       this.lastTimeSeenField.clearValidators();
       this.lastTimeSeenField.updateValueAndValidity();
+    }
+  }
+
+  get showName(): boolean {
+    return this.type === 'Perdida' || this.type === 'Ayuda';
+  }
+
+  get usesExistingPet(): boolean {
+    return this.selectedPetId !== null;
+  }
+
+  get selectedPet(): petView | null {
+    return this.myPets.find((p) => p.id === this.selectedPetId) ?? null;
+  }
+
+  private loadMyPets() {
+    this.petService.getMine().subscribe({
+      next: (pets) => (this.myPets = (pets ?? []).filter((p) => !p.isLost)),
+      error: () => (this.myPets = []), // sin la lista, se publica como mascota nueva
+    });
+  }
+
+  // Con una mascota existente, sus datos y fotos ya están en su ficha: los
+  // controles del animal se deshabilitan (no cuentan para la validez) y el
+  // backend los rechazaría si llegaran.
+  selectPet(id: number | null) {
+    this.selectedPetId = id;
+    const animal = [this.petNameField, this.petSpecieField, this.sexField, this.ageYearsField, this.ageMonthsField];
+    if (id === null) {
+      animal.forEach((c) => c.enable());
+      if (this.petSpecieField.value) this.petBreedField.enable();
+    } else {
+      [...animal, this.petBreedField].forEach((c) => c.disable());
     }
   }
 
@@ -130,8 +166,11 @@ export class PublishComponent implements OnInit {
         ],
       ],
       idPetSpecie: ['', Validators.required],
-      idPetBreed: [{ value: '', disabled: true }, Validators.required],
-      petAge: [null],
+      idPetBreed: [{ value: '', disabled: true }], // opcional
+      sex: ['Unknown' as PetSex],
+      petAge: [null, Validators.maxLength(20)],
+      ageYears: [null, [Validators.min(0), Validators.max(30)]],
+      ageMonths: [null, [Validators.min(0), Validators.max(11)]],
       petSpecialCondition: [null],
       contact: this.formBuilder.array([
         new UntypedFormControl('', [
@@ -179,52 +218,66 @@ export class PublishComponent implements OnInit {
 
   submit() {
     this.submitError = null;
-    if (this.user && this.form.valid && this.imgUrls.length > 0) {
+    const hasPhotos = this.usesExistingPet || this.imgUrls.length > 0;
+    if (this.user && this.form.valid && hasPhotos) {
       this.isLoading = true;
-      try {
-        this.createdPost = this.form.value;
-
-        if (!this.sectorField.value) {
-          this.createdPost.idSector = null;
-        }
-        if (!this.rewardField.value) {
-          this.createdPost.reward = null;
-        }
-
-        this.createdPost.urlImgs = this.imgUrls.map((url) => {
-          return { url: url } as createImgDTO;
-        });
-        this.createdPost.contact = this.contactField.value.join(' ');
-
-        this.createdPost.status = this.status;
-        this.published = true;
-        this.postpetService.create(this.createdPost).subscribe({
-          next: () => {
-            this.isLoading = false;
-            this.location.back();
-          },
-          error: (err) => {
-            // Sin este handler, isLoading nunca volvía a false en fallos de
-            // red/servidor y el botón giraba para siempre.
-            this.isLoading = false;
-            this.published = false;
-            this.submitError =
-              typeof err === 'string'
-                ? err
-                : 'No pudimos publicar. Inténtalo de nuevo en un momento.';
-            console.error('Error al crear la publicación:', err);
-          },
-        });
-      } catch (err) {
-        this.isLoading = false;
-        this.published = false;
-        this.submitError = 'No pudimos preparar la publicación. Recarga la página e inténtalo de nuevo.';
-        console.error('Error preparando la publicación:', err);
-      }
+      this.published = true;
+      this.reportService.create(this.buildDto()).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.location.back();
+        },
+        error: (err) => {
+          // Sin este handler, isLoading nunca volvía a false en fallos de
+          // red/servidor y el botón giraba para siempre.
+          this.isLoading = false;
+          this.published = false;
+          this.submitError =
+            typeof err === 'string'
+              ? err
+              : 'No pudimos publicar. Inténtalo de nuevo en un momento.';
+          console.error('Error al crear la publicación:', err);
+        },
+      });
     } else {
       this.published = false;
     }
     this.form.markAllAsTouched();
+  }
+
+  // Arma el body por tipo. El backend rechaza (400) lo que no corresponde a cada
+  // flujo, así que solo se manda lo que aplica. La provincia es solo de la
+  // cascada de la UI: no se envía (se deriva del cantón).
+  private buildDto(): CreateReportDTO {
+    const v = this.form.getRawValue();
+    const type = this.type;
+    const dto: CreateReportDTO = {
+      type,
+      description: v.description,
+      contact: (this.contactField.value as string[]).filter((n) => n).join(' '),
+      idCanton: Number(v.idCanton),
+      idSector: v.idSector ? Number(v.idSector) : null,
+      lastTimeSeen: requiresLastSeen(type) ? v.lastTimeSeen : null,
+      reward: type === 'Perdida' && v.reward ? Number(v.reward) : null,
+      urlImgs: [],
+    };
+
+    if (this.usesExistingPet) {
+      dto.idPet = this.selectedPetId;
+      return dto;
+    }
+
+    dto.petName = this.showName && v.petName ? v.petName : null;
+    dto.idPetSpecie = Number(v.idPetSpecie);
+    dto.idPetBreed = v.idPetBreed ? Number(v.idPetBreed) : null;
+    dto.sex = v.sex ?? 'Unknown';
+    if (type === 'Perdida') {
+      dto.birthDate = birthDateFromAge(v.ageYears, v.ageMonths);
+    } else if (type !== 'Encontrada') {
+      dto.petAge = v.petAge || null;
+    }
+    dto.urlImgs = this.imgUrls.map((url) => ({ url }));
+    return dto;
   }
 
   // Firma ampliada por la plantilla compartida; en modo crear siempre llega string[].
@@ -270,9 +323,8 @@ export class PublishComponent implements OnInit {
   private getBreedsBySpecie() {
     this.petSpecieField.valueChanges
       .pipe(
-        switchMap((id) => {
-          return this.categoryService.getBreedsBySpecie(id);
-        })
+        // Sin especie (vacía o deshabilitada) no hay razas que pedir.
+        switchMap((id) => (id ? this.categoryService.getBreedsBySpecie(id) : of([] as breed[])))
       )
       .subscribe((breeds: breed[]) => (this.breeds = breeds));
   }
@@ -436,6 +488,18 @@ export class PublishComponent implements OnInit {
 
   get petAgeField() {
     return this.form.get('petAge');
+  }
+
+  get sexField() {
+    return this.form.get('sex');
+  }
+
+  get ageYearsField() {
+    return this.form.get('ageYears');
+  }
+
+  get ageMonthsField() {
+    return this.form.get('ageMonths');
   }
 
   get petAgeFieldValid() {

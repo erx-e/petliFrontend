@@ -66,18 +66,22 @@
   color: var(--white);
   box-shadow: var(--shadow-sm);
 }
-.state--Buscado {
+.state--Perdida {
   background-color: var(--red);
 }
-.state--Encontrado {
+.state--Encontrada {
   background-color: var(--green);
 }
-.state--EnAdopcion {
+.state--Adopcion {
   background-color: var(--yellow);
   color: var(--ink);
 }
-.state--NecesitadoDeAyuda {
+.state--Ayuda {
   background-color: var(--blue);
+}
+// Reporte resuelto ("¡En casa!", adoptado...): un final feliz, no una alerta.
+.state--Resuelto {
+  background-color: var(--grey);
 }
 
 .postpet-img {

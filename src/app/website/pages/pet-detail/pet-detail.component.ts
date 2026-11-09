@@ -3,12 +3,17 @@ import { ActivatedRoute } from "@angular/router";
 import { Location } from "@angular/common";
 import { switchMap } from "rxjs/operators";
 import {
+  ageLabel,
   imgView,
-  PET_STATUS_LABELS,
-  postpetView,
-} from "src/app/models/postpet.model";
+  PET_SEX_LABELS,
+  REPORT_TYPE_AREA,
+  REPORT_TYPE_LABELS,
+  RESOLVED_LABELS,
+  reportView,
+  requiresLastSeen,
+} from "src/app/models/report.model";
 import { UserView } from "src/app/models/user.model";
-import { PostpetService } from "src/app/services/postpet.service";
+import { ReportService } from "src/app/services/report.service";
 import { AuthService } from "src/app/services/auth.service";
 import { of } from "rxjs";
 import format from "date-fns/format";
@@ -24,14 +29,15 @@ import { LoadingService } from "src/app/services/loading.service";
 export class PetDetailComponent implements OnInit {
   constructor(
     private router: ActivatedRoute,
-    private postpetService: PostpetService,
+    private reportService: ReportService,
     private location: Location,
     private authService: AuthService,
     private loadingService: LoadingService
   ) {}
 
+  // Detalle de un reporte (ruta reporte/:id, D17). Los nombres postpet* vienen de v1.
   postpetId: string | null = null;
-  postpet: postpetView | null = null;
+  postpet: reportView | null = null;
   // Imágenes a mostrar en la galería, deduplicadas por URL. Publicaciones
   // antiguas (creadas antes del arreglo de nombres duplicados en S3) pueden
   // traer varias entradas con la MISMA url. Como el @for usa `track img.url`,
@@ -45,12 +51,14 @@ export class PetDetailComponent implements OnInit {
   isLoading: boolean = true;
   contactNum: string[] = [];
 
-  // Estado del diálogo de confirmación de borrado: visible / en vuelo / error.
-  // Antes el clic en "Eliminar" disparaba la request de inmediato, sin feedback
-  // ni posibilidad de cancelar.
-  showDeleteConfirm: boolean = false;
-  isDeleting: boolean = false;
-  deleteError: string | null = null;
+  // Diálogo de confirmación de las acciones del dueño que no se deshacen:
+  // eliminar y resolver ("¡Está en casa!"). Acción pendiente / en vuelo / error.
+  confirmAction: "delete" | "resolve" | null = null;
+  isWorking: boolean = false;
+  actionError: string | null = null;
+  resolvedAt: string = "";
+
+  readonly requiresLastSeen = requiresLastSeen;
 
   // URLs cuyo <img> disparó (error): típicamente objetos de S3 que ya no existen
   // en el bucket o quedaron sin permisos de lectura pública (403). Sin esto, el
@@ -65,7 +73,7 @@ export class PetDetailComponent implements OnInit {
         switchMap((params) => {
           this.postpetId = params.get("id");
           if (this.postpetId) {
-            return this.postpetService.getById(parseInt(this.postpetId));
+            return this.reportService.getById(parseInt(this.postpetId));
           } else {
             this.notFound = true;
           }
@@ -77,11 +85,8 @@ export class PetDetailComponent implements OnInit {
           if (data) {
             this.postpet = data;
             this.galleryImgs = this.dedupeImgsByUrl(data.urlImgs);
-            this.lastTimeSeen = format(
-              new Date(this.postpet.lastTimeSeen),
-              "dd 'de' MMMM 'del' yyyy 'a las' HH:mm",
-              { locale: es }
-            );
+            this.lastTimeSeen = this.formatDate(data.lastTimeSeen);
+            this.resolvedAt = this.formatDate(data.resolvedAt);
             if(this.postpet.contact){
               this.contactNum = this.postpet.contact.trim().split(/\s+/)
             }
@@ -93,42 +98,59 @@ export class PetDetailComponent implements OnInit {
       );
   }
 
-  // El botón "Eliminar" ya no borra: abre la confirmación. La eliminación real
-  // ocurre en confirmDelete() para que el usuario pueda revisar y cancelar.
-  deletePost() {
-    this.deleteError = null;
-    this.showDeleteConfirm = true;
+  // "Eliminar" y "Resolver" no actúan al clic: abren la confirmación, y la
+  // acción real ocurre en confirm() para que el usuario pueda cancelar.
+  askConfirm(action: "delete" | "resolve") {
+    this.actionError = null;
+    this.confirmAction = action;
   }
 
-  cancelDelete() {
-    if (this.isDeleting) return; // No permitir cerrar a mitad de la request.
-    this.showDeleteConfirm = false;
-    this.deleteError = null;
+  cancelConfirm() {
+    if (this.isWorking) return; // No permitir cerrar a mitad de la request.
+    this.confirmAction = null;
+    this.actionError = null;
   }
 
-  confirmDelete() {
-    if (this.isDeleting || !this.postpet) return;
-    this.isDeleting = true;
-    this.deleteError = null;
-    this.postpetService.delete(parseInt(this.postpet.id)).subscribe({
-      next: () => {
-        // Mantener isDeleting=true: el modal sigue mostrando "Eliminando…" hasta
-        // que el router nos saca de esta pantalla. Evita un parpadeo del estado
-        // base entre la respuesta y la navegación.
-        this.location.back();
+  confirm() {
+    if (this.isWorking || !this.postpet || !this.confirmAction) return;
+    this.isWorking = true;
+    this.actionError = null;
+
+    if (this.confirmAction === "delete") {
+      this.reportService.delete(this.postpet.id).subscribe({
+        next: () => {
+          // Mantener isWorking=true: el modal sigue mostrando "Eliminando…"
+          // hasta que el router nos saca de esta pantalla (evita un parpadeo).
+          this.location.back();
+        },
+        error: (err) => {
+          this.isWorking = false;
+          this.actionError =
+            typeof err === "string" ? err : "No pudimos eliminar la publicación.";
+        },
+      });
+      return;
+    }
+
+    this.reportService.resolve(this.postpet.id).subscribe({
+      next: (result) => {
+        this.isWorking = false;
+        this.confirmAction = null;
+        this.postpet = { ...this.postpet, status: result.status, resolvedAt: result.resolvedAt };
+        this.resolvedAt = this.formatDate(result.resolvedAt);
       },
-      error: () => {
-        this.isDeleting = false;
-        this.deleteError =
-          "No pudimos eliminar la publicación. Inténtalo de nuevo en un momento.";
+      error: (err) => {
+        this.isWorking = false;
+        this.actionError =
+          typeof err === "string" ? err : "No pudimos marcarla como resuelta.";
       },
     });
   }
 
   @HostListener("document:keydown.escape")
   onEscapeKey() {
-    if (this.showDeleteConfirm) {
-      this.cancelDelete();
+    if (this.confirmAction) {
+      this.cancelConfirm();
     }
   }
 
@@ -177,10 +199,48 @@ export class PetDetailComponent implements OnInit {
     this.location.back();
   }
 
-  // Etiqueta del estado para el badge del detalle. Mismo mapa compartido que la
-  // tarjeta (PostpetComponent), para que no vuelvan a divergir.
+  private formatDate(value: string | null): string {
+    return value
+      ? format(new Date(value), "dd 'de' MMMM 'del' yyyy 'a las' HH:mm", { locale: es })
+      : "";
+  }
+
+  get isResolved(): boolean {
+    return this.postpet?.status === "Resuelto";
+  }
+
+  // Badge: el tipo, o cómo terminó si ya está resuelto. Mismos mapas que la
+  // tarjeta (PostpetComponent), para que no diverjan.
   get stateLabel(): string {
-    const status = this.postpet?.status;
-    return status ? PET_STATUS_LABELS[status] ?? "" : "";
+    const report = this.postpet;
+    if (!report) return "";
+    return this.isResolved ? RESOLVED_LABELS[report.type] ?? "" : REPORT_TYPE_LABELS[report.type] ?? "";
+  }
+
+  get stateClass(): string {
+    const report = this.postpet;
+    if (!report) return "";
+    return "stateBadge state--" + (this.isResolved ? "Resuelto" : report.type);
+  }
+
+  // Ruta de edición: cada tipo se edita en su área.
+  get editLink(): string[] {
+    return this.postpet ? ["/" + REPORT_TYPE_AREA[this.postpet.type] + "/editar", String(this.postpet.id)] : [];
+  }
+
+  // Texto del botón de resolver: el de la pérdida es el momento feliz.
+  get resolveLabel(): string {
+    return this.postpet?.type === "Perdida" ? "¡Está en casa!" : "Marcar como resuelto";
+  }
+
+  // Edad para el chip: la estimada (inline) o la derivada de la fecha de
+  // nacimiento del pet (Perdida).
+  get ageText(): string | null {
+    return this.postpet?.petAge || ageLabel(this.postpet?.birthDate ?? null);
+  }
+
+  get sexText(): string | null {
+    const sex = this.postpet?.sex;
+    return sex && sex !== "Unknown" ? PET_SEX_LABELS[sex] : null;
   }
 }

@@ -1,5 +1,5 @@
 import { AfterContentInit, AfterViewInit, Component, EventEmitter, Input, Output } from "@angular/core";
-import { updateImg } from "src/app/models/postpet.model";
+import { updateImg } from "src/app/models/report.model";
 
 @Component({
     selector: "app-uploader",

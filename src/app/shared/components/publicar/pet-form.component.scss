@@ -322,3 +322,52 @@
     margin: var(--space-8) auto;
   }
 }
+
+// Selector "¿cuál de tus mascotas se perdió?" (solo al publicar una pérdida).
+.pet-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pet-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: 96px;
+  padding: var(--space-2);
+  border: 2px solid var(--lighter-light-blue);
+  border-radius: var(--radius-md);
+  background: var(--white);
+
+  &--selected {
+    border-color: var(--blue);
+  }
+
+  &__img {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    background: var(--light-blue);
+    display: grid;
+    place-items: center;
+    font-size: var(--text-xl);
+    color: var(--blue);
+  }
+
+  &__name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  &__note {
+    margin: var(--space-2) 0;
+  }
+}
+
+.age-row {
+  display: flex;
+  gap: var(--space-2);
+}

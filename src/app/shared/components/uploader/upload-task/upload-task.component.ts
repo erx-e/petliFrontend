@@ -12,7 +12,7 @@ import {
 import { HttpEventType, HttpStatusCode } from "@angular/common/http";
 import { firstValueFrom } from "rxjs";
 import { switchMap } from "rxjs/operators";
-import { updateImg } from "src/app/models/postpet.model";
+import { updateImg } from "src/app/models/report.model";
 import { S3StorageService } from "src/app/services/s3-storage.service";
 import { TokenService } from "src/app/services/token.service";
 

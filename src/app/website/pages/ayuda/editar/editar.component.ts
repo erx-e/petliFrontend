@@ -1,11 +1,11 @@
 import { Component } from "@angular/core";
-import { PetStatus } from "src/app/models/postpet.model";
+import { ReportType } from "src/app/models/report.model";
 
 @Component({
     selector: "app-editarAyuda",
-    template: ` <app-editar [status]="status"></app-editar>`,
+    template: ` <app-editar [type]="type"></app-editar>`,
     standalone: false
 })
 export class EditarComponent {
-  status: PetStatus = "NecesitadoDeAyuda";
+  type: ReportType = "Ayuda";
 }

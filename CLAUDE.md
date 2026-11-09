@@ -17,15 +17,17 @@ hardcoded here. The backend checkout also holds the knowledge graph and the cros
   backend folder, where it is the default graph; or pass `--graph <that path>` from here.
 
 ```bash
-graphify query "where does the pet status filter end up server-side" \
+graphify query "where does the report type filter end up server-side" \
   --graph "$BACKEND/graphify-out/graph.json"
 ```
 
-> **The contract migration (`PL-X1`-`PL-X3`) is done as of 2026-11-06.** This frontend now speaks
-> the backend's current contract: `status`/`sex` as **enum names**, plus `lat`/`lng`; the legacy
-> single-letter `stateId` codes and `linkMapSeen` are gone. If you find a stray letter code
-> (`'A'`/`'E'`/`'B'`/`'H'`) anywhere, it is a leftover — the mapping is
-> `EnAdopcion`/`Encontrado`/`Buscado`/`NecesitadoDeAyuda`.
+> **v2, slice 1 (`PL-X8`) is in as of 2026-11-09.** The backend split `post_pet` into `pet` (the pet's
+> ID card) and `report` (the event): `/postpet` is gone, replaced by **`/report`** and **`/pet`**, and
+> `PetStatus` became **`ReportType` × `ReportStatus`**. The before → after is in
+> `$BACKEND/petslighthouse-back-main/FRONTEND_CONTRACT_CHANGES.md`. If you find `PetStatus`, `postpet`
+> model/service names or the values `Buscado`/`EnAdopcion`/`Encontrado`/`NecesitadoDeAyuda`, they are
+> leftovers. (The `PostpetComponent`/`PostspetComponent` card and list keep their v1 *names*; they
+> render `reportView`.)
 
 After changing code, refresh the graph with `$BACKEND/tools/graphify-kg/refresh.sh` (it re-extracts
 both sides and re-merges). Record cross-repo findings in `$BACKEND/PROJECT_STATE.md`.
@@ -56,7 +58,7 @@ Three interceptors registered in `app.module.ts`, executed in order: **Cache →
 
 - `CHECK_TOKEN` (`checkToken()` from `token.interceptor.ts`) — attaches the `Bearer` token. Authenticated calls must pass `{ context: checkToken() }`.
 - `CHECK_LOADING` (`checkLoading()` from `loading.interceptor.ts`) — toggles the global spinner via `LoadingService`. Pass `{ context: checkLoading() }` to show the spinner for a request.
-- `CacheInterceptor` caches **all GETs** automatically (no opt-in). It implements **stale-while-revalidate**: a fresh entry returns instantly; a stale entry returns the cached value immediately and refreshes in the background (with loading suppressed). TTL is short for `/postpet` listings (20s) and 5min for everything else. Mutations (POST/PUT/DELETE) trigger **granular invalidation** — only the affected resource (first path segment after `API_URL`) is cleared, e.g. publishing a post clears `postpet` cache but not categories/geography.
+- `CacheInterceptor` caches **all GETs** automatically (no opt-in). It implements **stale-while-revalidate**: a fresh entry returns instantly; a stale entry returns the cached value immediately and refreshes in the background (with loading suppressed). TTL is short for `/report` listings (20s) and 5min for everything else. Mutations (POST/PUT/DELETE) trigger **granular invalidation** — only the affected resource (first path segment after `API_URL`) is cleared, e.g. publishing a report clears the `report` cache but not categories/geography — plus the resources listed in `CacheInterceptor.DEPENDENTS` (`report` → `pet`: publishing a lost report with a new pet, or resolving/deleting one, changes `GET /pet/mine`).
 - `CacheService` is the in-memory store: per-entry TTL, 60-entry LRU cap, `invalidateResource()` / `invalidateAll()`.
 
 When adding a new service method, decide deliberately whether it needs `checkToken()` and/or `checkLoading()` — see existing services for the pattern.
@@ -74,55 +76,61 @@ When adding a new service method, decide deliberately whether it needs `checkTok
 ### Routing & module structure
 
 - Root `app-routing.module.ts` lazy-loads `WebsiteModule` and sets `QuicklinkStrategy` preloading plus `scrollPositionRestoration`.
-- `website-routing.module.ts` nests page routes under a `LayoutComponent` (shared nav/footer). Feature areas (`adopta`, `encuentra`, `difunde`, `ayuda`, `profile`) are **lazy-loaded feature modules**; `home`, `landpage`, `pet/:id` are eager. `login`/`register` sit outside the layout.
+- `website-routing.module.ts` nests page routes under a `LayoutComponent` (shared nav/footer). Feature areas (`adopta`, `encuentra`, `difunde`, `ayuda`, `profile`) are **lazy-loaded feature modules**; `home`, `landpage`, `reporte/:id` (report detail, `PetDetailComponent`; it was `pet/:id`, which slice 2 reserves for the pet's public card) are eager. `login`/`register` sit outside the layout.
 
-### Pet status domain
+### Report domain (v2)
 
-Posts are categorized by `status`, a `PetStatus` string-literal union declared in
-`models/postpet.model.ts` and sent/received as the **enum name** — the same value the backend's
-`PetStatus` enum serializes:
+Everything lives in `models/report.model.ts`. A report has a **`type`** (`ReportType`, immutable after
+creation) and a **`status`** (`ReportStatus`: `Activo` / `Resuelto`), both string-literal unions sent and
+received as the **enum name**:
 
-| `PetStatus` | Feature area | Notes |
+| `ReportType` | Feature area | Notes |
 |---|---|---|
-| `EnAdopcion` | `adopta/` | no pet name/age fields |
-| `Encontrado` | `encuentra/` | no name/age (unknown animal); requires `lastTimeSeen` |
-| `Buscado` | `difunde/` | the only status with a reward field; requires `lastTimeSeen` |
-| `NecesitadoDeAyuda` | `ayuda/` | — |
-| `SanoYSalvo` | *none* | backend-only; no UI to publish or display it |
+| `Perdida` | `difunde/` | the owner's own pet: points to a **pet** (`idPet`); name required; age is asked as years + months and sent as `birthDate`; the only type with `reward`; requires `lastTimeSeen` |
+| `Encontrada` | `encuentra/` | animal data **inline**; no name/age fields (unknown animal); requires `lastTimeSeen` |
+| `Adopcion` | `adopta/` | inline; free-text `petAge`; no name field |
+| `Ayuda` | `ayuda/` | inline; optional name; free-text `petAge` |
 
-The feature pages are thin wrappers that pass their `status` into the shared `FilterComponent`,
-`PublishComponent` (`<app-publish>`) and `EditarComponent` (`<app-editar>`); conditional fields in
-those components branch on `status`. Badge CSS classes are `state--<PetStatus>` (e.g.
-`.state--Buscado`), and the Spanish display label comes from the shared `PET_STATUS_LABELS` map —
-the backend no longer sends a status *text* (the old `petState` came from the dropped `pet_state`
-table), so the UI derives it.
+- **`requiresLastSeen(type)` is the single source** of the backend's `RequiresLastSeen()` rule — never
+  re-write `type === 'Perdida' || type === 'Encontrada'` in a template.
+- Labels come from `REPORT_TYPE_LABELS` (and `RESOLVED_LABELS` once resolved), the edit route from
+  `REPORT_TYPE_AREA`; badge classes are `state--<ReportType>` or `state--Resuelto`.
+- The feature pages are thin wrappers that pass their `type` into the shared `FilterComponent`,
+  `PublishComponent` (`<app-publish>`) and `EditarComponent` (`<app-editar>`).
+- **Publishing a `Perdida`**: `<app-publish>` loads `GET /pet/mine` and offers the user's pets that are
+  not already lost; choosing one sends only `idPet` + the event fields (the backend **rejects** animal
+  data or photos with an existing pet). "Otra mascota" creates the pet and its report in one request.
+- **Sex** is a form control now (`Unknown` / `Male` / `Female`). **Breed is optional.** The province is a
+  UI-only cascade: it is **never sent** (the backend derives it from the canton; `getUpdate` returns a
+  read-only `idProvincia` to prefill it).
+- **`PUT /report/update` replaces, it does not merge**: a missing field is cleared. `EditarComponent`
+  therefore sends the whole form and passes through, unchanged, the fields it has no control for
+  (`petSpecialCondition`, `lat`/`lng`, and name/age when the type hides them). Images still go by delta.
+- The feed only shows `Activo` reports (the backend default). The report detail lets the owner
+  **resolve** (`PUT /report/resolve/{id}`; "¡Está en casa!" for a `Perdida`) — final, with a confirm
+  dialog. "Mis publicaciones" renders two `<app-filter>`: `status="Activo"` and `status="Resuelto"`.
+- `lat` and `lng` must be sent together or not at all (when the map UI lands, `PL-X4`;
+  `ReportService.getMapPoints` already takes the viewport).
 
-**`status` is immutable after creation.** `UpdatePostCommand` has no `status` field, so
-`UpdatePostpetDTO` deliberately omits it (`Omit<…, "status">`); sending it would be a silent no-op.
-
-`PostpetService.GetByFilter()` builds query params through a `withParam` guard that skips
-null/undefined/empty — `HttpParams.set(k, undefined)` would otherwise send the literal string
-`k=undefined`, which the backend cannot bind to `int?` and answers with 400.
-
-Two backend rules to respect when the map UI lands: **`lat` and `lng` must be sent together or not
-at all** (the validator enforces `lat.HasValue == lng.HasValue`, ranges ±90 / ±180), and omitting
-`sex` on update *preserves* the stored value rather than resetting it (`c.sex ?? post.Sex`). There is
-still no sex control in the publish form, so new posts are created as `Unknown`.
+`ReportService` builds query params from a `ReportFilter` object, skipping null/undefined/empty values —
+`HttpParams.set(k, undefined)` would otherwise send the literal string `k=undefined`, which the backend
+cannot bind to `int?` and answers with 400.
 
 ### Data models
 
-DTO conventions in `models/postpet.model.ts`: `*View` interfaces are read shapes from the API;
+DTO conventions in `models/report.model.ts`: `*View` interfaces are read shapes from the API;
 `Create*DTO` / `Update*DTO` are write shapes. Request and response never share a type, mirroring the
 backend's own rule:
 
-- `postpetView` — full read view (`/get`, `/get/{id}`, `/getByState`, `/getByFilter`). Images are
-  `imgView` (`{ url }` only): `idImage` exists **only** on the edit prefill, so reading it here
-  always gave `undefined`.
-- `UpdatePostpetView` — prefill for `GET /postpet/getUpdate/{id}`; carries `status` (display-only)
-  and `idImage` per image.
-- `CreatePostpetDTO` / `UpdatePostpetDTO` — write bodies. Neither carries `idUser`: the owner comes
-  from the JWT (`AuthenticatedUserId`) and the backend ignores any `idUser` in the body.
-- `mapPointView` — lightweight map pins from `GET /postpet/getMapPoints`.
+- `reportView` — list and detail (`/report/getByFilter`, `/report/get/{id}`), with the animal data
+  already unified (from the pet for a `Perdida`, inline otherwise). Images are `imgView` (`{ url }`).
+- `reportUpdateView` — prefill for `GET /report/getUpdate/{id}`; images are `editableImgView`
+  (`{ idImage, url }`).
+- `CreateReportDTO` / `UpdateReportDTO` — write bodies. Neither carries `idUser` (the owner comes from
+  the JWT) nor `idProvincia`.
+- `reportMutationView` — what create / update / resolve return.
+- `mapPointView` — map pins from `GET /report/getMapPoints`.
+- `petView` — `GET /pet/mine` (`PetService`), with the derived `isLost`.
 
 `updateImg` images carry an optional `file` for newly added uploads vs. existing `idImage`/`url`.
 

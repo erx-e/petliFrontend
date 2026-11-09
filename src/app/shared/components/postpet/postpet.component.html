@@ -1,10 +1,10 @@
 @if (postpet) {
   <a
     [class]="home ? 'postpetHome' : 'postpet'"
-    [routerLink]="['/pet', postpet.id]" 
+    [routerLink]="['/reporte', postpet.id]"
   >
     <div class="container__postpet-img">
-      @if (postpet.urlImgs && !imgFailed) {
+      @if (postpet.urlImgs?.length && !imgFailed) {
         <div class="postpet-img">
           <img class="postpetImg" [src]="postpet.urlImgs[0].url" loading="lazy" decoding="async" [alt]="postpet.petName || 'Mascota publicada'" (error)="onImgError()" />
         </div>
@@ -17,7 +17,7 @@
           </svg>
         </div>
       }
-      <span class="stateBadge" [class]="'state--' + postpet.status">{{ stateLabel }}</span>
+      <span [class]="stateClass">{{ stateLabel }}</span>
     </div>
     <div class="postpet-info">
       <h3 class="postpet-name">
@@ -32,8 +32,7 @@
       </p>
 
       @if (
-        (postpet.status === 'Buscado' || postpet.status === 'Encontrado') &&
-        postpet.lastTimeSeen
+        requiresLastSeen(postpet.type) && postpet.lastTimeSeen
       ) {
         <p class="postpet-date">Visto {{ lastTimeSeen }}</p>
       }

@@ -16,15 +16,20 @@ import {
   specie,
 } from 'src/app/models/category.model';
 import {
-  PetStatus,
-  UpdatePostpetDTO,
-  UpdatePostpetView,
+  ageFromBirthDate,
+  birthDateFromAge,
+  petView,
+  PetSex,
+  ReportType,
+  reportUpdateView,
+  requiresLastSeen,
+  UpdateReportDTO,
   updateImg,
-} from 'src/app/models/postpet.model';
+} from 'src/app/models/report.model';
 import { UserView } from 'src/app/models/user.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
-import { PostpetService } from 'src/app/services/postpet.service';
+import { ReportService } from 'src/app/services/report.service';
 import { environment } from 'src/environments/environment';
 import { switchMap } from 'rxjs/operators';
 import { MyValidators } from 'src/app/validators/validators';
@@ -40,7 +45,7 @@ export class EditarComponent implements OnInit {
   constructor(
     private formBuilder: UntypedFormBuilder,
     private categoryService: CategoryService,
-    private postpetService: PostpetService,
+    private reportService: ReportService,
     private router: ActivatedRoute,
     private location: Location,
     private authService: AuthService
@@ -62,79 +67,97 @@ export class EditarComponent implements OnInit {
         switchMap((params) => {
           this.postpetId = params.get('id');
           if (this.postpetId) {
-            return this.postpetService.getByIdUpdate(parseInt(this.postpetId));
+            return this.reportService.getForUpdate(parseInt(this.postpetId));
           }
           return of(null);
         })
       )
       .subscribe((data) => {
         this.postpet = data;
-        if (this.postpet) {
-          this.petNameField.setValue(this.postpet.petName);
-          this.petSpecieField.setValue(this.postpet.idPetSpecie);
-          let petSpecie1 = document.getElementById(
-            'especie1'
-          ) as HTMLInputElement;
-          let petSpecie2 = document.getElementById(
-            'especie2'
-          ) as HTMLInputElement;
-          if (petSpecie1.value) {
-            petSpecie1.click();
-          } else {
-            petSpecie2.click();
-          }
-          this.petBreedField.setValue(this.postpet.idPetBreed);
-          this.provinciaField.setValue(this.postpet.idProvincia);
-          this.cantonField.setValue(this.postpet.idCanton);
-          if (this.postpet.reward) {
-            this.rewardField.setValue(this.postpet.reward);
-          }
-          if (this.postpet.idSector) {
-            this.sectorField.setValue(this.postpet.idSector);
-          }
-          this.petAgeField.setValue(this.postpet.petAge);
-          this.petSpecialConditionField.setValue(
-            this.postpet.petSpecialCondition
-          );
-          if (this.postpet.contact) {
-            // match() devuelve null si solo hay espacios; ?? [] lo neutraliza
-            // antes de leer .length.
-            const numbers = this.postpet.contact.match(/\S+/g) ?? [];
-            if (numbers.length > 0) {
-              this.contactNumbers = numbers;
-              for (let i = 1; i < numbers.length; i++) {
-                this.addContactField();
-              }
-              this.contactField.patchValue(numbers);
-            }
-          }
-          this.descriptionField.setValue(this.postpet.description);
-          this.lastTimeSeenField.setValue(this.postpet.lastTimeSeen);
-          // CRÍTICO: clonar dos arrays independientes. imgUrls es lo que el
-          // uploader muta al subir/eliminar (se envía al backend al guardar);
-          // imgUrlsOrigin solo se usa para el @for "imagenes ya subidas" del
-          // template. Si comparten referencia, cada push del uploader mete la
-          // foto recién subida también en imgUrlsOrigin → el segundo @for la
-          // pinta otra vez y la imagen se ve duplicada en la UI.
-          this.imgUrls = this.postpet.urlImgs.map((img) => ({ ...img }));
-          this.imgUrlsOrigin = this.postpet.urlImgs.map((img) => ({ ...img }));
-
-          this.urlImgsField.clearValidators();
-          this.urlImgsField.updateValueAndValidity();
-        }
+        if (this.postpet) this.prefill(this.postpet);
       });
-    if (this.status === 'Encontrado' || this.status === 'EnAdopcion') {
-      this.petNameField.clearValidators();
-      this.petNameField.updateValueAndValidity();
+  }
+
+  // Precarga el formulario con el reporte. El tipo manda el del reporte (el del
+  // área es solo el valor inicial).
+  private prefill(report: reportUpdateView) {
+    this.type = report.type;
+    this.applyTypeRules();
+
+    this.petNameField.setValue(report.petName);
+    // Los radios tienen value="1"/"2" (string): con el número no marcan nada.
+    this.petSpecieField.setValue(String(report.idPetSpecie));
+    this.petBreedField.setValue(report.idPetBreed ?? '');
+    this.sexField.setValue(report.sex ?? 'Unknown');
+    this.petAgeField.setValue(report.petAge);
+    this.initialAge = ageFromBirthDate(report.birthDate);
+    this.ageYearsField.setValue(this.initialAge?.years ?? null);
+    this.ageMonthsField.setValue(this.initialAge?.months ?? null);
+
+    // idProvincia es derivada del cantón (solo lectura): precarga la cascada.
+    this.provinciaField.setValue(report.idProvincia);
+    this.cantonField.setValue(report.idCanton);
+    if (report.idSector) this.sectorField.setValue(report.idSector);
+    if (report.reward) this.rewardField.setValue(report.reward);
+
+    // match() devuelve null si solo hay espacios; ?? [] lo neutraliza.
+    const numbers = report.contact?.match(/\S+/g) ?? [];
+    if (numbers.length > 0) {
+      for (let i = 1; i < numbers.length; i++) this.addContactField();
+      this.contactField.patchValue(numbers);
     }
-    if (this.status === 'EnAdopcion' || this.status === 'NecesitadoDeAyuda') {
+    this.descriptionField.setValue(report.description);
+    this.lastTimeSeenField.setValue(report.lastTimeSeen);
+
+    // CRÍTICO: dos arrays independientes. imgUrls es lo que el uploader muta
+    // (se envía al guardar); imgUrlsOrigin solo alimenta el @for de "imágenes
+    // ya subidas". Si compartieran referencia, cada foto nueva se pintaría dos
+    // veces.
+    this.imgUrls = report.urlImgs.map((img) => ({ ...img }));
+    this.imgUrlsOrigin = report.urlImgs.map((img) => ({ ...img }));
+
+    this.urlImgsField.clearValidators();
+    this.urlImgsField.updateValueAndValidity();
+  }
+
+  private applyTypeRules() {
+    this.petNameField.setValidators(this.type === 'Perdida' ? this.nameValidators : this.nameValidators.slice(1));
+    this.petNameField.updateValueAndValidity();
+    if (requiresLastSeen(this.type)) {
+      this.lastTimeSeenField.setValidators([Validators.required, MyValidators.correctDate]);
+    } else {
       this.lastTimeSeenField.clearValidators();
-      this.lastTimeSeenField.updateValueAndValidity();
     }
+    this.lastTimeSeenField.updateValueAndValidity();
+  }
+
+  get showName(): boolean {
+    return this.type === 'Perdida' || this.type === 'Ayuda';
   }
 
   form: UntypedFormGroup;
-  @Input() status: PetStatus | null = null;
+  @Input() type: ReportType | null = null;
+
+  // Regla compartida con el backend (RequiresLastSeen), para la plantilla.
+  readonly requiresLastSeen = requiresLastSeen;
+
+  // El selector de mascota es solo de la creación: al editar no se cambia.
+  readonly myPets: petView[] = [];
+  readonly selectedPetId: number | null = null;
+  readonly usesExistingPet = false;
+  readonly selectedPet: petView | null = null;
+  selectPet(_: number | null) {}
+
+  // Edad precargada: si el usuario no la toca, se reenvía la fecha original (la
+  // conversión edad -> fecha pierde el día).
+  private initialAge: { years: number; months: number } | null = null;
+
+  private readonly nameValidators = [
+    Validators.required,
+    Validators.minLength(2),
+    Validators.maxLength(12),
+    Validators.pattern(/^[Aa-zA-ZáéíóúÁÉÍÓÚÑñ ]*$/),
+  ];
 
   // API unificada con la plantilla compartida pet-form (modo editar).
   submitLabel = 'Editar publicación';
@@ -165,26 +188,8 @@ export class EditarComponent implements OnInit {
   maxFourFiles: boolean = false;
 
   postpetId: string | null;
-  postpet!: UpdatePostpetView | null;
-  updatePost: UpdatePostpetDTO = {
-    idPostPet: null,
-    petName: null,
-    idCanton: null,
-    idPetBreed: null,
-    petAge: null,
-    petSpecialCondition: null,
-    contact: null,
-    idPetSpecie: null,
-    idProvincia: null,
-    idSector: null,
-
-    description: null,
-    reward: null,
-    lastTimeSeen: null,
-    urlImgs: null,
-  };
+  postpet!: reportUpdateView | null;
   publishingPost: boolean = false;
-  contactNumbers: string[] = [];
 
   maxFourContactNumbers: boolean = false;
 
@@ -200,8 +205,11 @@ export class EditarComponent implements OnInit {
         ],
       ],
       idPetSpecie: ['', Validators.required],
-      idPetBreed: [{ value: '', disabled: true }, Validators.required],
-      petAge: [null],
+      idPetBreed: [{ value: '', disabled: true }], // opcional
+      sex: ['Unknown' as PetSex],
+      petAge: [null, Validators.maxLength(20)],
+      ageYears: [null, [Validators.min(0), Validators.max(30)]],
+      ageMonths: [null, [Validators.min(0), Validators.max(11)]],
       petSpecialCondition: [null],
       contact: this.formBuilder.array([
         new UntypedFormControl('', [
@@ -249,81 +257,17 @@ export class EditarComponent implements OnInit {
 
   submit() {
     this.submitError = null;
-    if (this.form.valid && this.imgUrls.length > 0) {
+    if (this.postpet && this.form.valid && this.imgUrls.length > 0) {
       this.isLoading = true;
-      try {
-      this.updatePost.idPostPet = this.postpet.idPostPet;
-      this.updatePost.petName =
-        this.postpet.petName != this.petNameField.value
-          ? this.petNameField.value
-          : null;
-      this.updatePost.idPetSpecie =
-        this.postpet.idPetSpecie != this.petSpecieField.value
-          ? this.petSpecieField.value
-          : null;
-      this.updatePost.idPetBreed =
-        this.postpet.idPetBreed != this.petBreedField.value
-          ? this.petBreedField.value
-          : null;
-      this.updatePost.petAge =
-        this.postpet.petAge != this.petAgeField.value
-          ? this.petAgeField.value
-          : null;
-      this.updatePost.petSpecialCondition =
-        this.postpet.petSpecialCondition != this.petSpecialConditionField.value
-          ? this.petSpecialConditionField.value
-          : null;
-
-      this.updatePost.idProvincia =
-        this.postpet.idProvincia != this.provinciaField.value
-          ? this.provinciaField.value
-          : null;
-      this.updatePost.idCanton =
-        this.postpet.idCanton != this.cantonField.value
-          ? this.cantonField.value
-          : null;
-      this.updatePost.idSector =
-        this.postpet.idSector != this.sectorField.value
-          ? this.sectorField.value
-          : null;
-      this.updatePost.description =
-        this.postpet.description != this.descriptionField.value
-          ? this.descriptionField.value
-          : null;
-      this.updatePost.contact =
-        this.contactNumbers != this.contactField.value
-          ? this.contactField.value.join(' ')
-          : null;
-      this.updatePost.reward =
-        this.postpet.reward != this.rewardField.value
-          ? this.rewardField.value
-          : null;
-      this.updatePost.lastTimeSeen =
-        this.postpet.lastTimeSeen != this.lastTimeSeenField.value
-          ? this.lastTimeSeenField.value
-          : this.lastTimeSeenField.value;
-
-      if (!this.updatePost.idSector) {
-        this.updatePost.idSector = null;
-      }
-
-      if (!this.updatePost.reward) {
-        this.updatePost.reward = null;
-      }
-
-      this.updatePost.urlImgs = this.imgUrls;
-
       this.published = true;
-      this.postpetService.update(this.updatePost).subscribe({
+      this.reportService.update(this.buildDto(this.postpet)).subscribe({
         next: () => {
           this.isLoading = false;
           this.location.back();
         },
         error: (err) => {
-          // El servicio convierte 400 → "Post Id incorrecto" y otros → "Error
-          // del servidor". Sin este handler, isLoading se quedaba en true y el
-          // botón giraba para siempre (típico al editar con imágenes huérfanas
-          // que el backend rechaza al recibir url:null).
+          // Sin este handler, isLoading se quedaba en true y el botón giraba
+          // para siempre.
           this.isLoading = false;
           this.published = false;
           this.submitError =
@@ -333,15 +277,43 @@ export class EditarComponent implements OnInit {
           console.error('Error al actualizar la publicación:', err);
         },
       });
-      } catch (err) {
-        // Error sincrónico armando el payload (p.ej. postpet/user nulos).
-        this.isLoading = false;
-        this.published = false;
-        this.submitError = 'No pudimos preparar los cambios. Recarga la página e inténtalo de nuevo.';
-        console.error('Error preparando la actualización:', err);
-      }
     }
     this.form.markAllAsTouched();
+  }
+
+  // El update REEMPLAZA (D4): un campo ausente quedaría vacío. Por eso se manda
+  // el formulario completo, y los campos sin control en la UI (señas
+  // particulares, coordenadas, y el nombre/edad cuando el tipo los oculta)
+  // viajan tal como llegaron en el prefill.
+  private buildDto(report: reportUpdateView): UpdateReportDTO {
+    const v = this.form.getRawValue();
+    const type = report.type;
+    const lost = type === 'Perdida';
+
+    const ageUnchanged =
+      (this.initialAge?.years ?? null) === (v.ageYears ?? null) &&
+      (this.initialAge?.months ?? null) === (v.ageMonths ?? null);
+
+    return {
+      idReport: report.idReport,
+      petName: this.showName ? v.petName || null : report.petName,
+      idPetSpecie: Number(v.idPetSpecie),
+      idPetBreed: v.idPetBreed ? Number(v.idPetBreed) : null,
+      sex: v.sex ?? 'Unknown',
+      petAge: lost ? null : type === 'Encontrada' ? report.petAge : v.petAge || null,
+      birthDate: !lost ? null : ageUnchanged ? report.birthDate : birthDateFromAge(v.ageYears, v.ageMonths),
+      petSpecialCondition: report.petSpecialCondition,
+      description: v.description,
+      contact: (this.contactField.value as string[]).filter((n) => n).join(' '),
+      reward: lost && v.reward ? Number(v.reward) : null,
+      lastTimeSeen: requiresLastSeen(type) ? v.lastTimeSeen : null,
+      idCanton: Number(v.idCanton),
+      idSector: v.idSector ? Number(v.idSector) : null,
+      lat: report.lat,
+      lng: report.lng,
+      // `file` es solo de la UI.
+      urlImgs: this.imgUrls.map(({ idImage, url }) => ({ idImage: idImage ?? null, url: url ?? null })),
+    };
   }
 
   // Firma ampliada por la plantilla compartida; en modo editar siempre llega updateImg[].
@@ -401,9 +373,7 @@ export class EditarComponent implements OnInit {
   private getBreedsBySpecie() {
     this.petSpecieField.valueChanges
       .pipe(
-        switchMap((id) => {
-          return this.categoryService.getBreedsBySpecie(id);
-        })
+        switchMap((id) => (id ? this.categoryService.getBreedsBySpecie(id) : of([] as breed[])))
       )
       .subscribe((breeds: breed[]) => (this.breeds = breeds));
   }
@@ -565,6 +535,18 @@ export class EditarComponent implements OnInit {
 
   get petAgeField() {
     return this.form.get('petAge');
+  }
+
+  get sexField() {
+    return this.form.get('sex');
+  }
+
+  get ageYearsField() {
+    return this.form.get('ageYears');
+  }
+
+  get ageMonthsField() {
+    return this.form.get('ageMonths');
   }
 
   get petAgeFieldValid() {

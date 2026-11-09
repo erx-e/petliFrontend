@@ -21,6 +21,8 @@ a {
 
 .ownerActions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: var(--space-2);
 }
@@ -39,6 +41,15 @@ a {
   font-weight: 600;
   color: var(--ink);
   background-color: var(--yellow);
+  border-radius: var(--radius-sm);
+}
+
+// Resolver: la acción feliz del dueño ("¡Está en casa!").
+.resolveButton {
+  padding: var(--space-2) var(--space-3);
+  font-weight: 600;
+  background-color: var(--green);
+  color: var(--white);
   border-radius: var(--radius-sm);
 }
 
@@ -98,18 +109,28 @@ a {
   font-weight: 700;
   color: var(--white);
 }
-.state--Buscado {
+.state--Perdida {
   background-color: var(--red);
 }
-.state--Encontrado {
+.state--Encontrada {
   background-color: var(--green);
 }
-.state--EnAdopcion {
+.state--Adopcion {
   background-color: var(--yellow);
   color: var(--ink);
 }
-.state--NecesitadoDeAyuda {
+.state--Ayuda {
   background-color: var(--blue);
+}
+// Reporte resuelto ("¡En casa!", adoptado...): un final feliz, no una alerta.
+.state--Resuelto {
+  background-color: var(--grey);
+}
+
+.resolvedNote {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--grey);
 }
 
 .pet-title {
@@ -396,6 +417,10 @@ a {
   color: var(--white);
   background-color: var(--red);
   border: 1px solid var(--red);
+}
+.delete-dialog__confirm--positive {
+  background-color: var(--green);
+  border-color: var(--green);
 }
 .delete-dialog__confirm:hover:not(:disabled) {
   filter: brightness(1.1);

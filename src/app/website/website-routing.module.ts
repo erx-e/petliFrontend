@@ -60,8 +60,10 @@ const routes: Routes = [
         loadChildren: () =>
           import("./pages/ayuda/ayuda.module").then((m) => m.AyudaModule),
       },
+      // Detalle de un reporte. Era "pet/:id"; desde v2 "pet" es el carné de la
+      // mascota (rebanada 2), así que el reporte tiene su propia ruta (D17).
       {
-        path: "pet/:id",
+        path: "reporte/:id",
         component: PetDetailComponent,
       },
       // Comodín DENTRO del layout: cualquier ruta no encontrada se muestra con

@@ -1,6 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { PetStatus, postpetView } from 'src/app/models/postpet.model';
+import {
+  ReportStatus,
+  ReportType,
+  reportView,
+  requiresLastSeen,
+} from 'src/app/models/report.model';
 import {
   breed,
   canton,
@@ -9,7 +14,7 @@ import {
 } from '../../../models/category.model';
 import { switchMap } from 'rxjs/operators';
 import { CategoryService } from 'src/app/services/category.service';
-import { PostpetService } from 'src/app/services/postpet.service';
+import { ReportService } from 'src/app/services/report.service';
 import { Observable, Subscription } from 'rxjs';
 import { MyValidators } from 'src/app/validators/validators';
 import { NoScrollService } from '../../../services/no-scroll.service';
@@ -24,7 +29,7 @@ import { LoadingService } from 'src/app/services/loading.service';
 })
 export class FilterComponent implements OnInit {
   constructor(
-    private postpetService: PostpetService,
+    private reportService: ReportService,
     private formBuilder: UntypedFormBuilder,
     private categoryService: CategoryService,
     private noScrollService: NoScrollService,
@@ -34,8 +39,16 @@ export class FilterComponent implements OnInit {
     this.buildForm();
   }
 
-  @Input() status: PetStatus | null = null;
+  // Tipo de reporte del área (adopta/encuentra/difunde/ayuda). null = todos
+  // (perfiles de usuario).
+  @Input() type: ReportType | null = null;
+  // Estado a listar. null = el backend asume Activo (el feed público). "Mis
+  // publicaciones" usa dos filtros: Activo y Resuelto (D6).
+  @Input() status: ReportStatus | null = null;
   @Input() userId: number = null;
+
+  // Regla compartida con el backend (RequiresLastSeen), para la plantilla.
+  readonly requiresLastSeen = requiresLastSeen;
 
   petSpecieId: number | null = null;
   petBreedId: number | null = null;
@@ -52,7 +65,7 @@ export class FilterComponent implements OnInit {
   sectores: sector[] = [];
 
   form: UntypedFormGroup;
-  postspet: postpetView[] = null;
+  postspet: reportView[] = null;
   limit: number = 12;
   offset: number = 0;
   filter: boolean = false;
@@ -140,20 +153,8 @@ export class FilterComponent implements OnInit {
   }
 
   async getPosts() {
-    this.postpetService
-      .GetByFilter(
-        this.status,
-        this.petSpecieId,
-        this.petBreedId,
-        this.provinciaId,
-        this.cantonId,
-        this.sectorId,
-        this.userId,
-        this.date,
-        this.order,
-        this.limit,
-        this.offset
-      )
+    this.reportService
+      .getByFilter(this.currentFilter(), this.limit, this.offset)
       .subscribe((data) => {
         this.postspet = [];
         if (data) {
@@ -172,20 +173,8 @@ export class FilterComponent implements OnInit {
 
   onLoadMore() {
     this.isLoadingMore = true;
-    this.postpetService
-      .GetByFilter(
-        this.status,
-        this.petSpecieId,
-        this.petBreedId,
-        this.provinciaId,
-        this.cantonId,
-        this.sectorId,
-        this.userId,
-        this.date,
-        this.order,
-        this.limit,
-        this.offset
-      )
+    this.reportService
+      .getByFilter(this.currentFilter(), this.limit, this.offset)
       .subscribe((data) => {
         if (data) {
           this.isLoadingMore = false;
@@ -198,6 +187,21 @@ export class FilterComponent implements OnInit {
           this.offset += this.limit;
         }
       });
+  }
+
+  private currentFilter() {
+    return {
+      type: this.type,
+      status: this.status,
+      petSpecieId: this.petSpecieId,
+      petBreedId: this.petBreedId,
+      provinciaId: this.provinciaId,
+      cantonId: this.cantonId,
+      sectorId: this.sectorId,
+      userId: this.userId,
+      date: this.date,
+      order: this.order,
+    };
   }
 
   private buildForm() {

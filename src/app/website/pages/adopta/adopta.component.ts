@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { PetStatus } from "src/app/models/postpet.model";
+import { ReportType } from "src/app/models/report.model";
 
 @Component({
     selector: 'app-adopta',
-    template: `<app-filter [status]="status"></app-filter>`,
+    template: `<app-filter [type]="type"></app-filter>`,
     standalone: false
 })
 export class AdoptaComponent implements OnInit {
@@ -12,5 +12,5 @@ export class AdoptaComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  status: PetStatus = "EnAdopcion";
+  type: ReportType = "Adopcion";
 }

@@ -1,9 +1,9 @@
 import { Component, OnInit } from "@angular/core";
-import { PetStatus } from "src/app/models/postpet.model";
+import { ReportType } from "src/app/models/report.model";
 
 @Component({
     selector: "app-publicar",
-    template: `<app-publish [status]="status"></app-publish>`,
+    template: `<app-publish [type]="type"></app-publish>`,
     standalone: false
 })
 export class PublicarComponent implements OnInit {
@@ -11,5 +11,5 @@ export class PublicarComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  status: PetStatus = "NecesitadoDeAyuda";
+  type: ReportType = "Ayuda";
 }

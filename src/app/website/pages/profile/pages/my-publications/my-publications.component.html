@@ -1,3 +1,8 @@
 <div class="publicationPage">
-  <app-filter [userId]="user.idUser" ></app-filter>
+  <!-- Dos listados (D6): el feed público solo muestra activas, y el dueño
+       también tiene que poder ver lo que ya resolvió. -->
+  <h2 class="publicationPage__title">Activas</h2>
+  <app-filter [userId]="user.idUser" status="Activo"></app-filter>
+  <h2 class="publicationPage__title">Resueltas</h2>
+  <app-filter [userId]="user.idUser" status="Resuelto"></app-filter>
 </div>

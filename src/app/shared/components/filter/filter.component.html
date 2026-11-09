@@ -119,10 +119,10 @@
                   </select>
                 </div>
               }
-              @if (status === 'Buscado' || status === 'Encontrado') {
+              @if (requiresLastSeen(type)) {
                 <div class="form-filter-element">
                   <label class="form-label" for="formLastTime"
-                    >Visto por última vez</label
+                    >Visto desde</label
                     >
                     <input
                       class="form-control"
@@ -145,7 +145,6 @@
                       </div>
                     </div>
                   }
-                  @if (status === 'Buscado' || status === 'Encontrado') {
                     <div class="form-filter-element">
                       <label class="form-label" for="order">Ordenar por</label>
                       <select
@@ -154,11 +153,10 @@
                         name="order"
                         id="order"
                         >
-                        <option value="0">Vistos (más recientes)</option>
-                        <option value="1">Vistos (más antiguos)</option>
+                        <option value="0">Más recientes</option>
+                        <option value="1">Más antiguos</option>
                       </select>
                     </div>
-                  }
                   }
                   <div class="submitButtons">
                     <a
@@ -211,16 +209,16 @@
                         </svg>
                       </i>
                       <a routerLink="publicar" class="publicPet show-mobile"
-                        >@if (status === 'Encontrado') {
+                        >@if (type === 'Encontrada') {
                         <span>Publica una mascota que encontraste</span
                           >
-                        }@if (status === 'Buscado') {
+                        }@if (type === 'Perdida') {
                         <span>Publica tu mascota perdida</span>
                       }
-                      @if (status === 'EnAdopcion') {
+                      @if (type === 'Adopcion') {
                         <span>Publica una mascota en adopción</span>
                       }
-                      @if (status === 'NecesitadoDeAyuda') {
+                      @if (type === 'Ayuda') {
                         <span
                           >Publica un caso que necesita ayuda</span
                           >
@@ -341,10 +339,10 @@
                                           </select>
                                         </div>
                                       }
-                                      @if (status === 'Buscado' || status === 'Encontrado') {
+                                      @if (requiresLastSeen(type)) {
                                         <div class="form-filter-element">
                                           <label class="form-label" for="formLastTime"
-                                            >Visto por última vez</label
+                                            >Visto desde</label
                                             >
                                             <input
                                               class="form-control"
@@ -367,7 +365,6 @@
                                               </div>
                                             </div>
                                           }
-                                          @if (status === 'Buscado' || status === 'Encontrado') {
                                             <div class="form-filter-element">
                                               <label class="form-label" for="order">Ordenar por</label>
                                               <select
@@ -376,11 +373,10 @@
                                                 name="order"
                                                 id="order"
                                                 >
-                                                <option value="0">Vistos (más recientes)</option>
-                                                <option value="1">Vistos (más antiguos)</option>
+                                                <option value="0">Más recientes</option>
+                                                <option value="1">Más antiguos</option>
                                               </select>
                                             </div>
-                                          }
                                           }
                   <div class="submitButtons">
                                             <a
@@ -422,16 +418,16 @@
                                       <div class="post-container" [class.profilePostsContainer] = "userId">
                                         @if (!userId) {
                                           <a routerLink="publicar" class="publicPet hide-mobile"
-                                            >@if (status === 'Encontrado') {
+                                            >@if (type === 'Encontrada') {
                                             <span>Publica una mascota que encontraste</span
                                               >
-                                            }@if (status === 'Buscado') {
+                                            }@if (type === 'Perdida') {
                                             <span>Publica tu mascota perdida</span>
                                           }
-                                          @if (status === 'EnAdopcion') {
+                                          @if (type === 'Adopcion') {
                                             <span>Publica una mascota en adopción</span>
                                           }
-                                          @if (status === 'NecesitadoDeAyuda') {
+                                          @if (type === 'Ayuda') {
                                             <span
                                               >Publica un caso que necesita ayuda</span
                                               >

@@ -10,7 +10,7 @@ interface CacheEntry {
  * Caché en memoria de respuestas GET con:
  * - TTL por entrada (cada respuesta caduca por su cuenta).
  * - Tope de tamaño con desalojo LRU (la menos usada se va primero).
- * - Invalidación granular por recurso (ej. solo "postpet").
+ * - Invalidación granular por recurso (ej. solo "report").
  */
 @Injectable({
   providedIn: 'root',
@@ -38,7 +38,7 @@ export class CacheService {
     }
   }
 
-  /** Invalida las entradas cuyo URL contenga `/<resource>` (granular, p. ej. "postpet"). */
+  /** Invalida las entradas cuyo URL contenga `/<resource>` (granular, p. ej. "report"). */
   invalidateResource(resource: string) {
     const needle = `/${resource}`;
     for (const key of [...this.store.keys()]) {

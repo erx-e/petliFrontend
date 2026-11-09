@@ -1,12 +1,12 @@
 import { Component, OnInit } from "@angular/core";
-import { PetStatus } from "src/app/models/postpet.model";
+import { ReportType } from "src/app/models/report.model";
 
 @Component({
     selector: "app-encuentra",
-    template: `<app-filter [status]="status"></app-filter>`,
+    template: `<app-filter [type]="type"></app-filter>`,
     standalone: false
 })
 export class DifundeComponent implements OnInit {
   ngOnInit(): void {}
-  status: PetStatus = "Buscado";
+  type: ReportType = "Perdida";
 }

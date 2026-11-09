@@ -2,37 +2,13 @@
   <div class="navButtons" *ngIf="postpet && user; else elseNav">
     <button class="backBotton" (click)="goToBack()">← Volver</button>
     <div class="ownerActions" *ngIf="user.idUser == postpet.idUser">
-      <div [ngSwitch]="postpet.status" [style.display]="'inline'">
-        <button
-          *ngSwitchCase="'Encontrado'"
-          [routerLink]="['/encuentra/editar', postpetId]"
-          class="editButton"
-        >
-          Editar
+      @if (!isResolved) {
+        <button (click)="askConfirm('resolve')" class="resolveButton">
+          {{ resolveLabel }}
         </button>
-        <button
-          *ngSwitchCase="'Buscado'"
-          [routerLink]="['/difunde/editar', postpetId]"
-          class="editButton"
-        >
-          Editar
-        </button>
-        <button
-          *ngSwitchCase="'NecesitadoDeAyuda'"
-          [routerLink]="['/ayuda/editar', postpetId]"
-          class="editButton"
-        >
-          Editar
-        </button>
-        <button
-          *ngSwitchCase="'EnAdopcion'"
-          [routerLink]="['/adopta/editar', postpetId]"
-          class="editButton"
-        >
-          Editar
-        </button>
-      </div>
-      <button (click)="deletePost()" class="deleteButton">Eliminar</button>
+      }
+      <button [routerLink]="editLink" class="editButton">Editar</button>
+      <button (click)="askConfirm('delete')" class="deleteButton">Eliminar</button>
     </div>
   </div>
   <ng-template #elseNav>
@@ -74,9 +50,10 @@
         </swiper-container>
 
         <div class="petData">
-          <span class="stateBadge" [class]="'state--' + postpet.status">{{
-            stateLabel
-          }}</span>
+          <span [class]="stateClass">{{ stateLabel }}</span>
+          @if (isResolved && resolvedAt) {
+            <p class="resolvedNote">Resuelto el {{ resolvedAt }}</p>
+          }
 
           <h1 class="pet-title">
             {{
@@ -93,8 +70,11 @@
             @if (postpet.petBreed) {
               <span class="chip">{{ postpet.petBreed | titlecase }}</span>
             }
-            @if (postpet.petAge) {
-              <span class="chip">{{ postpet.petAge | titlecase }}</span>
+            @if (sexText) {
+              <span class="chip">{{ sexText }}</span>
+            }
+            @if (ageText) {
+              <span class="chip">{{ ageText }}</span>
             }
           </div>
 
@@ -115,8 +95,7 @@
             </li>
 
             @if (
-              (postpet.status === 'Buscado' || postpet.status === 'Encontrado') &&
-              lastTimeSeen
+              requiresLastSeen(postpet.type) && lastTimeSeen
             ) {
               <li>
                 <svg class="fact-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -125,13 +104,13 @@
                   />
                 </svg>
                 <span
-                  >{{ postpet.status === "Encontrado" ? "Encontrado" : "Visto" }} el
+                  >{{ postpet.type === "Encontrada" ? "Encontrado" : "Visto" }} el
                   {{ lastTimeSeen }}</span
                 >
               </li>
             }
 
-            @if (postpet.status === 'Buscado' && postpet.reward) {
+            @if (postpet.type === 'Perdida' && postpet.reward) {
               <li class="fact--reward">
                 <svg class="fact-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -160,7 +139,7 @@
           @if (postpet.contact && contactNum.length) {
             <section class="pet-section">
               <h2 class="pet-section__title">
-                @if (postpet.status === 'Buscado' || postpet.status === 'Encontrado') {
+                @if (requiresLastSeen(postpet.type) && !isResolved) {
                   ¿Tienes información?
                 } @else {
                   Contacto
@@ -206,7 +185,7 @@
     </div>
   </ng-template>
 
-  @if (showDeleteConfirm) {
+  @if (confirmAction) {
     <div
       class="delete-dialog"
       role="dialog"
@@ -218,31 +197,45 @@
         type="button"
         class="delete-dialog__scrim"
         aria-label="Cerrar diálogo"
-        (click)="cancelDelete()"
-        [disabled]="isDeleting"
+        (click)="cancelConfirm()"
+        [disabled]="isWorking"
       ></button>
       <div class="delete-dialog__panel">
-        <h2 id="delete-dialog-title" class="delete-dialog__title">
-          ¿Eliminar esta publicación?
-        </h2>
-        <p id="delete-dialog-desc" class="delete-dialog__body">
-          @if (postpet?.petName) {
-            Esta acción no se puede deshacer. Se eliminarán las fotos y los datos
-            de <strong>{{ postpet.petName | titlecase }}</strong>.
-          } @else {
-            Esta acción no se puede deshacer. Se eliminarán las fotos y los datos
-            de la publicación.
-          }
-        </p>
-        @if (deleteError) {
-          <p class="delete-dialog__error" role="alert">{{ deleteError }}</p>
+        @if (confirmAction === 'delete') {
+          <h2 id="delete-dialog-title" class="delete-dialog__title">
+            ¿Eliminar esta publicación?
+          </h2>
+          <p id="delete-dialog-desc" class="delete-dialog__body">
+            Esta acción no se puede deshacer. Se eliminarán los datos de la publicación.
+            @if (postpet?.type === 'Perdida') {
+              La ficha de <strong>{{ (postpet.petName | titlecase) || 'tu mascota' }}</strong>
+              y sus fotos se conservan.
+            } @else {
+              También se eliminarán sus fotos.
+            }
+          </p>
+        } @else {
+          <h2 id="delete-dialog-title" class="delete-dialog__title">
+            @if (postpet?.type === 'Perdida') {
+              ¿{{ (postpet.petName | titlecase) || 'Tu mascota' }} ya está en casa?
+            } @else {
+              ¿Marcar como resuelta?
+            }
+          </h2>
+          <p id="delete-dialog-desc" class="delete-dialog__body">
+            La publicación dejará de aparecer en los listados y no se puede volver a
+            activar. Si vuelve a pasar, crea una publicación nueva.
+          </p>
+        }
+        @if (actionError) {
+          <p class="delete-dialog__error" role="alert">{{ actionError }}</p>
         }
         <div class="delete-dialog__actions">
           <button
             type="button"
             class="delete-dialog__cancel"
-            (click)="cancelDelete()"
-            [disabled]="isDeleting"
+            (click)="cancelConfirm()"
+            [disabled]="isWorking"
             autofocus
           >
             Cancelar
@@ -250,15 +243,16 @@
           <button
             type="button"
             class="delete-dialog__confirm"
-            (click)="confirmDelete()"
-            [disabled]="isDeleting"
+            [class.delete-dialog__confirm--positive]="confirmAction === 'resolve'"
+            (click)="confirm()"
+            [disabled]="isWorking"
             aria-live="polite"
           >
-            @if (!isDeleting) {
-              <span>Sí, eliminar</span>
+            @if (!isWorking) {
+              <span>{{ confirmAction === 'delete' ? 'Sí, eliminar' : 'Sí, resolver' }}</span>
             } @else {
               <span class="delete-dialog__spinner" aria-hidden="true"></span>
-              <span>Eliminando…</span>
+              <span>{{ confirmAction === 'delete' ? 'Eliminando…' : 'Guardando…' }}</span>
             }
           </button>
         </div>

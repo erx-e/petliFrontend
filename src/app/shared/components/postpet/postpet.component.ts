@@ -1,8 +1,10 @@
 import { Component, OnInit, Input } from "@angular/core";
 import {
-  PET_STATUS_LABELS,
-  postpetView,
-} from "src/app/models/postpet.model";
+  REPORT_TYPE_LABELS,
+  RESOLVED_LABELS,
+  reportView,
+  requiresLastSeen,
+} from "src/app/models/report.model";
 import { formatDistance, subDays } from "date-fns";
 import es from "date-fns/locale/es";
 import { RouterLink } from "@angular/router";
@@ -19,7 +21,8 @@ import { SharedModule } from "../../shared.module";
 export class PostpetComponent implements OnInit {
   constructor() {}
 
-  @Input() postpet: postpetView | null;
+  // Tarjeta de un reporte (el nombre del componente viene de v1).
+  @Input() postpet: reportView | null;
   @Input() home: boolean = false;
   lastTimeSeen: string = null;
 
@@ -28,8 +31,10 @@ export class PostpetComponent implements OnInit {
   // booleano; no necesitamos un Set como en el detalle.
   imgFailed = false;
 
+  readonly requiresLastSeen = requiresLastSeen;
+
   ngOnInit(): void {
-    if (this.postpet) {
+    if (this.postpet?.lastTimeSeen) {
       this.lastTimeSeen = formatDistance(
         new Date(this.postpet.lastTimeSeen),
         new Date(),
@@ -42,11 +47,20 @@ export class PostpetComponent implements OnInit {
     this.imgFailed = true;
   }
 
-  // Etiqueta del estado del post, para el badge de la tarjeta. El backend ya no
-  // manda un texto de estado (`petState` venia de la tabla pet_state, que se
-  // elimino), asi que se deriva del enum con el mapa compartido.
+  // Etiqueta del badge: el tipo, o cómo terminó si ya está resuelto. El backend
+  // manda los enums por nombre; el texto lo pone la UI.
   get stateLabel(): string {
-    const status = this.postpet?.status;
-    return status ? PET_STATUS_LABELS[status] ?? "" : "";
+    const report = this.postpet;
+    if (!report) return "";
+    return report.status === "Resuelto"
+      ? RESOLVED_LABELS[report.type] ?? ""
+      : REPORT_TYPE_LABELS[report.type] ?? "";
+  }
+
+  // Clase del badge: state--<ReportType>, o state--Resuelto.
+  get stateClass(): string {
+    const report = this.postpet;
+    if (!report) return "";
+    return "stateBadge state--" + (report.status === "Resuelto" ? "Resuelto" : report.type);
   }
 }
