@@ -71,7 +71,11 @@ When adding a new service method, decide deliberately whether it needs `checkTok
 
 ### Image uploads (S3)
 
-`S3StorageService` does direct-to-S3 uploads **without AWS credentials in the frontend**. Two-step flow: (1) `getPresignedUploadUrl()` asks the backend (which holds the credentials) for a signed URL; (2) `uploadToPresignedUrl()` PUTs the file directly to S3 — this request deliberately does **not** use `checkToken()` (S3 validates the URL signature). Deletion also goes through the backend. The uploader UI lives in `shared/components/uploader/`.
+`S3StorageService` does direct-to-S3 uploads **without AWS credentials in the frontend**. Two-step flow: (1) `getPresignedUploadUrl(contentType)` asks the backend for a signed URL — **the backend names the file** and returns it as `key` (never invent a name here); (2) `uploadToPresignedUrl()` PUTs the file directly to S3 — this request deliberately does **not** use `checkToken()` (S3 validates the URL signature).
+
+**Photos travel by name (`key`), never by URL** (`PL-X10`). A signed upload stays *pending* in the user's name for 24 h; forms send the keys (`imageKeys`, `petImageKeys`) and the backend only accepts the caller's own unused pending uploads (30 pending max → 429). `deleteImage(key)` only **discards a pending upload** (a photo uploaded and removed before saving); a saved photo is removed by sending the full list without it.
+
+The uploader (`shared/components/uploader/`) has **one mode**: `[initial]` takes the saved photos (`imgView[]`, `{ key, url }`), and `(keysChange)` emits the full ordered list of keys after every change — that list goes straight into the DTO; the first is the primary. Each photo is an `<app-upload-task>`: a new `file` uploads on init and is discarded on the server if removed or left unsaved; an `existing` one only leaves the list. Set `[published]` to true when the form saves, so the tasks don't discard linked uploads on destroy. The input id is per instance: two uploaders can share a page.
 
 ### Routing & module structure
 
@@ -98,14 +102,22 @@ received as the **enum name**:
 - The feature pages are thin wrappers that pass their `type` into the shared `FilterComponent`,
   `PublishComponent` (`<app-publish>`) and `EditarComponent` (`<app-editar>`).
 - **Publishing a `Perdida`**: `<app-publish>` loads `GET /pet/mine` and offers the user's pets that are
-  not already lost; choosing one sends only `idPet` + the event fields (the backend **rejects** animal
-  data or photos with an existing pet). "Otra mascota" creates the pet and its report in one request.
+  not already lost (`?pet=ID` preselects one: "Reportar como perdida" from "Mis mascotas"); choosing one
+  sends `idPet` + the event fields (the backend **rejects** animal data with an existing pet). "Otra
+  mascota" creates the pet and its report in one request; its photos go to the pet card (`petImageKeys`).
+- **Photos of a report linked to a pet** (a `Perdida`): the shared template offers "Las de la ficha de X"
+  / "Otras fotos para este reporte" (`photoMode`). Every report may have its own photos (`imageKeys`); a
+  `Perdida` without them shows its pet's card. When publishing, the card photos are a preview only; when
+  editing, they are editable too (`petImageKeys`, F9), and switching back to the card clears the
+  report's own photos on save (the form warns). Both uploaders stay mounted (`[hidden]`), so switching
+  doesn't lose uploads. The form requires at least one *visible* photo (`photosMissing`).
 - **Sex** is a form control now (`Unknown` / `Male` / `Female`). **Breed is optional.** The province is a
   UI-only cascade: it is **never sent** (the backend derives it from the canton; `getUpdate` returns a
   read-only `idProvincia` to prefill it).
 - **`PUT /report/update` replaces, it does not merge**: a missing field is cleared. `EditarComponent`
   therefore sends the whole form and passes through, unchanged, the fields it has no control for
-  (`petSpecialCondition`, `lat`/`lng`, and name/age when the type hides them). Images still go by delta.
+  (`petSpecialCondition`, `lat`/`lng`, and name/age when the type hides them). Photos go as full lists
+  of keys: absent = untouched, `[]` = remove all.
 - The feed only shows `Activo` reports (the backend default). The report detail lets the owner
   **resolve** (`PUT /report/resolve/{id}`; "¡Está en casa!" for a `Perdida`) — final, with a confirm
   dialog. "Mis publicaciones" renders two `<app-filter>`: `status="Activo"` and `status="Resuelto"`.
@@ -152,16 +164,29 @@ DTO conventions in `models/report.model.ts`: `*View` interfaces are read shapes 
 backend's own rule:
 
 - `reportView` — list and detail (`/report/getByFilter`, `/report/get/{id}`), with the animal data
-  already unified (from the pet for a `Perdida`, inline otherwise). Images are `imgView` (`{ url }`).
-- `reportUpdateView` — prefill for `GET /report/getUpdate/{id}`; images are `editableImgView`
-  (`{ idImage, url }`).
+  already unified (from the pet for a `Perdida`, inline otherwise). Images are `imgView` (`{ key, url }`),
+  already the *effective* photos (own, else the pet's card).
+- `reportUpdateView` — prefill for `GET /report/getUpdate/{id}`; `reportImages` (own) and `petImages`
+  (a `Perdida`'s card) as separate lists.
 - `CreateReportDTO` / `UpdateReportDTO` — write bodies. Neither carries `idUser` (the owner comes from
   the JWT) nor `idProvincia`.
 - `reportMutationView` — what create / update / resolve return.
 - `mapPointView` — map pins from `GET /report/getMapPoints`.
-- `petView` — `GET /pet/mine` (`PetService`), with the derived `isLost`.
+- `petView` — `GET /pet/mine` and the pet create/update response (`PetService`), with the derived
+  `isLost` / `lostReportId` and `idProvincia` (to prefill the cascade).
+- `PetCardDTO` — body of `POST /pet/create` and `PUT /pet/update` (with `idPet`); `imageKeys` is the full
+  list, first = primary.
 
-`updateImg` images carry an optional `file` for newly added uploads vs. existing `idImage`/`url`.
+### My pets (`profile/pets`, ADR-16)
+
+**Private**: only the owner sees their pets; a pet shows up in public only through its report.
+`MyPetsComponent` lists the cards (`GET /pet/mine`) with "Editar ficha", "Ver su reporte" (when lost) or
+"Reportar como perdida" (→ `difunde/publicar?pet=ID`). `PetFormComponent` serves both `pets/new`
+(`POST /pet/create`) and `pets/edit/:id` (`PUT /pet/update`, which **replaces** the card and its zone);
+editing finds the pet in `GET /pet/mine` (there is no get-by-id). It is built from two reusable pieces in
+`SharedModule`: `<app-animal-fields>` (name, species, breed, sex, age → `birthDate`) and
+`<app-zone-fields>` (provincia → cantón → sector), both bound to the parent's `FormGroup`. The report
+forms still have their own copy of that markup (migrating them is a separate change).
 
 ## Design system
 
@@ -169,4 +194,4 @@ backend's own rule:
 
 ## Environment
 
-`src/environments/environment.ts` (and `.prod.ts`) hold `API_URL` (backend) and `BUCKET_URL` (public S3 bucket). AWS credentials live only on the backend, never here.
+`src/environments/environment.ts` (and `.prod.ts`) hold `API_URL` (backend). There is no bucket URL any more: every photo arrives with its full `url` from the API. AWS credentials live only on the backend, never here.

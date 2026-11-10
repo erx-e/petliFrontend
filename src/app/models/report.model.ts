@@ -79,14 +79,10 @@ export const PET_SEX_LABELS: Record<PetSex, string> = {
 // OJO con lat/lng: el backend exige ambos o ninguno (400 si llega uno solo).
 // Rangos: lat [-90, 90], lng [-180, 180].
 
-/** Imagen en una vista de lectura: solo la url. */
+/** Una foto en una respuesta: su nombre de archivo (`key`, lo que se manda de
+ *  vuelta al editar) y su URL pública (`url`, lo que se muestra). */
 export interface imgView {
-  url: string;
-}
-
-/** Imagen editable (prefill de edición): con su id, para quitarla o reemplazarla. */
-export interface editableImgView {
-  idImage: number;
+  key: string;
   url: string;
 }
 
@@ -155,7 +151,11 @@ export interface reportUpdateView {
   idSector: number | null;
   lat: number | null;
   lng: number | null;
-  urlImgs: editableImgView[];
+  /** Fotos propias del reporte (se editan con `imageKeys`). */
+  reportImages: imgView[];
+  /** Solo Perdida: las de la ficha de su mascota, principal primero (se editan
+   *  con `petImageKeys`). */
+  petImages: imgView[];
 }
 
 /** Respuesta de create / update / resolve (ReportMutationView). */
@@ -169,8 +169,10 @@ export interface reportMutationView {
 
 /** Body de POST /report/create. Reglas por tipo (el backend RECHAZA con 400 lo
  *  que no corresponde, en vez de ignorarlo):
- *  - Perdida con pet nuevo: petName + idPetSpecie; la edad va como birthDate.
- *  - Perdida con pet existente (idPet): SIN datos del animal ni urlImgs.
+ *  - Perdida con pet nuevo: petName + idPetSpecie; la edad va como birthDate;
+ *    sus fotos van a la ficha (`petImageKeys`).
+ *  - Perdida con pet existente (idPet): SIN datos del animal; puede llevar fotos
+ *    propias del reporte (`imageKeys`); si no, muestra las de la ficha.
  *  - Encontrada / Adopcion / Ayuda: idPetSpecie; petAge libre; sin birthDate.
  *  - reward solo en Perdida. La provincia NO se envía (se deriva del cantón).
  *  No lleva idUser: el dueño sale del JWT. */
@@ -192,13 +194,19 @@ export interface CreateReportDTO {
   idSector?: number | null;
   lat?: number | null;
   lng?: number | null;
-  urlImgs: createImgDTO[];
+  /** Fotos propias del reporte, por nombre de archivo (los `key` que devolvió
+   *  la subida firmada; nunca URLs). */
+  imageKeys?: string[];
+  /** Fotos de la ficha de la mascota nueva (solo Perdida sin idPet). La primera
+   *  es la principal. */
+  petImageKeys?: string[];
 }
 
 /** Body de PUT /report/update. REEMPLAZA los campos editables: un campo ausente
  *  queda vacío en el backend, así que se manda SIEMPRE el formulario completo
  *  (incluidos los campos sin control en la UI, tal como llegaron en el prefill).
- *  `type` no va: es inmutable. Las imágenes sí van por delta (ver updateImg). */
+ *  `type` no va: es inmutable. Las fotos van como LISTA COMPLETA de nombres:
+ *  lo que falta se borra; ausente = no tocar. */
 export interface UpdateReportDTO {
   idReport: number;
   petName: string | null;
@@ -216,7 +224,9 @@ export interface UpdateReportDTO {
   idSector: number | null;
   lat: number | null;
   lng: number | null;
-  urlImgs: updateImg[];
+  imageKeys?: string[];
+  /** Solo Perdida: lista completa de fotos de la ficha de su mascota. */
+  petImageKeys?: string[];
 }
 
 /** Filtros de GET /report/getByFilter. `status` vale Activo si no se envía. */
@@ -242,20 +252,10 @@ export interface MapBounds {
   maxLng: number;
 }
 
-export interface createImgDTO {
-  url: string;
-}
-
-/** Imagen en el body de update: `{idImage: null, url}` agrega, `{idImage,
- *  url: null}` quita, `{idImage, url}` reemplaza. `file` es solo de la UI. */
-export interface updateImg {
-  url?: string | null;
-  idImage?: number | null;
-  file?: File;
-}
-
-/** Una mascota del usuario: GET /pet/mine (PetView). `isLost` es derivado: hay
- *  un reporte Perdida activo que la apunta. `urlImgs` trae la principal primero. */
+/** Una mascota del usuario: GET /pet/mine y la respuesta de crearla o editarla
+ *  (PetView). Derivados: `isLost` / `lostReportId` (su reporte Perdida activo) e
+ *  `idProvincia` (del cantón, para precargar la cascada). `urlImgs`: la
+ *  principal primero. Privada: solo la ve su dueño (ADR-16). */
 export interface petView {
   id: number;
   petName: string;
@@ -270,8 +270,26 @@ export interface petView {
   cantonName: string;
   idSector: number | null;
   sectorName: string | null;
+  idProvincia: number;
   isLost: boolean;
+  lostReportId: number | null;
   urlImgs: imgView[];
+}
+
+/** Body de POST /pet/create (registrar sin reporte) y de PUT /pet/update (con
+ *  idPet). El update REEMPLAZA la ficha y su zona; `imageKeys` es la lista
+ *  completa de fotos (la primera, principal; ausente = no tocar). */
+export interface PetCardDTO {
+  idPet?: number;
+  petName: string;
+  idPetSpecie: number;
+  idPetBreed: number | null;
+  sex: PetSex;
+  birthDate: string | null;
+  petSpecialCondition: string | null;
+  idCanton: number;
+  idSector: number | null;
+  imageKeys?: string[];
 }
 
 // --- Edad aproximada <-> fecha de nacimiento (D12) ---

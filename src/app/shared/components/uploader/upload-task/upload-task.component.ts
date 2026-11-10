@@ -12,10 +12,20 @@ import {
 import { HttpEventType, HttpStatusCode } from "@angular/common/http";
 import { firstValueFrom } from "rxjs";
 import { switchMap } from "rxjs/operators";
-import { updateImg } from "src/app/models/report.model";
+import { imgView } from "src/app/models/report.model";
 import { S3StorageService } from "src/app/services/s3-storage.service";
 import { TokenService } from "src/app/services/token.service";
 
+/**
+ * Una foto del uploader. Dos casos:
+ * - `file`: foto nueva. Se sube al iniciar (URL firmada → PUT directo a S3) y,
+ *   al terminar, emite `uploaded` con su `{ key, url }`. Hasta que el formulario
+ *   se guarde, es una subida PENDIENTE: si el usuario la quita, o se va sin
+ *   guardar, se descarta en el servidor.
+ * - `existing`: foto ya guardada (modo editar). Solo se muestra; quitarla no
+ *   llama al servidor: el backend la borra al guardar, porque ya no viene en la
+ *   lista de fotos.
+ */
 @Component({
   selector: "app-upload-task",
   templateUrl: "./upload-task.component.html",
@@ -30,139 +40,79 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  @Input() imgUpdating: updateImg = null;
-  @Input() updating: boolean = false;
-  @Output() deletedUpdate = new EventEmitter<updateImg>();
-  @Output() uploadedUpdate = new EventEmitter<updateImg>();
-  idImg: number = null;
+  @Input() file: File | null = null;
+  @Input() existing: imgView | null = null;
+  /** true cuando el formulario se guardó: las subidas ya quedaron vinculadas y
+   *  no hay que descartarlas al destruir el componente. */
+  @Input() published = false;
 
-  @Input() file: File = null;
-  downloadUrl: string = null;
-  @Input() published: boolean = false;
-  @Output() deleted = new EventEmitter<{ file: File; key: string }>();
-  // Emite el File además de la URL: el padre lo usa como clave única en su
-  // Map<File, string>. Antes emitía { name, url } y el padre keyeaba por
-  // name → archivos con nombres iguales se sobreescribían y se perdían URLs.
-  @Output() uploaded = new EventEmitter<{ file: File; url: string }>();
+  @Output() uploaded = new EventEmitter<imgView>();
+  @Output() removed = new EventEmitter<void>();
+
+  downloadUrl: string | null = null;
 
   // Empieza en null (no en 0) para que el @if del progress-container solo se
-  // active cuando arranca una subida real. Si lo dejamos en 0, las imágenes
-  // que solo se muestran (existentes en modo editar: file=null, imgUpdating
-  // con URL) renderizarían un "Subiendo imagen" fantasma a 0% hasta que la
-  // <img> dispara (load), lo que se veía como una segunda subida en paralelo
-  // a la del archivo nuevo. startUpload() pone percentage = 0 al empezar.
+  // active cuando arranca una subida real: una foto existente no debe mostrar un
+  // "Subiendo imagen" fantasma mientras su <img> carga.
   percentage: number | null = null;
-  isImgLoaded: boolean = false;
-  // True cuando el <img> dispara (error): URL inalcanzable (404/403 de S3 por
-  // objeto huérfano). Mostramos un placeholder dentro del .img-container y
-  // mantenemos visible el botón de borrar para limpiar la referencia.
-  imgFailed: boolean = false;
-  isLoading: boolean = false;
-  imgKey: string = "";
-  // Mensaje de error de la subida; se muestra en la tarjeta de la imagen.
-  errorMessage: string = null;
+  isImgLoaded = false;
+  // True cuando el <img> dispara (error): URL inalcanzable. Se muestra un
+  // placeholder y se mantiene el botón de quitar.
+  imgFailed = false;
+  isLoading = false;
+  errorMessage: string | null = null;
 
-  // URL pública que devuelve el backend; se asigna a downloadUrl solo cuando la
-  // subida termina, para no intentar mostrar la imagen antes de tiempo.
-  private publicUrl: string = null;
+  // Nombre que generó el backend para la foto nueva (su subida pendiente).
+  private pendingKey: string | null = null;
+  // URL pública: se asigna a downloadUrl solo cuando la subida termina.
+  private publicUrl: string | null = null;
 
   ngOnInit(): void {
-    if (this.updating) {
-      if (this.file) {
-        this.startUpload();
-      } else {
-        this.downloadUrl = this.imgUpdating.url;
-        this.idImg = this.imgUpdating.idImage;
-      }
-    } else {
-      if (this.file) {
-        this.startUpload();
-      }
+    if (this.file) {
+      this.startUpload();
+    } else if (this.existing) {
+      this.downloadUrl = this.existing.url;
     }
   }
 
   @HostListener("window:beforeunload")
   async ngOnDestroy(): Promise<void> {
-    if (this.updating) {
-      if (!this.idImg && !this.published) {
-        await this.deleteImg();
-        return;
-      } else {
-        return;
-      }
+    // Una subida que no llegó a guardarse se descarta (best-effort: si falla, el
+    // backend la purga sola a las 25 h).
+    if (this.pendingKey && !this.published) {
+      await this.discardPending();
     }
-
-    if (this.downloadUrl && !this.published) {
-      await this.deleteImg();
-    }
-  }
-
-  // Genera un nombre de archivo único conservando la extensión original (para
-  // que el backend infiera bien el Content-Type / extensión de la key). Usa
-  // crypto.randomUUID() cuando está disponible (https/localhost) y, si no, un
-  // fallback con timestamp + aleatorio. Evita colisiones de key en S3 entre
-  // archivos que comparten nombre.
-  private uniqueFileName(originalName: string): string {
-    const dot = originalName.lastIndexOf(".");
-    const ext = dot >= 0 ? originalName.slice(dot) : "";
-    const unique =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    return `${unique}${ext}`;
   }
 
   startUpload() {
     this.errorMessage = null;
-    // Sin sesión, el backend rechazaría la URL firmada con 401: no intentamos
-    // subir y avisamos directamente que hay que iniciar sesión.
+    // Sin sesión, el backend rechazaría la firma con 401: avisamos sin intentar.
     if (!this.tokenService.getToken()) {
       this.percentage = null;
       this.errorMessage = "Inicia sesión para subir imágenes";
       return;
     }
     this.percentage = 0;
-    // 1) Pedimos al backend la URL firmada; 2) subimos el archivo directo a S3.
-    // Enviamos un nombre ÚNICO por archivo (no el original): el backend deriva
-    // la key del objeto S3 a partir del fileName, así que dos archivos con el
-    // mismo nombre (p. ej. varias "image.jpg" desde el móvil) generaban la misma
-    // key, se sobreescribían en el bucket y devolvían la MISMA publicUrl. Como
-    // el padre acumula las URLs, todas terminaban siendo idénticas y solo se
-    // guardaba/mostraba una imagen. Un nombre único garantiza una key, un objeto
-    // y una publicUrl distintos por archivo.
+    // 1) El backend firma y genera el nombre; 2) subimos directo a S3.
     this.s3StorageService
-      .getPresignedUploadUrl(this.uniqueFileName(this.file.name), this.file.type)
+      .getPresignedUploadUrl(this.file!.type)
       .pipe(
         switchMap((presigned) => {
-          this.imgKey = presigned.key;
+          this.pendingKey = presigned.key;
           this.publicUrl = presigned.publicUrl;
-          return this.s3StorageService.uploadToPresignedUrl(
-            presigned.uploadUrl,
-            this.file
-          );
+          return this.s3StorageService.uploadToPresignedUrl(presigned.uploadUrl, this.file!);
         })
       )
       .subscribe({
         next: (event) => {
           if (event.type === HttpEventType.UploadProgress) {
-            this.percentage = Math.round(
-              (event.loaded / (event.total ?? event.loaded)) * 100
-            );
+            this.percentage = Math.round((event.loaded / (event.total ?? event.loaded)) * 100);
           } else if (event.type === HttpEventType.Response) {
-            // Subida completada. Dejamos la barra al 100% (no la ocultamos aún)
-            // y asignamos la URL: el <img> empieza a cargar oculto. La barra se
-            // ocultará en onLoaded(), cuando la imagen ya esté lista, evitando
-            // el hueco en blanco entre la barra y la foto.
+            // Subida completa. La barra queda al 100% hasta que la imagen cargue
+            // (onLoaded), para no dejar un hueco en blanco entre las dos.
             this.percentage = 100;
             this.downloadUrl = this.publicUrl;
-            if (this.updating) {
-              this.uploadedUpdate.emit({ url: this.downloadUrl });
-            } else {
-              this.uploaded.emit({
-                file: this.file,
-                url: this.downloadUrl,
-              });
-            }
+            this.uploaded.emit({ key: this.pendingKey!, url: this.publicUrl! });
           }
         },
         error: (error) => {
@@ -170,6 +120,8 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
           this.percentage = null;
           if (error?.status === HttpStatusCode.Unauthorized) {
             this.errorMessage = "Inicia sesión para subir imágenes";
+          } else if (error?.status === HttpStatusCode.TooManyRequests) {
+            this.errorMessage = "Subiste muchas fotos sin publicar. Publica o quita algunas e inténtalo de nuevo.";
           } else {
             this.errorMessage = "No se pudo subir la imagen, inténtalo de nuevo";
           }
@@ -177,49 +129,34 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
       });
   }
 
-  async deleteImg() {
-    // Para imágenes recién subidas ya tenemos la key; para imágenes existentes
-    // (modo edición) la derivamos del último segmento de la URL pública.
-    if (!this.imgKey && this.downloadUrl) {
-      this.imgKey = this.downloadUrl.split("/").pop();
+  // Botón "quitar". Una foto existente solo sale de la lista (el backend la
+  // borra al guardar); una nueva ya subida se descarta en el servidor.
+  async remove() {
+    if (this.pendingKey) {
+      this.isLoading = true;
+      await this.discardPending();
+      this.isLoading = false;
     }
-    this.isLoading = true;
+    this.downloadUrl = null;
+    this.removed.emit();
+  }
 
-    if (!this.published) {
-      if (this.updating) {
-        if (this.file) {
-          try {
-            await firstValueFrom(this.s3StorageService.deleteImage(this.imgKey));
-            this.deleted.emit({ file: this.file, key: this.imgKey });
-            this.downloadUrl = null;
-          } catch (error) {
-            console.error("Error al eliminar la imagen:", error);
-          }
-        } else {
-          this.deletedUpdate.emit({
-            idImage: this.idImg,
-            url: null,
-            file: this.file ? this.file : null,
-          });
-        }
-      } else {
-        try {
-          await firstValueFrom(this.s3StorageService.deleteImage(this.imgKey));
-          this.deleted.emit({ file: this.file, key: this.imgKey });
-          this.downloadUrl = null;
-        } catch (error) {
-          console.error("Error al eliminar la imagen:", error);
-        }
-      }
+  private async discardPending() {
+    const key = this.pendingKey;
+    this.pendingKey = null;
+    try {
+      await firstValueFrom(this.s3StorageService.deleteImage(key!));
+    } catch (error) {
+      // No bloquea: el backend purga las subidas abandonadas.
+      console.error("No se pudo descartar la imagen:", error);
     }
-    this.isLoading = false;
   }
 
   onLoaded() {
     // Imágenes cacheadas pueden disparar (load) sincrónicamente al insertar el
     // <img>, en algunas implementaciones fuera de la zona de Angular: forzamos
-    // que el flag y la CD ocurran en el mismo tick para que el swap progress
-    // → thumbnail sea atómico y no se vea brevemente como "dos cuadros".
+    // que el flag y la CD ocurran en el mismo tick para que el cambio barra →
+    // miniatura sea atómico.
     this.ngZone.run(() => {
       this.isImgLoaded = true;
       this.cdr.markForCheck();
@@ -227,8 +164,7 @@ export class UploadTaskComponent implements OnInit, OnDestroy {
   }
 
   onImgError() {
-    // Mismo motivo que en onLoaded: (error) puede llegar fuera de la zona si
-    // la URL falla de forma síncrona desde caché del navegador.
+    // Mismo motivo que en onLoaded.
     this.ngZone.run(() => {
       this.imgFailed = true;
       this.cdr.markForCheck();

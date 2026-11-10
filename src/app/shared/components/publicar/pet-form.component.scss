@@ -383,3 +383,43 @@
   font-size: var(--text-sm);
   color: var(--grey);
 }
+
+// --- Fotos: ficha de la mascota vs. fotos propias del reporte ---
+.photo-mode {
+  margin-bottom: var(--space-3);
+}
+
+.photo-hint {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--grey);
+}
+
+.photo-warning {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  background-color: var(--yellow);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.photo-error {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--red);
+}
+
+.pet-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pet-photos__img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--darker-light-blue);
+}

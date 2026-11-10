@@ -14,6 +14,8 @@ import { UploaderComponent } from './components/uploader/uploader.component';
 import { UploadTaskComponent } from './components/uploader/upload-task/upload-task.component';
 import { EditarComponent } from './components/publicar/editar/editar.component';
 import { LocationPickerComponent } from './components/location-picker/location-picker.component';
+import { AnimalFieldsComponent } from './components/pet-fields/animal-fields.component';
+import { ZoneFieldsComponent } from './components/pet-fields/zone-fields.component';
 
 
 
@@ -30,7 +32,9 @@ import { LocationPickerComponent } from './components/location-picker/location-p
     UploaderComponent,
     UploadTaskComponent,
     EditarComponent,
-    LocationPickerComponent
+    LocationPickerComponent,
+    AnimalFieldsComponent,
+    ZoneFieldsComponent
   ],
   imports: [
     CommonModule,
@@ -49,6 +53,10 @@ import { LocationPickerComponent } from './components/location-picker/location-p
     PublishComponent,
     EditarComponent,
     NgOptimizedImage,
+    // Para el formulario de mascota (perfil).
+    UploaderComponent,
+    AnimalFieldsComponent,
+    ZoneFieldsComponent,
   ]
 })
 export class SharedModule { }

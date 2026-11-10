@@ -1,0 +1,41 @@
+<div class="fields" [formGroup]="group">
+  <div class="field">
+    <label class="form-label" [for]="idPrefix + 'Provincia'">Provincia:</label>
+    <select class="form-select" formControlName="idProvincia" [id]="idPrefix + 'Provincia'"
+      [class.is-invalid]="invalid('idProvincia')" (change)="onProvinciaChange()">
+      <option value="">Elige la provincia</option>
+      @for (p of provincias; track p.id) {
+        <option [value]="p.id">{{ p.name }}</option>
+      }
+    </select>
+    @if (invalid('idProvincia')) {
+      <p class="field-error">Selecciona la provincia</p>
+    }
+  </div>
+
+  <div class="field">
+    <label class="form-label" [for]="idPrefix + 'Canton'">Cantón:</label>
+    <select class="form-select" formControlName="idCanton" [id]="idPrefix + 'Canton'"
+      [class.is-invalid]="invalid('idCanton')" (change)="onCantonChange()">
+      <option value="">Elige el cantón</option>
+      @for (c of cantones; track c.id) {
+        <option [value]="c.id">{{ c.name }}</option>
+      }
+    </select>
+    @if (invalid('idCanton')) {
+      <p class="field-error">Selecciona el cantón</p>
+    }
+  </div>
+
+  @if (sectores.length > 0) {
+    <div class="field">
+      <label class="form-label" [for]="idPrefix + 'Sector'">Sector (opcional):</label>
+      <select class="form-select" formControlName="idSector" [id]="idPrefix + 'Sector'">
+        <option value="">Elige el sector</option>
+        @for (s of sectores; track s.id) {
+          <option [value]="s.id">{{ s.name }}</option>
+        }
+      </select>
+    </div>
+  }
+</div>

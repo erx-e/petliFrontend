@@ -1,0 +1,55 @@
+<section class="petForm">
+  <a class="petForm__back" routerLink="/profile/pets">← Mis mascotas</a>
+  <h2 class="petForm__title">{{ editing ? 'Editar ficha' : 'Registrar mascota' }}</h2>
+
+  @if (notFound) {
+    <p class="petForm__msg" role="alert">No encontramos esa mascota entre las tuyas.</p>
+  } @else {
+    <p class="petForm__lead">
+      La ficha es privada: solo tú la ves. Si algún día se pierde, la eliges al publicar el reporte.
+    </p>
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <fieldset class="petForm__section">
+        <legend>Datos de la mascota</legend>
+        <app-animal-fields [group]="form" idPrefix="pet"></app-animal-fields>
+        <div class="petForm__field">
+          <label class="form-label" for="petSpecial">Señas particulares (opcional):</label>
+          <textarea class="form-control" id="petSpecial" formControlName="petSpecialCondition" rows="3"
+            maxlength="200" placeholder="Ej: mancha blanca en el pecho, collar rojo"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="petForm__section">
+        <legend>Dónde vive</legend>
+        <app-zone-fields [group]="form" idPrefix="petZone"></app-zone-fields>
+      </fieldset>
+
+      <fieldset class="petForm__section">
+        <legend>Fotos</legend>
+        <app-uploader
+          [initial]="initialImages"
+          [published]="published"
+          (keysChange)="onKeys($event)"
+          (limitReached)="onLimit($event)"
+        ></app-uploader>
+        @if (maxFourFiles) {
+          <p class="petForm__error">Puedes subir máximo 4 fotos</p>
+        }
+        @if (photosMissing && submitted) {
+          <p class="petForm__error" role="alert">Agrega al menos una foto</p>
+        }
+      </fieldset>
+
+      @if (submitError) {
+        <p class="petForm__error" role="alert">{{ submitError }}</p>
+      }
+      <button class="petForm__submit" type="submit" [disabled]="isLoading">
+        @if (isLoading) {
+          <app-spinner></app-spinner>
+        } @else {
+          {{ editing ? 'Guardar cambios' : 'Registrar mascota' }}
+        }
+      </button>
+    </form>
+  }
+</section>

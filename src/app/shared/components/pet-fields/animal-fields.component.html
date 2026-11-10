@@ -1,0 +1,64 @@
+<div class="fields" [formGroup]="group">
+  <div class="field">
+    <label class="form-label" [for]="idPrefix + 'Name'">Nombre:</label>
+    <input class="form-control" formControlName="petName" [id]="idPrefix + 'Name'" type="text"
+      placeholder="Nombre de la mascota" [class.is-invalid]="invalid('petName')" />
+    @if (invalid('petName')) {
+      <p class="field-error">
+        @if (group.get('petName')!.hasError('required')) { Escribe el nombre de la mascota }
+        @else if (group.get('petName')!.hasError('minlength')) { El nombre debe tener más de dos caracteres }
+        @else if (group.get('petName')!.hasError('maxlength')) { El nombre debe tener menos de 12 caracteres }
+        @else { El nombre no puede tener números ni signos especiales }
+      </p>
+    }
+  </div>
+
+  <div class="field">
+    <p class="form-label">Tipo de mascota:</p>
+    <div class="btn-group full-width" role="radiogroup" aria-label="Especie">
+      @for (s of species; track s.id) {
+        <input type="radio" class="btn-check" formControlName="idPetSpecie" [value]="'' + s.id"
+          [id]="idPrefix + 'Specie' + s.id" autocomplete="off" (change)="onSpecieChange()" />
+        <label class="btn btn-outline-primary" [for]="idPrefix + 'Specie' + s.id">{{ s.name }}</label>
+      }
+    </div>
+    @if (invalid('idPetSpecie')) {
+      <p class="field-error">Selecciona el tipo de mascota</p>
+    }
+  </div>
+
+  <div class="field">
+    <label class="form-label" [for]="idPrefix + 'Breed'">Raza (opcional):</label>
+    <select class="form-select" formControlName="idPetBreed" [id]="idPrefix + 'Breed'">
+      <option value="">No sé / prefiero no decir</option>
+      @for (b of breeds; track b.id) {
+        <option [value]="b.id">{{ b.name }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <p class="form-label">Sexo:</p>
+    <div class="btn-group full-width" role="radiogroup" aria-label="Sexo">
+      <input type="radio" class="btn-check" formControlName="sex" value="Unknown" [id]="idPrefix + 'SexU'" autocomplete="off" />
+      <label class="btn btn-outline-primary" [for]="idPrefix + 'SexU'">No sé</label>
+      <input type="radio" class="btn-check" formControlName="sex" value="Male" [id]="idPrefix + 'SexM'" autocomplete="off" />
+      <label class="btn btn-outline-primary" [for]="idPrefix + 'SexM'">Macho</label>
+      <input type="radio" class="btn-check" formControlName="sex" value="Female" [id]="idPrefix + 'SexF'" autocomplete="off" />
+      <label class="btn btn-outline-primary" [for]="idPrefix + 'SexF'">Hembra</label>
+    </div>
+  </div>
+
+  <div class="field">
+    <p class="form-label">Edad aproximada (opcional):</p>
+    <div class="age-row">
+      <input type="number" min="0" max="30" class="form-control" formControlName="ageYears"
+        aria-label="Años" placeholder="Años" [class.is-invalid]="group.get('ageYears')!.invalid" />
+      <input type="number" min="0" max="11" class="form-control" formControlName="ageMonths"
+        aria-label="Meses" placeholder="Meses" [class.is-invalid]="group.get('ageMonths')!.invalid" />
+    </div>
+    @if (group.get('ageYears')!.invalid || group.get('ageMonths')!.invalid) {
+      <p class="field-error">Indica hasta 30 años y entre 0 y 11 meses</p>
+    }
+  </div>
+</div>

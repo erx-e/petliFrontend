@@ -9,6 +9,8 @@ import { PublicProfileComponent } from './pages/public-profile/public-profile.co
 import { AccountComponent } from './pages/account/account.component';
 import { MyPublicationsComponent } from './pages/my-publications/my-publications.component';
 import { LayoutComponent } from './layout/layout.component';
+import { MyPetsComponent } from './pages/my-pets/my-pets.component';
+import { PetFormComponent } from './pages/pet-form/pet-form.component';
 import { WebsiteModule } from '../../website.module';
 import {  RouterModule } from '@angular/router';
 
@@ -19,7 +21,9 @@ import {  RouterModule } from '@angular/router';
     PublicProfileComponent,
     AccountComponent,
     MyPublicationsComponent,
-    LayoutComponent
+    LayoutComponent,
+    MyPetsComponent,
+    PetFormComponent
   ],
   imports: [
     CommonModule,

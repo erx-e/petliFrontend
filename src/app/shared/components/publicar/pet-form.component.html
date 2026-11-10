@@ -51,7 +51,7 @@
         @if (usesExistingPet) {
           <p class="pet-choice__note">
             Publicaremos la pérdida de <strong>{{ selectedPet?.petName | titlecase }}</strong>
-            con los datos y las fotos de su ficha.
+            con los datos de su ficha. Las fotos las eliges más abajo.
           </p>
         } @else {
         <div class="form-element-section">
@@ -412,33 +412,72 @@
                                   </div>
                                 </div>
                               }
-                              @if (!usesExistingPet) {
+                              <!--
+                                Fotos. Un reporte ligado a una mascota (pérdida) elige entre las
+                                fotos de la ficha y fotos propias del reporte. Los dos uploaders
+                                se ocultan con [hidden] en vez de @if: así no se pierden ni se
+                                descartan las fotos ya subidas al cambiar de opción.
+                              -->
                               <div class="files-uploader">
-                                <label for="inputElement">Fotos de la mascota</label>
-                                @if (updating) {
-                                  <app-uploader
-                                    [published]="published"
-                                    [imgsUrlUpdating]="imgsUrlUpdating"
-                                    [imgsUrlUpdatingToShow]="imgsUrlUpdatingToShow"
-                                    [updating]="true"
-                                    (maxFourLimit)="onLimit($event)"
-                                    (changeUpdate)="onUrlsChange($event)"
-                                  ></app-uploader>
-                                } @else {
-                                  <app-uploader
-                                    [published]="published"
-                                    [updating]="false"
-                                    (maxFourLimit)="onLimit($event)"
-                                    (change)="onUrlsChange($event)"
-                                  ></app-uploader>
+                                <p class="form-label">Fotos</p>
+                                @if (linkedToPet) {
+                                  <div class="btn-group full-width photo-mode" role="radiogroup" aria-label="Qué fotos muestra el reporte">
+                                    <input type="radio" class="btn-check" name="photoMode" id="photoModePet"
+                                      autocomplete="off" [checked]="photoMode === 'pet'" (change)="setPhotoMode('pet')" />
+                                    <label class="btn btn-outline-primary" for="photoModePet">
+                                      Las de la ficha de {{ (petNameForPhotos || 'tu mascota') | titlecase }}
+                                    </label>
+                                    <input type="radio" class="btn-check" name="photoMode" id="photoModeOwn"
+                                      autocomplete="off" [checked]="photoMode === 'own'" (change)="setPhotoMode('own')" />
+                                    <label class="btn btn-outline-primary" for="photoModeOwn">Otras fotos para este reporte</label>
+                                  </div>
+                                  <div [hidden]="photoMode !== 'pet'">
+                                    @if (petPhotosEditable) {
+                                      <p class="photo-hint">
+                                        Son las fotos de su ficha: lo que cambies aquí también cambia en su ficha.
+                                      </p>
+                                      <app-uploader
+                                        [initial]="petInitial"
+                                        [published]="published"
+                                        (keysChange)="onPetKeys($event)"
+                                        (limitReached)="onLimit($event)"
+                                      ></app-uploader>
+                                    } @else if (petPhotos.length > 0) {
+                                      <div class="pet-photos" aria-label="Fotos de la ficha">
+                                        @for (img of petPhotos; track img.key) {
+                                          <img class="pet-photos__img" [src]="img.url" alt="" />
+                                        }
+                                      </div>
+                                    } @else {
+                                      <p class="photo-hint">Su ficha no tiene fotos: elige "Otras fotos" para subir algunas.</p>
+                                    }
+                                  </div>
                                 }
-                                @if (maxFourFiles) {
-                                  <p class="invalid-feedback">
-                                    Puedes subir máximo 4 fotos
+                                <div [hidden]="linkedToPet && photoMode !== 'own'">
+                                  @if (linkedToPet) {
+                                    <p class="photo-hint">Estas fotos se muestran en el reporte en lugar de las de su ficha.</p>
+                                  } @else if (type === 'Perdida') {
+                                    <p class="photo-hint">Estas fotos quedan en la ficha de tu mascota.</p>
+                                  }
+                                  <app-uploader
+                                    [initial]="ownInitial"
+                                    [published]="published"
+                                    (keysChange)="onOwnKeys($event)"
+                                    (limitReached)="onLimit($event)"
+                                  ></app-uploader>
+                                </div>
+                                @if (linkedToPet && photoMode === 'pet' && ownInitial.length > 0) {
+                                  <p class="photo-warning" role="status">
+                                    Al guardar se borrarán las fotos propias de este reporte.
                                   </p>
                                 }
+                                @if (maxFourFiles) {
+                                  <p class="photo-error">Puedes subir máximo 4 fotos</p>
+                                }
+                                @if (photosMissing && submitted) {
+                                  <p class="photo-error" role="alert">Agrega al menos una foto</p>
+                                }
                               </div>
-                              }
                             </div>
                           </div>
                           @if (submitError) {

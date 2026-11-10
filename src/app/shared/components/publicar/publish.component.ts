@@ -9,14 +9,15 @@ import {
 import {
   birthDateFromAge,
   CreateReportDTO,
+  imgView,
   locationHint,
   petView,
   PetSex,
   ReportType,
   requiresLastSeen,
-  updateImg,
 } from 'src/app/models/report.model';
 import { Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { CategoryService } from 'src/app/services/category.service';
 import {
   breed,
@@ -28,7 +29,6 @@ import {
 import { switchMap } from 'rxjs/operators';
 import { ReportService } from 'src/app/services/report.service';
 import { PetService } from 'src/app/services/pet.service';
-import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserView } from 'src/app/models/user.model';
 import { MyValidators } from 'src/app/validators/validators';
@@ -48,7 +48,8 @@ export class PublishComponent implements OnInit {
     private reportService: ReportService,
     private petService: PetService,
     private location: Location,
-    private authService: AuthService
+    private authService: AuthService,
+    private route: ActivatedRoute
   ) {
     this.buildForm();
   }
@@ -66,9 +67,18 @@ export class PublishComponent implements OnInit {
 
   // API unificada con la plantilla compartida pet-form (modo crear).
   submitLabel = 'Publicar mascota';
-  updating = false;
-  imgsUrlUpdating: updateImg[] = [];
-  imgsUrlUpdatingToShow: updateImg[] = [];
+
+  // --- Fotos (por nombre de archivo, ver uploader) ---
+  // Con una mascota existente, el reporte muestra las fotos de su ficha
+  // ('pet') u otras propias ('own'). Al crear, la ficha no se edita desde aquí:
+  // solo se ve. En los demás casos hay un solo uploader (ownKeys): fotos del
+  // reporte, o de la ficha de la mascota nueva en una pérdida.
+  photoMode: 'pet' | 'own' = 'pet';
+  ownKeys: string[] = [];
+  readonly ownInitial: imgView[] = [];
+  readonly petInitial: imgView[] = [];
+  readonly petPhotosEditable = false;
+  submitted = false;
 
   published: boolean = false;
   isLoading: boolean = false;
@@ -76,7 +86,6 @@ export class PublishComponent implements OnInit {
   // creación falla, para no dejar al usuario con un spinner colgado.
   submitError: string | null = null;
 
-  urlBucket = `${environment.BUCKET_URL}`;
   form: UntypedFormGroup;
   species: specie[] = [];
   specieId: number;
@@ -88,8 +97,6 @@ export class PublishComponent implements OnInit {
   sectores: sector[] = [];
   dateInvalid: boolean = false;
   user: UserView = null;
-
-  imgUrls: string[] = [];
 
   disableSubmit: boolean = false;
   maxFourFiles: boolean = false;
@@ -136,9 +143,44 @@ export class PublishComponent implements OnInit {
     return this.myPets.find((p) => p.id === this.selectedPetId) ?? null;
   }
 
+  get linkedToPet(): boolean {
+    return this.usesExistingPet;
+  }
+
+  get petNameForPhotos(): string | null {
+    return this.selectedPet?.petName ?? null;
+  }
+
+  get petPhotos(): imgView[] {
+    return this.selectedPet?.urlImgs ?? [];
+  }
+
+  // El formulario exige al menos una foto VISIBLE en el reporte.
+  get photosMissing(): boolean {
+    if (this.usesExistingPet && this.photoMode === 'pet') return this.petPhotos.length === 0;
+    return this.ownKeys.length === 0;
+  }
+
+  setPhotoMode(mode: 'pet' | 'own') {
+    this.photoMode = mode;
+  }
+
+  onOwnKeys(keys: string[]) {
+    this.ownKeys = keys;
+  }
+
+  // Al crear, la ficha de una mascota existente no se edita.
+  onPetKeys(_: string[]) {}
+
   private loadMyPets() {
     this.petService.getMine().subscribe({
-      next: (pets) => (this.myPets = (pets ?? []).filter((p) => !p.isLost)),
+      next: (pets) => {
+        this.myPets = (pets ?? []).filter((p) => !p.isLost);
+        // "Reportar como perdida" desde Mis mascotas llega con ?pet=ID: la
+        // mascota viene ya elegida (si es del usuario y no está perdida).
+        const preselected = Number(this.route.snapshot.queryParamMap.get('pet'));
+        if (preselected && this.myPets.some((p) => p.id === preselected)) this.selectPet(preselected);
+      },
       error: () => (this.myPets = []), // sin la lista, se publica como mascota nueva
     });
   }
@@ -148,6 +190,8 @@ export class PublishComponent implements OnInit {
   // backend los rechazaría si llegaran.
   selectPet(id: number | null) {
     this.selectedPetId = id;
+    // Una ficha sin fotos no tiene qué mostrar: se ofrecen fotos propias.
+    this.photoMode = id !== null && this.petPhotos.length === 0 ? 'own' : 'pet';
     const animal = [this.petNameField, this.petSpecieField, this.sexField, this.ageYearsField, this.ageMonthsField];
     if (id === null) {
       animal.forEach((c) => c.enable());
@@ -190,7 +234,6 @@ export class PublishComponent implements OnInit {
       location: [null as GeoPoint | null], // opcional: el pin del mapa
       description: ['', Validators.required],
       lastTimeSeen: [null, [Validators.required, MyValidators.correctDate]],
-      urlImgs: [''],
     });
   }
 
@@ -222,8 +265,8 @@ export class PublishComponent implements OnInit {
 
   submit() {
     this.submitError = null;
-    const hasPhotos = this.usesExistingPet || this.imgUrls.length > 0;
-    if (this.user && this.form.valid && hasPhotos) {
+    this.submitted = true;
+    if (this.user && this.form.valid && !this.photosMissing) {
       this.isLoading = true;
       this.published = true;
       this.reportService.create(this.buildDto()).subscribe({
@@ -266,11 +309,12 @@ export class PublishComponent implements OnInit {
       // lat y lng van juntos o ninguno (el backend responde 400 si no).
       lat: v.location?.lat ?? null,
       lng: v.location?.lng ?? null,
-      urlImgs: [],
     };
 
     if (this.usesExistingPet) {
       dto.idPet = this.selectedPetId;
+      // Sin fotos propias, el reporte muestra las de la ficha.
+      if (this.photoMode === 'own') dto.imageKeys = this.ownKeys;
       return dto;
     }
 
@@ -283,13 +327,10 @@ export class PublishComponent implements OnInit {
     } else if (type !== 'Encontrada') {
       dto.petAge = v.petAge || null;
     }
-    dto.urlImgs = this.imgUrls.map((url) => ({ url }));
+    // Pérdida con mascota nueva: las fotos son de su ficha. El resto: del reporte.
+    if (type === 'Perdida') dto.petImageKeys = this.ownKeys;
+    else dto.imageKeys = this.ownKeys;
     return dto;
-  }
-
-  // Firma ampliada por la plantilla compartida; en modo crear siempre llega string[].
-  onUrlsChange(event: string[] | updateImg[]) {
-    this.imgUrls = event as string[];
   }
 
   toggleDisabledBreed() {
@@ -472,25 +513,6 @@ export class PublishComponent implements OnInit {
 
   get lastTimeSeenFieldInvalid() {
     return this.lastTimeSeenField.touched && this.lastTimeSeenField.invalid;
-  }
-
-  get urlImgsField() {
-    return this.form.get('urlImgs');
-  }
-
-  get urlImgsFieldValid() {
-    return (
-      this.urlImgsField.touched &&
-      this.urlImgsField.valid &&
-      this.maxFourFiles == false
-    );
-  }
-
-  get urlImgsFieldInvalid() {
-    return (
-      this.urlImgsField.touched &&
-      (this.imgUrls.length == 0 || this.maxFourFiles)
-    );
   }
 
   get petAgeField() {

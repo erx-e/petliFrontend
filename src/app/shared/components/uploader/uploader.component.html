@@ -24,8 +24,9 @@
   <div class="file">
     <label class="file-label">
       <input
+        #fileInput
         class="file-input"
-        id="inputElement"
+        [id]="inputId"
         type="file"
         multiple="multiple"
         accept="image/*"
@@ -34,48 +35,19 @@
         <span>Elige imágenes</span>
       </label>
     </div>
-    <p class="dropzone__meta">PNG o JPG · hasta 4 fotos</p>
+    <p class="dropzone__meta">PNG o JPG · hasta {{ max }} fotos · la primera es la principal</p>
   </div>
 
-  @if (!updating) {
-    <div class="uploaded-files">
-      @for (file of files; track file) {
-        <div class="imgUploaded">
-          <app-upload-task
-            [published]="published"
-            [updating]="false"
-            (uploaded)="onUpload($event)"
-            (deleted)="onDelete($event)"
-            [file]="file"
-          ></app-upload-task>
-        </div>
-      }
-    </div>
-  } @else {
-    <div class="uploaded-files">
-      @for (file of files; track file) {
-        <div class="imgUploaded">
-          <app-upload-task
-            [published]="published"
-            [updating]="true"
-            (uploadedUpdate)="onUpload($event)"
-            (deleted)="onDelete($event)"
-            [file]="file"
-          ></app-upload-task>
-        </div>
-      }
-      @for (img of imgsUrlUpdatingToShow; track img) {
-        <div class="imgUploaded">
-          @if (img.url) {
-            <app-upload-task
-              [published]="published"
-              [updating]="true"
-              (uploadedUpdate)="onUpload($event)"
-              (deletedUpdate)="onDelete($event)"
-              [imgUpdating]="img"
-            ></app-upload-task>
-          }
-        </div>
-      }
-    </div>
-  }
+  <div class="uploaded-files">
+    @for (item of items; track item.id) {
+      <div class="imgUploaded">
+        <app-upload-task
+          [file]="item.file ?? null"
+          [existing]="item.existing ? { key: item.key!, url: item.url! } : null"
+          [published]="published"
+          (uploaded)="onUploaded(item, $event)"
+          (removed)="onRemoved(item)"
+        ></app-upload-task>
+      </div>
+    }
+  </div>

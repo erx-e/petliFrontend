@@ -1,0 +1,56 @@
+<section class="myPets">
+  <header class="myPets__head">
+    <div>
+      <h2 class="myPets__title">Mis mascotas</h2>
+      <p class="myPets__lead">Solo tú las ves. Aparecen en público únicamente si publicas un reporte de pérdida.</p>
+    </div>
+    <a class="myPets__new" routerLink="new">Registrar mascota</a>
+  </header>
+
+  @if (loading) {
+    <app-spinner></app-spinner>
+  } @else if (error) {
+    <p class="myPets__msg" role="alert">No pudimos cargar tus mascotas. Inténtalo de nuevo en un momento.</p>
+  } @else if (pets.length === 0) {
+    <div class="myPets__empty">
+      <p>Todavía no registraste ninguna mascota.</p>
+      <p>Registrarla te deja su ficha lista: si algún día se pierde, publicas el reporte en un minuto.</p>
+    </div>
+  } @else {
+    <ul class="petGrid">
+      @for (pet of pets; track pet.id) {
+        <li class="petCard">
+          <div class="petCard__photo">
+            @if (pet.urlImgs.length) {
+              <img [src]="pet.urlImgs[0].url" alt="" loading="lazy" />
+            } @else {
+              <span class="petCard__noPhoto" aria-hidden="true">Sin foto</span>
+            }
+            @if (pet.isLost) {
+              <span class="petCard__badge">Perdida</span>
+            }
+          </div>
+          <div class="petCard__body">
+            <h3 class="petCard__name">{{ pet.petName | titlecase }}</h3>
+            <p class="petCard__meta">
+              {{ pet.petSpecie }}@if (pet.petBreed) { · {{ pet.petBreed }} }
+            </p>
+            <p class="petCard__meta">
+              {{ sexLabels[pet.sex] }}@if (ageLabel(pet.birthDate); as age) { · {{ age }} }
+            </p>
+            <div class="petCard__actions">
+              <a class="petCard__btn" [routerLink]="['edit', pet.id]">Editar ficha</a>
+              @if (pet.lostReportId) {
+                <a class="petCard__btn petCard__btn--alert" [routerLink]="['/reporte', pet.lostReportId]">Ver su reporte</a>
+              } @else {
+                <a class="petCard__btn petCard__btn--ghost" routerLink="/difunde/publicar" [queryParams]="{ pet: pet.id }">
+                  Reportar como perdida
+                </a>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

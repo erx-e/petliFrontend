@@ -24,14 +24,16 @@ export class S3StorageService {
   private apiUrl = `${environment.API_URL}`;
 
   /**
-   * Paso 1: pide al backend una URL firmada para subir.
-   * El backend la genera con sus credenciales y responde, además, con la key
-   * y la URL pública final. Lleva el token de la app (checkToken).
+   * Paso 1: pide al backend una URL firmada para subir. Solo se manda el tipo
+   * de imagen: el NOMBRE del archivo lo genera el backend (nunca el cliente) y
+   * lo devuelve como `key`, junto con la URL pública. La subida queda pendiente
+   * a nombre del usuario 24 h: en ese plazo hay que vincularla en un formulario
+   * (por su `key`). Con 30 subidas pendientes, el backend responde 429.
    */
-  getPresignedUploadUrl(fileName: string, contentType: string) {
+  getPresignedUploadUrl(contentType: string) {
     return this.http.post<PresignedUploadResponse>(
       `${this.apiUrl}/s3/presigned-upload`,
-      { fileName, contentType },
+      { contentType },
       { context: checkToken() }
     );
   }
@@ -54,8 +56,9 @@ export class S3StorageService {
   }
 
   /**
-   * Borra un objeto del bucket a través del backend (que tiene las credenciales).
-   * Recibe la key del objeto (no la URL completa). Lleva el token de la app.
+   * Descarta una subida PENDIENTE propia (una foto subida y quitada antes de
+   * guardar el formulario). Una foto ya guardada no se borra por aquí: se quita
+   * editando su reporte o su mascota (el backend responde 404). Recibe la key.
    */
   deleteImage(key: string) {
     return this.http.delete(

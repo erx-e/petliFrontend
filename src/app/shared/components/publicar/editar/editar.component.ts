@@ -25,13 +25,12 @@ import {
   locationHint,
   requiresLastSeen,
   UpdateReportDTO,
-  updateImg,
+  imgView,
 } from 'src/app/models/report.model';
 import { UserView } from 'src/app/models/user.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
 import { ReportService } from 'src/app/services/report.service';
-import { environment } from 'src/environments/environment';
 import { switchMap } from 'rxjs/operators';
 import { MyValidators } from 'src/app/validators/validators';
 import { Location } from '@angular/common';
@@ -114,15 +113,43 @@ export class EditarComponent implements OnInit {
       report.lat != null && report.lng != null ? { lat: report.lat, lng: report.lng } : null
     );
 
-    // CRÍTICO: dos arrays independientes. imgUrls es lo que el uploader muta
-    // (se envía al guardar); imgUrlsOrigin solo alimenta el @for de "imágenes
-    // ya subidas". Si compartieran referencia, cada foto nueva se pintaría dos
-    // veces.
-    this.imgUrls = report.urlImgs.map((img) => ({ ...img }));
-    this.imgUrlsOrigin = report.urlImgs.map((img) => ({ ...img }));
+    // Fotos: las propias del reporte y, en una pérdida, las de la ficha. Sin
+    // fotos propias, la pérdida arranca mostrando las de la ficha.
+    this.ownInitial = report.reportImages ?? [];
+    this.petInitial = report.petImages ?? [];
+    this.ownKeys = this.ownInitial.map((img) => img.key);
+    this.petKeys = this.petInitial.map((img) => img.key);
+    this.photoMode = report.type === 'Perdida' && this.ownKeys.length === 0 ? 'pet' : 'own';
+  }
 
-    this.urlImgsField.clearValidators();
-    this.urlImgsField.updateValueAndValidity();
+  get linkedToPet(): boolean {
+    return this.type === 'Perdida';
+  }
+
+  get petNameForPhotos(): string | null {
+    return this.postpet?.petName ?? null;
+  }
+
+  get petPhotos(): imgView[] {
+    return this.petInitial;
+  }
+
+  // El formulario exige al menos una foto VISIBLE en el reporte.
+  get photosMissing(): boolean {
+    if (this.linkedToPet && this.photoMode === 'pet') return this.petKeys.length === 0;
+    return this.ownKeys.length === 0;
+  }
+
+  setPhotoMode(mode: 'pet' | 'own') {
+    this.photoMode = mode;
+  }
+
+  onOwnKeys(keys: string[]) {
+    this.ownKeys = keys;
+  }
+
+  onPetKeys(keys: string[]) {
+    this.petKeys = keys;
   }
 
   private applyTypeRules() {
@@ -167,7 +194,18 @@ export class EditarComponent implements OnInit {
 
   // API unificada con la plantilla compartida pet-form (modo editar).
   submitLabel = 'Editar publicación';
-  updating = true;
+
+  // --- Fotos (por nombre de archivo, ver uploader) ---
+  // Inline: un solo uploader, las fotos propias (ownKeys). Pérdida: elige entre
+  // las fotos de la ficha de su mascota ('pet', editables aquí también: F9) y
+  // fotos propias del reporte ('own'). Las dos listas viajan completas.
+  photoMode: 'pet' | 'own' = 'own';
+  ownKeys: string[] = [];
+  petKeys: string[] = [];
+  ownInitial: imgView[] = [];
+  petInitial: imgView[] = [];
+  readonly petPhotosEditable = true;
+  submitted = false;
 
   published: boolean = false;
   isLoading: boolean = false;
@@ -175,7 +213,6 @@ export class EditarComponent implements OnInit {
   // botón para que el usuario sepa qué pasó cuando la edición falla.
   submitError: string | null = null;
 
-  urlBucket = environment.BUCKET_URL;
   species: specie[] = [];
   specieId: number;
   breeds: breed[] = [];
@@ -186,9 +223,6 @@ export class EditarComponent implements OnInit {
   sectores: sector[] = [];
   dateInvalid: boolean = false;
   user: UserView;
-
-  imgUrls: updateImg[] = [];
-  imgUrlsOrigin: updateImg[] = [];
 
   disableSubmit: boolean = false;
   maxFourFiles: boolean = false;
@@ -232,7 +266,6 @@ export class EditarComponent implements OnInit {
       location: [null as GeoPoint | null], // opcional: el pin del mapa
       description: ['', Validators.required],
       lastTimeSeen: [null, [Validators.required, MyValidators.correctDate]],
-      urlImgs: [''],
     });
   }
 
@@ -264,7 +297,8 @@ export class EditarComponent implements OnInit {
 
   submit() {
     this.submitError = null;
-    if (this.postpet && this.form.valid && this.imgUrls.length > 0) {
+    this.submitted = true;
+    if (this.postpet && this.form.valid && !this.photosMissing) {
       this.isLoading = true;
       this.published = true;
       this.reportService.update(this.buildDto(this.postpet)).subscribe({
@@ -301,6 +335,14 @@ export class EditarComponent implements OnInit {
       (this.initialAge?.years ?? null) === (v.ageYears ?? null) &&
       (this.initialAge?.months ?? null) === (v.ageMonths ?? null);
 
+    // Fotos como listas completas. En una pérdida con las fotos de la ficha, se
+    // manda la ficha y se vacían las propias (si había, se borran al guardar);
+    // con fotos propias, la ficha no se toca (petImageKeys ausente).
+    const photos: Pick<UpdateReportDTO, 'imageKeys' | 'petImageKeys'> =
+      lost && this.photoMode === 'pet'
+        ? { petImageKeys: this.petKeys, imageKeys: [] }
+        : { imageKeys: this.ownKeys };
+
     return {
       idReport: report.idReport,
       petName: this.showName ? v.petName || null : report.petName,
@@ -319,28 +361,12 @@ export class EditarComponent implements OnInit {
       // Quitar el punto en el mapa lo borra: lat y lng viajan juntos o ninguno.
       lat: v.location?.lat ?? null,
       lng: v.location?.lng ?? null,
-      // `file` es solo de la UI.
-      urlImgs: this.imgUrls.map(({ idImage, url }) => ({ idImage: idImage ?? null, url: url ?? null })),
+      ...photos,
     };
-  }
-
-  // Firma ampliada por la plantilla compartida; en modo editar siempre llega updateImg[].
-  onUrlsChange(event: string[] | updateImg[]) {
-    this.imgUrls = event as updateImg[];
   }
 
   onLimit(event: boolean) {
     this.maxFourFiles = event;
-  }
-
-  // Alias para la plantilla compartida: el uploader en modo editar lee
-  // imgsUrlUpdating / imgsUrlUpdatingToShow.
-  get imgsUrlUpdating() {
-    return this.imgUrls;
-  }
-
-  get imgsUrlUpdatingToShow() {
-    return this.imgUrlsOrigin;
   }
 
   toggleDisabledBreed() {
@@ -520,25 +546,6 @@ export class EditarComponent implements OnInit {
 
   get lastTimeSeenFieldInvalid() {
     return this.lastTimeSeenField.touched && this.lastTimeSeenField.invalid;
-  }
-
-  get urlImgsField() {
-    return this.form.get('urlImgs');
-  }
-
-  get urlImgsFieldValid() {
-    return (
-      this.urlImgsField.touched &&
-      this.urlImgsField.valid &&
-      this.maxFourFiles == false
-    );
-  }
-
-  get urlImgsFieldInvalid() {
-    return (
-      this.urlImgsField.touched &&
-      (this.imgUrls.length == 0 || this.maxFourFiles)
-    );
   }
 
   get petAgeField() {
