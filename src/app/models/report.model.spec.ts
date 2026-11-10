@@ -1,4 +1,4 @@
-import { ageFromBirthDate, birthDateFromAge, requiresLastSeen } from './report.model';
+import { ageFromBirthDate, birthDateFromAge, locationHint, requiresLastSeen } from './report.model';
 
 describe('report.model', () => {
   it('requiresLastSeen: solo los avistamientos', () => {
@@ -19,5 +19,12 @@ describe('report.model', () => {
     expect(birthDateFromAge(null, null)).toBeNull();
     expect(birthDateFromAge(0, 0)).toBeNull();
     expect(ageFromBirthDate(null)).toBeNull();
+  });
+
+  it('locationHint: en adopción y ayuda advierte que el punto es público', () => {
+    expect(locationHint('Perdida')).toContain('se perdió');
+    expect(locationHint('Encontrada')).toContain('la viste');
+    expect(locationHint('Adopcion')).toContain('a la vista de todos');
+    expect(locationHint('Ayuda')).toContain('a la vista de todos');
   });
 });

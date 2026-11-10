@@ -371,3 +371,15 @@
   display: flex;
   gap: var(--space-2);
 }
+
+// El mapa ocupa todo el ancho, también en escritorio (donde .form-elements va
+// a la mitad).
+.form-elements.location-field {
+  width: 100%;
+}
+
+.location-hint {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--grey);
+}

@@ -1,0 +1,161 @@
+.mapa {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.mapa__head .title {
+  margin: 0;
+  font-size: var(--text-2xl);
+}
+
+.mapa__lead {
+  margin: var(--space-1) 0 0;
+  color: var(--grey);
+}
+
+.mapa__filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--darker-light-blue);
+  border-radius: 999px;
+  background-color: var(--white);
+  color: var(--blue);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    border-color: var(--blue);
+  }
+}
+
+.chip--on {
+  border-color: var(--blue);
+  background-color: var(--blue);
+  color: var(--white);
+}
+
+.chip__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--dot, var(--blue));
+  box-shadow: 0 0 0 2px var(--white);
+}
+
+.chip--Perdida { --dot: var(--red); }
+.chip--Encontrada { --dot: var(--green); }
+.chip--Adopcion { --dot: var(--yellow); }
+.chip--Ayuda { --dot: var(--blue); }
+
+.mapa__tools {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.mapa__specie {
+  width: auto;
+  min-width: 170px;
+}
+
+.mapa__locate {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--blue);
+  border-radius: var(--radius-sm);
+  background-color: var(--yellow);
+  color: var(--ink);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: var(--yellow-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.mapa__wrap {
+  position: relative;
+}
+
+.mapa__map {
+  width: 100%;
+  height: 70vh;
+  min-height: 360px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--darker-light-blue);
+  overflow: hidden;
+}
+
+// Encima del mapa, que aísla sus capas (.map-surface): no hace falta un
+// z-index alto.
+.mapa__loading {
+  position: absolute;
+  top: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background-color: var(--white);
+  color: var(--blue);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+}
+
+.mapa__status {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--grey);
+}
+
+.mapa__status--error {
+  color: var(--red);
+}
+
+@media (max-width: 640px) {
+  .mapa {
+    padding: var(--space-3);
+  }
+
+  .mapa__tools {
+    width: 100%;
+  }
+
+  .mapa__specie {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mapa__map {
+    height: 62vh;
+  }
+}

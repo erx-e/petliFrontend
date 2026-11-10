@@ -9,6 +9,7 @@ import {
 import {
   birthDateFromAge,
   CreateReportDTO,
+  locationHint,
   petView,
   PetSex,
   ReportType,
@@ -32,6 +33,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { UserView } from 'src/app/models/user.model';
 import { MyValidators } from 'src/app/validators/validators';
 import { Observable, of } from 'rxjs';
+import { GeoPoint } from '../../map/leaflet';
 
 @Component({
     selector: 'app-publish',
@@ -55,6 +57,7 @@ export class PublishComponent implements OnInit {
 
   // Regla compartida con el backend (RequiresLastSeen), para la plantilla.
   readonly requiresLastSeen = requiresLastSeen;
+  readonly locationHint = locationHint;
 
   // Pérdida: mascotas del usuario que pueden reportarse (las que no están ya
   // perdidas). selectedPetId null = mascota nueva (se crea su ficha).
@@ -184,6 +187,7 @@ export class PublishComponent implements OnInit {
       idProvincia: ['', Validators.required],
       idCanton: [{ value: '', disabled: true }, Validators.required],
       idSector: [''],
+      location: [null as GeoPoint | null], // opcional: el pin del mapa
       description: ['', Validators.required],
       lastTimeSeen: [null, [Validators.required, MyValidators.correctDate]],
       urlImgs: [''],
@@ -259,6 +263,9 @@ export class PublishComponent implements OnInit {
       idSector: v.idSector ? Number(v.idSector) : null,
       lastTimeSeen: requiresLastSeen(type) ? v.lastTimeSeen : null,
       reward: type === 'Perdida' && v.reward ? Number(v.reward) : null,
+      // lat y lng van juntos o ninguno (el backend responde 400 si no).
+      lat: v.location?.lat ?? null,
+      lng: v.location?.lng ?? null,
       urlImgs: [],
     };
 

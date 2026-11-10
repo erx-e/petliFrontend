@@ -22,6 +22,7 @@ import {
   PetSex,
   ReportType,
   reportUpdateView,
+  locationHint,
   requiresLastSeen,
   UpdateReportDTO,
   updateImg,
@@ -34,6 +35,7 @@ import { environment } from 'src/environments/environment';
 import { switchMap } from 'rxjs/operators';
 import { MyValidators } from 'src/app/validators/validators';
 import { Location } from '@angular/common';
+import { GeoPoint } from '../../../map/leaflet';
 
 @Component({
     selector: 'app-editar',
@@ -108,6 +110,9 @@ export class EditarComponent implements OnInit {
     }
     this.descriptionField.setValue(report.description);
     this.lastTimeSeenField.setValue(report.lastTimeSeen);
+    this.form.get('location').setValue(
+      report.lat != null && report.lng != null ? { lat: report.lat, lng: report.lng } : null
+    );
 
     // CRÍTICO: dos arrays independientes. imgUrls es lo que el uploader muta
     // (se envía al guardar); imgUrlsOrigin solo alimenta el @for de "imágenes
@@ -140,6 +145,7 @@ export class EditarComponent implements OnInit {
 
   // Regla compartida con el backend (RequiresLastSeen), para la plantilla.
   readonly requiresLastSeen = requiresLastSeen;
+  readonly locationHint = locationHint;
 
   // El selector de mascota es solo de la creación: al editar no se cambia.
   readonly myPets: petView[] = [];
@@ -223,6 +229,7 @@ export class EditarComponent implements OnInit {
       idProvincia: ['', Validators.required],
       idCanton: [{ value: '', disabled: true }, Validators.required],
       idSector: [''],
+      location: [null as GeoPoint | null], // opcional: el pin del mapa
       description: ['', Validators.required],
       lastTimeSeen: [null, [Validators.required, MyValidators.correctDate]],
       urlImgs: [''],
@@ -283,7 +290,7 @@ export class EditarComponent implements OnInit {
 
   // El update REEMPLAZA (D4): un campo ausente quedaría vacío. Por eso se manda
   // el formulario completo, y los campos sin control en la UI (señas
-  // particulares, coordenadas, y el nombre/edad cuando el tipo los oculta)
+  // particulares, y el nombre/edad cuando el tipo los oculta)
   // viajan tal como llegaron en el prefill.
   private buildDto(report: reportUpdateView): UpdateReportDTO {
     const v = this.form.getRawValue();
@@ -309,8 +316,9 @@ export class EditarComponent implements OnInit {
       lastTimeSeen: requiresLastSeen(type) ? v.lastTimeSeen : null,
       idCanton: Number(v.idCanton),
       idSector: v.idSector ? Number(v.idSector) : null,
-      lat: report.lat,
-      lng: report.lng,
+      // Quitar el punto en el mapa lo borra: lat y lng viajan juntos o ninguno.
+      lat: v.location?.lat ?? null,
+      lng: v.location?.lng ?? null,
       // `file` es solo de la UI.
       urlImgs: this.imgUrls.map(({ idImage, url }) => ({ idImage: idImage ?? null, url: url ?? null })),
     };

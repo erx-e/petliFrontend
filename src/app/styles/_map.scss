@@ -1,0 +1,75 @@
+// Pines y popups de los mapas (Leaflet). Son globales porque Leaflet crea estos
+// nodos fuera de la vista de Angular, donde el encapsulado de los componentes
+// no llega. La hoja de Leaflet (leaflet.css) se carga aparte, bajo demanda.
+
+// Cada mapa aísla sus capas: los z-index internos de Leaflet (400-1000) no
+// tapan el nav ni su menú móvil.
+.map-surface {
+  isolation: isolate;
+  background-color: var(--darker-light-blue);
+}
+
+.map-pin {
+  background: none;
+  border: none;
+}
+
+// Gota con la punta abajo, en el punto exacto (iconAnchor = centro inferior).
+.map-pin__dot {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background-color: var(--pin-color, var(--blue));
+  border: 3px solid var(--white);
+  box-shadow: var(--shadow-md);
+}
+
+.map-pin--Perdida { --pin-color: var(--red); }
+.map-pin--Encontrada { --pin-color: var(--green); }
+.map-pin--Adopcion { --pin-color: var(--yellow); }
+.map-pin--Ayuda { --pin-color: var(--blue); }
+.map-pin--pick { --pin-color: var(--yellow); }
+
+.map-popup {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-width: 190px;
+  font-family: var(--font-body);
+}
+
+.map-popup__img {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background-color: var(--light-blue);
+}
+
+// Leaflet da a los <p> del popup un margen de 1.3em con un selector más
+// específico (.leaflet-popup-content p): se repite su prefijo para ganarle.
+.leaflet-popup-content .map-popup__type {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--grey);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.leaflet-popup-content .map-popup__name {
+  margin: 2px 0 var(--space-1);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--blue);
+}
+
+// Leaflet pinta los enlaces del popup con su propio color: se iguala al sitio.
+.leaflet-container a.map-popup__link {
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: underline;
+}

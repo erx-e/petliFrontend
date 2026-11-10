@@ -1,0 +1,32 @@
+<div class="picker">
+  <div class="picker__bar">
+    <button
+      type="button"
+      class="picker__btn"
+      (click)="useMyLocation()"
+      [disabled]="locating || disabled || mapFailed"
+    >
+      {{ locating ? 'Buscando tu ubicación…' : 'Usar mi ubicación' }}
+    </button>
+    @if (value) {
+      <button type="button" class="picker__btn picker__btn--ghost" (click)="clear()" [disabled]="disabled">
+        Quitar el punto
+      </button>
+    }
+  </div>
+  <div
+    #mapEl
+    class="picker__map map-surface"
+    role="application"
+    aria-label="Mapa para marcar la ubicación: toca el punto o arrastra el pin"
+  ></div>
+  @if (mapFailed) {
+    <p class="picker__error" role="alert">No pudimos cargar el mapa. Puedes publicar sin ubicación.</p>
+  } @else if (geoError) {
+    <p class="picker__error" role="alert">{{ geoError }}</p>
+  } @else {
+    <p class="picker__hint">
+      {{ value ? 'Punto marcado. Arrastra el pin o toca otro lugar para moverlo.' : 'Toca el mapa para marcar el punto.' }}
+    </p>
+  }
+</div>

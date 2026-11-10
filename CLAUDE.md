@@ -76,7 +76,7 @@ When adding a new service method, decide deliberately whether it needs `checkTok
 ### Routing & module structure
 
 - Root `app-routing.module.ts` lazy-loads `WebsiteModule` and sets `QuicklinkStrategy` preloading plus `scrollPositionRestoration`.
-- `website-routing.module.ts` nests page routes under a `LayoutComponent` (shared nav/footer). Feature areas (`adopta`, `encuentra`, `difunde`, `ayuda`, `profile`) are **lazy-loaded feature modules**; `home`, `landpage`, `reporte/:id` (report detail, `PetDetailComponent`; it was `pet/:id`, which slice 2 reserves for the pet's public card) are eager. `login`/`register` sit outside the layout.
+- `website-routing.module.ts` nests page routes under a `LayoutComponent` (shared nav/footer). Feature areas (`adopta`, `encuentra`, `difunde`, `ayuda`, `profile`) and `mapa` are **lazy-loaded feature modules**; `home`, `landpage`, `reporte/:id` (report detail, `PetDetailComponent`; it was `pet/:id`, which slice 2 reserves for the pet's public card) are eager. `login`/`register` sit outside the layout.
 
 ### Report domain (v2)
 
@@ -109,8 +109,37 @@ received as the **enum name**:
 - The feed only shows `Activo` reports (the backend default). The report detail lets the owner
   **resolve** (`PUT /report/resolve/{id}`; "¡Está en casa!" for a `Perdida`) — final, with a confirm
   dialog. "Mis publicaciones" renders two `<app-filter>`: `status="Activo"` and `status="Resuelto"`.
-- `lat` and `lng` must be sent together or not at all (when the map UI lands, `PL-X4`;
-  `ReportService.getMapPoints` already takes the viewport).
+- `lat` and `lng` must be sent together or not at all. The forms hold them as one optional `location`
+  control (`GeoPoint | null`) bound to `<app-location-picker>`; editing sends the control's value, so
+  "Quitar el punto" clears the stored coordinates.
+
+### Maps (`PL-X4`)
+
+**Leaflet + OpenStreetMap tiles** (free, no API key). Everything shared lives in
+`shared/map/leaflet.ts`: `loadLeaflet()`, the Ecuador view constants, `pinIcon()` (a `divIcon` per
+`ReportType`), `currentPosition()` (geolocation with Spanish error messages) and `roundCoord()` (the
+DB column is `decimal(9, 6)`).
+
+- **Leaflet never enters the initial bundle.** It is loaded with a dynamic `import('leaflet')`, and
+  its stylesheet is a non-injected style bundle (`angular.json`: `bundleName: "leaflet"`,
+  `inject: false`) that `loadLeaflet()` appends as a `<link>` on first use. Don't `import` from
+  `'leaflet'` at runtime anywhere else (`import type` is fine): that would pull ~150 kB into whichever
+  chunk imports it.
+- Leaflet runs **outside the Angular zone**; handlers re-enter with `zone.run` only when app state
+  changes. Pins and popups are created by Leaflet outside Angular's view, so their styles are global
+  (`styles/_map.scss`). Each map element gets `.map-surface` (`isolation: isolate`), so Leaflet's
+  internal z-indexes (400–1000) never cover the nav.
+- **`<app-location-picker>`** (`SharedModule`) is a `ControlValueAccessor`: tap the map, drag the pin
+  or "Usar mi ubicación". The wheel does not zoom inside the form. The hint above it comes from
+  `locationHint(type)`: the point is public, so adoption/help posts suggest a nearby spot instead of
+  one's home.
+- **`/mapa`** (`website/pages/mapa`) asks `getMapPoints(filter, viewport)` every time the map stops
+  (debounced, `switchMap` drops stale areas), with type chips and a species select. It caps at
+  `MAX_MAP_POINTS` (500, mirrors the backend) and says so. Popups are built with DOM nodes and
+  `textContent` (the pet name is user input), and navigate with the router. `getMapPoints` does not
+  use `checkLoading()`: the page shows its own indicator instead of the global spinner on every pan.
+  The last view and filters are kept in memory, so coming back from a report restores the map.
+- OSM's tile policy does not allow heavy traffic: if the site grows, swap `TILE_URL` for a provider.
 
 `ReportService` builds query params from a `ReportFilter` object, skipping null/undefined/empty values —
 `HttpParams.set(k, undefined)` would otherwise send the literal string `k=undefined`, which the backend

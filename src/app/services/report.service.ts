@@ -78,7 +78,8 @@ export class ReportService {
   }
 
   /** GET /report/getMapPoints: mismos filtros + viewport opcional; tope de 500
-   *  pines (los más recientes). Sin consumidor todavía (PL-X4). */
+   *  pines (los más recientes, MAX_MAP_POINTS). Lo usa /mapa en cada movimiento
+   *  del mapa: por eso no enciende el spinner global (la página tiene el suyo). */
   getMapPoints(filter: ReportFilter, bounds?: MapBounds) {
     let params = ReportService.filterParams({ ...filter, order: null });
     if (bounds) {
@@ -88,10 +89,7 @@ export class ReportService {
         .set("minLng", bounds.minLng)
         .set("maxLng", bounds.maxLng);
     }
-    return this.http.get<mapPointView[]>(`${this.apiUrl}/report/getMapPoints`, {
-      params,
-      context: checkLoading(),
-    });
+    return this.http.get<mapPointView[]>(`${this.apiUrl}/report/getMapPoints`, { params });
   }
 
   getById(id: number) {

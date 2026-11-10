@@ -24,7 +24,8 @@
           }<a routerLinkActive="active" routerLink="/encuentra">Encuentra</a
           ><a routerLinkActive="active" routerLink="difunde">Difunde</a
           ><a routerLinkActive="active" routerLink="adopta">Adopta</a
-          ><a routerLinkActive="active" routerLink="ayuda">Ayuda</a>
+          ><a routerLinkActive="active" routerLink="ayuda">Ayuda</a
+          ><a routerLinkActive="active" routerLink="/mapa">Mapa</a>
         </div>
         <div class="nav__links" [class.flex-end]="user">
           @if (!user) {
@@ -55,7 +56,8 @@
             <a (click)="toggleMenu()" routerLink="encuentra">Encuentra</a
               ><a (click)="toggleMenu()" routerLink="difunde">Difunde</a
               ><a (click)="toggleMenu()" routerLink="adopta">Adopta</a
-              ><a (click)="toggleMenu()" routerLink="ayuda">Ayuda</a>
+              ><a (click)="toggleMenu()" routerLink="ayuda">Ayuda</a
+              ><a (click)="toggleMenu()" routerLink="/mapa">Mapa</a>
             </div>
           } @else {
             <div
@@ -68,6 +70,7 @@
                 ><a (click)="toggleMenu()" routerLink="difunde">Difunde</a
                 ><a (click)="toggleMenu()" routerLink="adopta">Adopta</a
                 ><a (click)="toggleMenu()" routerLink="ayuda">Ayuda</a
+                ><a (click)="toggleMenu()" routerLink="/mapa">Mapa</a
                 ><a (click)="toggleMenu()" routerLink="/profile">Perfil</a
                 ><a (click)="toggleMenu()" (click)="logout()">Cerrar sesión</a>
               </div>

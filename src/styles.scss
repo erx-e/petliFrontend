@@ -10,6 +10,7 @@
 // 2) Reset propio (incluye box-sizing). Va ANTES de los componentes de Bootstrap
 //    para que el reset no pise el padding/borde de botones e inputs.
 @import "./app/styles/reset";
+@import "./app/styles/map";
 
 // 3) Componentes de Bootstrap realmente usados.
 @import "bootstrap/scss/forms";

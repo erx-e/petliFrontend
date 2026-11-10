@@ -284,6 +284,12 @@
                             </div>
                           }
                         </div>
+                        <!-- Opcional: con un punto, el reporte aparece en /mapa (PL-X4). -->
+                        <div class="form-elements location-field">
+                          <p class="form-label">Punto en el mapa (opcional):</p>
+                          <p class="location-hint">{{ locationHint(type) }}</p>
+                          <app-location-picker formControlName="location"></app-location-picker>
+                        </div>
                       </div>
                       <div class="form-element-section">
                         <p>Indica algunos datos adicionales</p>

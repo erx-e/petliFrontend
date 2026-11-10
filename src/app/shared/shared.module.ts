@@ -13,6 +13,7 @@ import { PublishComponent } from './components/publicar/publish.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
 import { UploadTaskComponent } from './components/uploader/upload-task/upload-task.component';
 import { EditarComponent } from './components/publicar/editar/editar.component';
+import { LocationPickerComponent } from './components/location-picker/location-picker.component';
 
 
 
@@ -28,7 +29,8 @@ import { EditarComponent } from './components/publicar/editar/editar.component';
     PublishComponent,
     UploaderComponent,
     UploadTaskComponent,
-    EditarComponent
+    EditarComponent,
+    LocationPickerComponent
   ],
   imports: [
     CommonModule,

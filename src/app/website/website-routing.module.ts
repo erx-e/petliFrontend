@@ -60,6 +60,12 @@ const routes: Routes = [
         loadChildren: () =>
           import("./pages/ayuda/ayuda.module").then((m) => m.AyudaModule),
       },
+      // Mapa de reportes activos con ubicación (PL-X4).
+      {
+        path: "mapa",
+        loadChildren: () =>
+          import("./pages/mapa/mapa.module").then((m) => m.MapaModule),
+      },
       // Detalle de un reporte. Era "pet/:id"; desde v2 "pet" es el carné de la
       // mascota (rebanada 2), así que el reporte tiene su propia ruta (D17).
       {

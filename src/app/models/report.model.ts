@@ -29,6 +29,22 @@ export function requiresLastSeen(type: ReportType | null | undefined): boolean {
   return type === "Perdida" || type === "Encontrada";
 }
 
+/** Ayuda junto al selector de ubicación. El punto es público: en adopción y
+ *  ayuda suele ser la casa de quien publica, así que se le sugiere uno cercano. */
+export function locationHint(type: ReportType | null | undefined): string {
+  switch (type) {
+    case "Perdida":
+      return "Marca dónde se perdió: así aparecerá en el mapa de mascotas.";
+    case "Encontrada":
+      return "Marca dónde la viste: así aparecerá en el mapa de mascotas.";
+    default:
+      return "Aparecerá en el mapa de mascotas, a la vista de todos: si es tu casa, marca un punto cercano.";
+  }
+}
+
+/** Tope de pines por consulta del mapa: espejo de ReportQueries.MaxMapPoints. */
+export const MAX_MAP_POINTS = 500;
+
 /** Etiqueta en español del tipo, para badges y títulos. */
 export const REPORT_TYPE_LABELS: Record<ReportType, string> = {
   Perdida: "Perdido",

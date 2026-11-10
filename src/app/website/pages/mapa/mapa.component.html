@@ -1,0 +1,56 @@
+<main class="mapa">
+  <header class="mapa__head">
+    <h1 class="title">Mapa de mascotas</h1>
+    <p class="mapa__lead">Reportes activos con ubicación. Toca un pin para ver el reporte.</p>
+  </header>
+
+  <div class="mapa__filters">
+    <div class="chips" role="group" aria-label="Filtrar por tipo de reporte">
+      <button
+        type="button"
+        class="chip"
+        [class.chip--on]="type === null"
+        [attr.aria-pressed]="type === null"
+        (click)="setType(null)"
+      >
+        Todos
+      </button>
+      @for (t of types; track t) {
+        <button
+          type="button"
+          class="chip chip--{{ t }}"
+          [class.chip--on]="type === t"
+          [attr.aria-pressed]="type === t"
+          (click)="setType(t)"
+        >
+          <span class="chip__dot" aria-hidden="true"></span>{{ labels[t] }}
+        </button>
+      }
+    </div>
+    <div class="mapa__tools">
+      <select
+        class="form-select mapa__specie"
+        aria-label="Filtrar por especie"
+        (change)="setSpecie($any($event.target).value)"
+      >
+        <option value="" [selected]="specieId === null">Todas las especies</option>
+        @for (s of species; track s.id) {
+          <option [value]="s.id" [selected]="specieId === s.id">{{ s.name }}</option>
+        }
+      </select>
+      <button type="button" class="mapa__locate" (click)="locateMe()" [disabled]="locating || mapFailed">
+        {{ locating ? 'Buscando…' : 'Cerca de mí' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="mapa__wrap">
+    <div #mapEl class="mapa__map map-surface" role="region" aria-label="Mapa de reportes"></div>
+    @if (loading) {
+      <span class="mapa__loading">Cargando…</span>
+    }
+  </div>
+  <p class="mapa__status" [class.mapa__status--error]="mapFailed || loadError || geoError" aria-live="polite">
+    {{ status }}
+  </p>
+</main>
