@@ -11,8 +11,12 @@ bridged across the HTTP contract.
 Set `$BACKEND` to wherever you cloned the backend — the path is machine-specific, so it is not
 hardcoded here. The backend checkout also holds the knowledge graph and the cross-repo memory.
 
-- **`$BACKEND/PROJECT_STATE.md`** is the cross-repo memory: the full endpoint table, the open
-  cross-repo items (`PL-X*`), and the change log.
+- **`$BACKEND/PROJECT_STATE.md`** is the cross-repo memory: the full endpoint table and the design
+  of each cross-repo item (`PL-X*`).
+- **Work on this repo goes through the harness in `$BACKEND`** (its `AGENTS.md`): the `leader`
+  session never edits code; a change is a feature in `$BACKEND/feature_list.json`, specified, built by
+  the `implementer` subagent and approved by the owner. Pending work and debt live in
+  `$BACKEND/progress/pending.md`; finished work in `$BACKEND/progress/history.md`.
 - **The unified graph** is `$BACKEND/graphify-out/graph.json`. Run graphify read commands from the
   backend folder, where it is the default graph; or pass `--graph <that path>` from here.
 

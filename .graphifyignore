@@ -13,15 +13,9 @@ coverage/
 # Icon/logo raster assets: no architectural information worth a vision pass.
 src/assets/imgs/
 
-# Graphify is for SOURCE CODE only (deterministic AST, refreshed for free by the
-# git hooks). Markdown -- CLAUDE.md, PRODUCT.md, DESIGN.md, docs/ -- is read
-# directly as plain text and NEVER indexed: indexing it cost an LLM pass on every
-# edit and let the graph contradict the docs (ADR-13 in the backend memory repo,
-# memory-bank/lessonsLearned.md). This replaces the old !CLAUDE.md and !docs/
-# negations, which existed only to index those files.
-*.md
-docs/
-memory-bank/
+# Markdown IS indexed (CLAUDE.md, PRODUCT.md, DESIGN.md, docs/): graphify 0.9.x
+# extracts it deterministically, with no LLM pass (ADR-20 in the memory repo,
+# docs/lessons.md). Templates below stay out: they have no deterministic extractor.
 
 # Angular templates too: graphify has no AST extractor for them and treats them
 # as documents (an LLM pass that goes stale on every UI change). The template <->
