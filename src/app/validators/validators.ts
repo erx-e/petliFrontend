@@ -1,5 +1,10 @@
 import { AbstractControl } from '@angular/forms';
 
+// Nombre de usuario: copia literal de UserRules.NamePattern del backend (F-1, D48). Sin
+// cuantificadores anidados: coste lineal aunque Angular la evalúe con un nombre largo.
+export const USER_NAME_PATTERN =
+  /^[a-zA-ZáéíóúÁÉÍÓÚÑñüÜ](?:[a-zA-ZáéíóúÁÉÍÓÚÑñüÜ]|\s[a-zA-ZáéíóúÁÉÍÓÚÑñüÜ])+\s?$/;
+
 export class MyValidators {
   static matchPassword(control: AbstractControl) {
     if (

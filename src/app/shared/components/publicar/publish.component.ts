@@ -218,7 +218,6 @@ export class PublishComponent implements OnInit {
       petAge: [null, Validators.maxLength(20)],
       ageYears: [null, [Validators.min(0), Validators.max(30)]],
       ageMonths: [null, [Validators.min(0), Validators.max(11)]],
-      petSpecialCondition: [null],
       contact: this.formBuilder.array([
         new UntypedFormControl('', [
           Validators.required,
@@ -232,7 +231,7 @@ export class PublishComponent implements OnInit {
       idCanton: [{ value: '', disabled: true }, Validators.required],
       idSector: [''],
       location: [null as GeoPoint | null], // opcional: el pin del mapa
-      description: ['', Validators.required],
+      description: ['', [Validators.required, Validators.maxLength(1000)]],
       lastTimeSeen: [null, [Validators.required, MyValidators.correctDate]],
     });
   }
@@ -537,10 +536,6 @@ export class PublishComponent implements OnInit {
 
   get petAgeFieldInvalid() {
     return this.petAgeField.touched && this.petAgeField.invalid;
-  }
-
-  get petSpecialConditionField() {
-    return this.form.get('petSpecialCondition');
   }
 
   get contactField() {

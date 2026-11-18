@@ -9,6 +9,7 @@ import {
 import { UserView, UpdateUserDTO } from "src/app/models/user.model";
 import { AuthService } from "src/app/services/auth.service";
 import { UserService } from "src/app/services/user.service";
+import { USER_NAME_PATTERN } from "src/app/validators/validators";
 
 @Component({
     selector: "app-public-profile",
@@ -108,7 +109,8 @@ export class PublicProfileComponent implements OnInit {
         { value: "", disabled: true },
         [
           Validators.required,
-          Validators.pattern(/^([Aa-zA-ZáéíóúÁÉÍÓÚÑñ]{2,}\s?){2,4}$/),
+          Validators.maxLength(60),
+          Validators.pattern(USER_NAME_PATTERN),
         ],
       ],
       email: [

@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { CreateUserDTO } from "src/app/models/user.model";
 import { UserService } from "src/app/services/user.service";
 import { Validators, UntypedFormGroup, UntypedFormBuilder } from "@angular/forms";
-import { MyValidators } from "src/app/validators/validators";
+import { MyValidators, USER_NAME_PATTERN } from "src/app/validators/validators";
 import { ActivatedRoute, Router } from "@angular/router";
 import { userErrors } from "src/app/models/errorsModelBinding";
 
@@ -75,7 +75,8 @@ export class RegisterComponent implements OnInit {
           "",
           [
             Validators.required,
-            Validators.pattern(/^([Aa-zA-ZáéíóúÁÉÍÓÚÑñ]{2,}\s?){2,4}$/),
+            Validators.maxLength(60),
+            Validators.pattern(USER_NAME_PATTERN),
           ],
         ],
         email: ["", [Validators.required, Validators.email]],

@@ -20,6 +20,7 @@
             name="name"
             type="text"
             id="formName"
+            maxlength="60"
             formControlName="name"
             />
             <div class="validationMessage" [class.active]="nameFieldInvalid">
@@ -31,6 +32,11 @@
               @if (nameField.hasError('pattern')) {
                 <p class="invalid-feedback">
                   Escribe tu nombre y apellido, solo con letras
+                </p>
+              }
+              @if (nameField.hasError('maxlength')) {
+                <p class="invalid-feedback">
+                  El nombre puede tener hasta 60 caracteres
                 </p>
               }
             </div>

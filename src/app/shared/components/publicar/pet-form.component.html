@@ -301,6 +301,7 @@
                                 formControlName="description"
                                 name="description"
                                 id="formDescription"
+                                maxlength="1000"
                                 placeholder="Agrega cualquier detalle que ayude a identificar a la mascota"
                                 [class.is-valid]="descriptionFieldValid"
                                 [class.is-invalid]="descriptionFieldInvalid"
@@ -316,6 +317,13 @@
                                   class="invalid-feedback"
                                   >
                                   Escribe una descripción
+                                </p>
+                              }
+                              @if (descriptionField.hasError('maxlength')) {
+                                <p
+                                  class="invalid-feedback"
+                                  >
+                                  La descripción puede tener hasta 1000 caracteres
                                 </p>
                               }
                             </div>
