@@ -9,14 +9,14 @@ lives in a separate checkout, and both repos are indexed into a single graphify 
 bridged across the HTTP contract.
 
 Set `$BACKEND` to wherever you cloned the backend — the path is machine-specific, so it is not
-hardcoded here. The backend checkout also holds the knowledge graph and the cross-repo memory.
+hardcoded here. The backend checkout also holds the knowledge graph and the project memory.
 
-- **`$BACKEND/PROJECT_STATE.md`** is the cross-repo memory: the full endpoint table and the design
-  of each cross-repo item (`PL-X*`).
+- **The HTTP contract:** the endpoint table is `$BACKEND/docs/architecture.md` › Contrato HTTP, and
+  every payload change (before → after) is in `$BACKEND/petslighthouse-back-main/FRONTEND_CONTRACT_CHANGES.md`.
 - **Work on this repo goes through the harness in `$BACKEND`** (its `AGENTS.md`): the `leader`
-  session never edits code; a change is a feature in `$BACKEND/feature_list.json`, specified, built by
-  the `implementer` subagent and approved by the owner. Pending work and debt live in
-  `$BACKEND/progress/pending.md`; finished work in `$BACKEND/progress/history.md`.
+  session never edits code; a change is a feature in `$BACKEND/feature_list.json` whose size decides
+  the flow (a plan or a spec the owner approves), built by the `implementer` subagent and approved by
+  the owner. Pending work and debt live in `$BACKEND/progress/pending.md`; finished work, in git.
 - **The unified graph** is `$BACKEND/graphify-out/graph.json`. Run graphify read commands from the
   backend folder, where it is the default graph; or pass `--graph <that path>` from here.
 
@@ -34,7 +34,7 @@ graphify query "where does the report type filter end up server-side" \
 > render `reportView`.)
 
 After changing code, refresh the graph with `$BACKEND/tools/graphify-kg/refresh.sh` (it re-extracts
-both sides and re-merges). Record cross-repo findings in `$BACKEND/PROJECT_STATE.md`.
+both sides and re-merges). Cross-repo findings go to `$BACKEND/progress/pending.md`.
 
 ## Commands
 
