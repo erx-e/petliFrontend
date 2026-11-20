@@ -114,6 +114,13 @@
                     Debe contener al menos 6 caracteres
                   </p>
                 }
+                @if (passwordField.hasError('maxlength')) {
+                  <p
+                    class="invalid-feedback"
+                    >
+                    Usa como máximo 128 caracteres
+                  </p>
+                }
                 @if (
                   !passwordField.hasError('minlength') &&
                   passwordField.hasError('pattern')
@@ -121,7 +128,7 @@
                   <p
                     class="invalid-feedback"
                     >
-                    Debe contener al menos una letra mayuscula, un numero y sin
+                    Incluye una mayúscula, una minúscula y un número, sin
                     espacios
                   </p>
                 }

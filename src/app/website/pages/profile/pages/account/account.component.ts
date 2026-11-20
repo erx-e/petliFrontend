@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms
 import { UpdateUserDTO } from "src/app/models/user.model";
 import { AuthService } from "src/app/services/auth.service";
 import { UserService } from "src/app/services/user.service";
-import { MyValidators } from "src/app/validators/validators";
+import { MyValidators, USER_PASSWORD_PATTERN } from "src/app/validators/validators";
 
 @Component({
     selector: "app-account",
@@ -63,9 +63,8 @@ export class AccountComponent implements OnInit {
           [
             Validators.required,
             Validators.minLength(6),
-            Validators.pattern(
-              /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/
-            ),
+            Validators.maxLength(128),
+            Validators.pattern(USER_PASSWORD_PATTERN),
           ],
         ],
         confirmPassword: ["", Validators.required],

@@ -5,6 +5,10 @@ import { AbstractControl } from '@angular/forms';
 export const USER_NAME_PATTERN =
   /^[a-zA-ZáéíóúÁÉÍÓÚÑñüÜ](?:[a-zA-ZáéíóúÁÉÍÓÚÑñüÜ]|\s[a-zA-ZáéíóúÁÉÍÓÚÑñüÜ])+\s?$/;
 
+// Contraseña: el texto de UserRules.PasswordPattern del backend (F-2), salvo el final: allí es \z
+// porque en .NET $ acepta un salto de línea final.
+export const USER_PASSWORD_PATTERN = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])\S{6,}$/;
+
 export class MyValidators {
   static matchPassword(control: AbstractControl) {
     if (

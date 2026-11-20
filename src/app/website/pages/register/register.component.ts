@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { CreateUserDTO } from "src/app/models/user.model";
 import { UserService } from "src/app/services/user.service";
 import { Validators, UntypedFormGroup, UntypedFormBuilder } from "@angular/forms";
-import { MyValidators, USER_NAME_PATTERN } from "src/app/validators/validators";
+import { MyValidators, USER_NAME_PATTERN, USER_PASSWORD_PATTERN } from "src/app/validators/validators";
 import { ActivatedRoute, Router } from "@angular/router";
 import { userErrors } from "src/app/models/errorsModelBinding";
 
@@ -85,9 +85,8 @@ export class RegisterComponent implements OnInit {
           [
             Validators.required,
             Validators.minLength(6),
-            Validators.pattern(
-              /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/
-            ),
+            Validators.maxLength(128),
+            Validators.pattern(USER_PASSWORD_PATTERN),
           ],
         ],
         confirmPassword: ["", Validators.required],

@@ -1,4 +1,4 @@
-import { USER_NAME_PATTERN } from './validators';
+import { USER_NAME_PATTERN, USER_PASSWORD_PATTERN } from './validators';
 
 // La expresión que se sustituyó (retroceso catastrófico, D48). Solo vive aquí, como oráculo.
 const LEGACY_NAME_PATTERN = /^([Aa-zA-ZáéíóúÁÉÍÓÚÑñ]{2,}\s?){2,4}$/;
@@ -48,5 +48,15 @@ describe('USER_NAME_PATTERN', () => {
 
     expect(matched).toBeFalse();
     expect(elapsed).toBeLessThan(100);
+  });
+});
+
+describe('USER_PASSWORD_PATTERN', () => {
+  // Los mismos casos que UserValidatorTests del backend (sin los de 128 y 129 caracteres: la longitud
+  // la pone Validators.maxLength).
+  it('USER_PASSWORD_PATTERN accepts and rejects the same passwords as the backend', () => {
+    expect(USER_PASSWORD_PATTERN.test('Abc123')).withContext('Abc123').toBeTrue();
+    ['Abc12', 'Abc1 xyz', 'Abc123\n', 'abc123', 'ABC123', 'Abcdef'].forEach((password) =>
+      expect(USER_PASSWORD_PATTERN.test(password)).withContext(password).toBeFalse());
   });
 });
