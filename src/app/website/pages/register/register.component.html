@@ -138,6 +138,7 @@
                   }
                   @if (
                     !passwordField.hasError('minlength') &&
+                    !passwordField.hasError('maxlength') &&
                     passwordField.hasError('pattern')
                     ) {
                     <p
